@@ -13,7 +13,11 @@
   ],
 
   "host_permissions": [
-    "<all_urls>"
+    "https://www.baidu.com/*",
+    "https://www.google.com/*",
+    "https://www.bing.com/*",
+    "https://www.sogou.com/*",
+    "https://www.so.com/*"
   ],
 
   "background": {
