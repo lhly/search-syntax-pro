@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-// 暂时移除ThemeProvider
-// import { ThemeProvider } from '@/hooks/useTheme'
+import { ThemeProvider } from '@/hooks/useTheme'
 import { useStorage } from '@/hooks/useStorage'
 import { Logo } from '@/components/Logo'
 import type { UserSettings, Language } from '@/types'
@@ -135,20 +134,22 @@ function App() {
   }
 
   return (
-    <TranslationProvider language={language}>
-      <OptionsContent
-        loading={loading}
-        settings={settings}
-        updateSettings={updateSettings}
-        message={message}
-        saving={saving}
-        onReset={handleResetSettings}
-        onSave={handleSaveSettings}
-        onExport={handleExportData}
-        onImport={handleImportData}
-        onClearAll={handleClearAllData}
-      />
-    </TranslationProvider>
+    <ThemeProvider>
+      <TranslationProvider language={language}>
+        <OptionsContent
+          loading={loading}
+          settings={settings}
+          updateSettings={updateSettings}
+          message={message}
+          saving={saving}
+          onReset={handleResetSettings}
+          onSave={handleSaveSettings}
+          onExport={handleExportData}
+          onImport={handleImportData}
+          onClearAll={handleClearAllData}
+        />
+      </TranslationProvider>
+    </ThemeProvider>
   )
 }
 

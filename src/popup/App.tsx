@@ -5,6 +5,7 @@ import { SearchHistory as SearchHistoryComponent } from '@/components/SearchHist
 import { SettingsButton } from '@/components/SettingsButton'
 import { LogoIcon } from '@/components/Logo'
 import { useStorage } from '@/hooks/useStorage'
+import { ThemeProvider } from '@/hooks/useTheme'
 import { SearchAdapterFactory } from '@/services/adapters'
 import { TranslationProvider, useTranslation } from '@/i18n'
 import type { SearchParams, SearchHistory as SearchHistoryType, UserSettings, ValidationResult } from '@/types'
@@ -132,19 +133,21 @@ function App() {
   }
 
   return (
-    <TranslationProvider language={settings?.language ?? 'zh-CN'}>
-      <PopupContent
-        searchParams={searchParams}
-        generateQuery={generateQuery}
-        validation={validation}
-        generatedQuery={generatedQuery}
-        executeSearch={executeSearch}
-        history={history}
-        settings={settings}
-        restoreFromHistory={restoreFromHistory}
-        clearHistory={clearHistory}
-      />
-    </TranslationProvider>
+    <ThemeProvider>
+      <TranslationProvider language={settings?.language ?? 'zh-CN'}>
+        <PopupContent
+          searchParams={searchParams}
+          generateQuery={generateQuery}
+          validation={validation}
+          generatedQuery={generatedQuery}
+          executeSearch={executeSearch}
+          history={history}
+          settings={settings}
+          restoreFromHistory={restoreFromHistory}
+          clearHistory={clearHistory}
+        />
+      </TranslationProvider>
+    </ThemeProvider>
   )
 }
 
