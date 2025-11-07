@@ -1,0 +1,102 @@
+{
+  "app_name": {
+    "message": "搜索语法大师",
+    "description": "搜索语法大师 - SearchSyntax Pro"
+  },
+  "app_description": {
+    "message": "搜索语法可视化工具，降低高级搜索语法使用门槛",
+    "description": "应用描述"
+  },
+  "search_keyword": {
+    "message": "搜索关键词",
+    "description": "搜索关键词输入框标签"
+  },
+  "search_button": {
+    "message": "搜索",
+    "description": "搜索按钮文本"
+  },
+  "site_search": {
+    "message": "网站内搜索",
+    "description": "网站内搜索功能标签"
+  },
+  "site_placeholder": {
+    "message": "输入网站域名，如 example.com",
+    "description": "网站域名输入框占位符"
+  },
+  "file_type_search": {
+    "message": "文件类型搜索",
+    "description": "文件类型搜索功能标签"
+  },
+  "file_type_placeholder": {
+    "message": "选择或输入文件类型，如 PDF",
+    "description": "文件类型输入框占位符"
+  },
+  "query_preview": {
+    "message": "查询预览",
+    "description": "查询预览标签"
+  },
+  "search_history": {
+    "message": "搜索历史",
+    "description": "搜索历史标签"
+  },
+  "clear_history": {
+    "message": "清除历史",
+    "description": "清除历史按钮"
+  },
+  "settings": {
+    "message": "设置",
+    "description": "设置按钮标签"
+  },
+  "default_engine": {
+    "message": "默认搜索引擎",
+    "description": "默认搜索引擎设置标签"
+  },
+  "language": {
+    "message": "语言",
+    "description": "语言设置标签"
+  },
+  "enable_history": {
+    "message": "启用搜索历史",
+    "description": "启用搜索历史开关标签"
+  },
+  "theme": {
+    "message": "主题",
+    "description": "主题设置标签"
+  },
+  "light_theme": {
+    "message": "浅色主题",
+    "description": "浅色主题选项"
+  },
+  "dark_theme": {
+    "message": "深色主题",
+    "description": "深色主题选项"
+  },
+  "auto_theme": {
+    "message": "跟随系统",
+    "description": "自动主题选项"
+  },
+  "about": {
+    "message": "关于",
+    "description": "关于页面标签"
+  },
+  "version": {
+    "message": "版本",
+    "description": "版本信息标签"
+  },
+  "author": {
+    "message": "作者",
+    "description": "作者信息标签"
+  },
+  "export_data": {
+    "message": "导出数据",
+    "description": "导出数据按钮"
+  },
+  "import_data": {
+    "message": "导入数据",
+    "description": "导入数据按钮"
+  },
+  "clear_all_data": {
+    "message": "清除所有数据",
+    "description": "清除所有数据按钮"
+  }
+}

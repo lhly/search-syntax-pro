@@ -1,0 +1,102 @@
+{
+  "app_name": {
+    "message": "SearchSyntax Pro",
+    "description": "SearchSyntax Pro - Advanced Search Syntax Tool"
+  },
+  "app_description": {
+    "message": "Advanced search syntax visualization tool to lower the barrier for search syntax usage",
+    "description": "App description"
+  },
+  "search_keyword": {
+    "message": "Search Keyword",
+    "description": "Search keyword input label"
+  },
+  "search_button": {
+    "message": "Search",
+    "description": "Search button text"
+  },
+  "site_search": {
+    "message": "Site Search",
+    "description": "Site search function label"
+  },
+  "site_placeholder": {
+    "message": "Enter website domain, e.g., example.com",
+    "description": "Website domain input placeholder"
+  },
+  "file_type_search": {
+    "message": "File Type Search",
+    "description": "File type search function label"
+  },
+  "file_type_placeholder": {
+    "message": "Select or enter file type, e.g., PDF",
+    "description": "File type input placeholder"
+  },
+  "query_preview": {
+    "message": "Query Preview",
+    "description": "Query preview label"
+  },
+  "search_history": {
+    "message": "Search History",
+    "description": "Search history label"
+  },
+  "clear_history": {
+    "message": "Clear History",
+    "description": "Clear history button"
+  },
+  "settings": {
+    "message": "Settings",
+    "description": "Settings button label"
+  },
+  "default_engine": {
+    "message": "Default Search Engine",
+    "description": "Default search engine setting label"
+  },
+  "language": {
+    "message": "Language",
+    "description": "Language setting label"
+  },
+  "enable_history": {
+    "message": "Enable Search History",
+    "description": "Enable search history toggle label"
+  },
+  "theme": {
+    "message": "Theme",
+    "description": "Theme setting label"
+  },
+  "light_theme": {
+    "message": "Light Theme",
+    "description": "Light theme option"
+  },
+  "dark_theme": {
+    "message": "Dark Theme",
+    "description": "Dark theme option"
+  },
+  "auto_theme": {
+    "message": "Follow System",
+    "description": "Auto theme option"
+  },
+  "about": {
+    "message": "About",
+    "description": "About page label"
+  },
+  "version": {
+    "message": "Version",
+    "description": "Version info label"
+  },
+  "author": {
+    "message": "Author",
+    "description": "Author info label"
+  },
+  "export_data": {
+    "message": "Export Data",
+    "description": "Export data button"
+  },
+  "import_data": {
+    "message": "Import Data",
+    "description": "Import data button"
+  },
+  "clear_all_data": {
+    "message": "Clear All Data",
+    "description": "Clear all data button"
+  }
+}

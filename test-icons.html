@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图标优化效果对比</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #2563eb;
+            text-align: center;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .icon-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .icon-card h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 16px;
+        }
+        .icon-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .icon-display.dark {
+            background: #1f2937;
+        }
+        .icon-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .comparison {
+            margin-top: 40px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .comparison h2 {
+            color: #2563eb;
+            margin-top: 0;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .before-after {
+            text-align: center;
+        }
+        .before-after h4 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        .status.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 SVG 图标优化效果验证</h1>
+
+    <div class="comparison">
+        <h2>优化说明 <span class="status success">已完成</span></h2>
+        <ul>
+            <li><strong>viewBox 优化:</strong> 从 <code>0 0 2656 2656</code> 调整为 <code>650 600 1400 1550</code></li>
+            <li><strong>内容占比:</strong> 从 32% 提升至 ~100%（提升约 3倍可见度）</li>
+            <li><strong>白色背景:</strong> 已移除，支持透明背景</li>
+            <li><strong>应用范围:</strong> 所有尺寸图标（16x16, 32x32, 48x48, 128x128）</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div class="icon-card">
+            <h3>16×16 图标</h3>
+            <div class="icon-display">
+                <img src="public/icons/icon16.svg" alt="16x16 icon" width="16" height="16">
+            </div>
+            <div class="icon-display dark">
+                <img src="public/icons/icon16.svg" alt="16x16 icon" width="16" height="16">
+            </div>
+            <div class="icon-info">实际尺寸: 16×16px</div>
+        </div>
+
+        <div class="icon-card">
+            <h3>32×32 图标</h3>
+            <div class="icon-display">
+                <img src="public/icons/icon32.svg" alt="32x32 icon" width="32" height="32">
+            </div>
+            <div class="icon-display dark">
+                <img src="public/icons/icon32.svg" alt="32x32 icon" width="32" height="32">
+            </div>
+            <div class="icon-info">实际尺寸: 32×32px</div>
+        </div>
+
+        <div class="icon-card">
+            <h3>48×48 图标</h3>
+            <div class="icon-display">
+                <img src="public/icons/icon48.svg" alt="48x48 icon" width="48" height="48">
+            </div>
+            <div class="icon-display dark">
+                <img src="public/icons/icon48.svg" alt="48x48 icon" width="48" height="48">
+            </div>
+            <div class="icon-info">实际尺寸: 48×48px</div>
+        </div>
+
+        <div class="icon-card">
+            <h3>128×128 图标</h3>
+            <div class="icon-display">
+                <img src="public/icons/icon128.svg" alt="128x128 icon" width="128" height="128">
+            </div>
+            <div class="icon-display dark">
+                <img src="public/icons/icon128.svg" alt="128x128 icon" width="128" height="128">
+            </div>
+            <div class="icon-info">实际尺寸: 128×128px</div>
+        </div>
+    </div>
+
+    <div class="comparison">
+        <h2>技术对比</h2>
+        <div class="comparison-grid">
+            <div class="before-after">
+                <h4>优化前</h4>
+                <ul style="text-align: left; font-size: 14px;">
+                    <li>viewBox: 2656×2656</li>
+                    <li>内容占比: ~32%</li>
+                    <li>白色背景: 存在</li>
+                    <li>小尺寸可见度: 差</li>
+                </ul>
+            </div>
+            <div class="before-after">
+                <h4>优化后</h4>
+                <ul style="text-align: left; font-size: 14px;">
+                    <li>viewBox: 1400×1550</li>
+                    <li>内容占比: ~100%</li>
+                    <li>白色背景: 已移除</li>
+                    <li>小尺寸可见度: 优秀</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
