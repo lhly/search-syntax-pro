@@ -409,21 +409,21 @@ function OptionsContent({
           {t('options.sections.data')}
         </h2>
         
-        <div className="space-y-4">
+        <div className="flex flex-col gap-5">
           <button
             onClick={onExport}
             className="btn btn-secondary"
           >
             {t('options.actions.export')}
           </button>
-          
+
           <button
             onClick={onImport}
             className="btn btn-secondary"
           >
             {t('options.actions.import')}
           </button>
-          
+
           <button
             onClick={onClearAll}
             className="btn btn-danger"
