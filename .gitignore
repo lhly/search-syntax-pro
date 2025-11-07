@@ -102,4 +102,4 @@ crx/
 # Test files
 test-results/
 playwright-report/
-test-results.xml
+test-results.xml.tmp-chrome/
