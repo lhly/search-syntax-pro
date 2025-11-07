@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/hooks/useTheme'
 import { SearchAdapterFactory } from '@/services/adapters'
 import { TranslationProvider, useTranslation } from '@/i18n'
 import type { SearchParams, SearchHistory as SearchHistoryType, UserSettings, ValidationResult } from '@/types'
+import { DEFAULT_SETTINGS } from '@/types'
 
 function App() {
   const [searchParams, setSearchParams] = useState<SearchParams>({
@@ -26,17 +27,16 @@ function App() {
   const [settings, setSettings] = useState<UserSettings | null>(null)
   
   // 从存储中加载用户设置和历史记录
-  const { data: storedSettings } = useStorage<UserSettings>('user_settings')
+  const { data: storedSettings } = useStorage<UserSettings>('user_settings', DEFAULT_SETTINGS)
   const { data: storedHistory } = useStorage<SearchHistoryType[]>('search_history')
 
   useEffect(() => {
-    if (storedSettings) {
-      setSettings(storedSettings)
-      setSearchParams(prev => ({
-        ...prev,
-        engine: storedSettings.defaultEngine
-      }))
-    }
+    const effectiveSettings = storedSettings || DEFAULT_SETTINGS
+    setSettings(effectiveSettings)
+    setSearchParams(prev => ({
+      ...prev,
+      engine: effectiveSettings.defaultEngine
+    }))
   }, [storedSettings])
 
   useEffect(() => {
@@ -101,8 +101,21 @@ function App() {
       })
     }
 
-    // 在新标签页打开搜索结果
-    chrome.tabs.create({ url: searchUrl })
+    // 根据用户设置选择打开方式
+    if (settings?.autoOpenInNewTab) {
+      // 在新标签页打开搜索结果
+      chrome.tabs.create({ url: searchUrl })
+    } else {
+      // 在当前标签页打开搜索结果
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]?.id) {
+          chrome.tabs.update(tabs[0].id, { url: searchUrl })
+        } else {
+          // 如果无法获取当前标签页，回退到创建新标签页
+          chrome.tabs.create({ url: searchUrl })
+        }
+      })
+    }
 
     // 关闭弹窗
     window.close()

@@ -14,13 +14,11 @@ function App() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; key: string } | null>(null)
 
   // 从存储中加载设置
-  const { data: storedSettings, save: saveSettings } = useStorage<UserSettings>('user_settings')
+  const { data: storedSettings, save: saveSettings } = useStorage<UserSettings>('user_settings', DEFAULT_SETTINGS)
 
   useEffect(() => {
-    if (storedSettings) {
-      setSettings(storedSettings)
-      setLoading(false)
-    }
+    setSettings(storedSettings || DEFAULT_SETTINGS)
+    setLoading(false)
   }, [storedSettings])
 
   const language = settings?.language ?? 'zh-CN'
@@ -50,9 +48,30 @@ function App() {
   }
 
   // 重置设置
-  const handleResetSettings = () => {
+  const handleResetSettings = async () => {
     if (confirm(translate(language, 'options.confirm.reset'))) {
-      setSettings({ ...DEFAULT_SETTINGS })
+      const defaultSettings = { ...DEFAULT_SETTINGS }
+      setSettings(defaultSettings)
+
+      // 自动保存重置后的设置
+      setSaving(true)
+      setMessage(null)
+
+      try {
+        const success = await saveSettings(defaultSettings)
+        if (success) {
+          setMessage({ type: 'success', key: 'options.messages.resetSuccess' })
+        } else {
+          setMessage({ type: 'error', key: 'options.messages.resetFailure' })
+        }
+      } catch (error) {
+        setMessage({ type: 'error', key: 'options.messages.resetFailure' })
+      } finally {
+        setSaving(false)
+      }
+
+      // 3秒后清除消息
+      setTimeout(() => setMessage(null), 3000)
     }
   }
 
