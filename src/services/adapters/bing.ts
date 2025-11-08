@@ -28,7 +28,7 @@ export class BingAdapter implements SearchEngineAdapter {
   private buildSearchQuery(params: SearchParams): string {
     let query = params.keyword.trim()
 
-    // 精确匹配优先级最高
+    // 1. 精确匹配优先级最高
     if (params.exactMatch && params.exactMatch.trim()) {
       query = `"${params.exactMatch.trim()}"`
       if (params.keyword.trim()) {
@@ -36,6 +36,12 @@ export class BingAdapter implements SearchEngineAdapter {
       }
     }
 
+    // 2. 通配符查询（如果存在则替换主查询）
+    if (params.wildcardQuery && params.wildcardQuery.includes('*')) {
+      query = params.wildcardQuery
+    }
+
+    // 3. 限定性语法 (site, filetype)
     // 网站内搜索
     if (params.site && params.site.trim()) {
       const site = this.cleanSiteDomain(params.site.trim())
@@ -47,13 +53,77 @@ export class BingAdapter implements SearchEngineAdapter {
       query += ` filetype:${params.fileType.trim()}`
     }
 
-    // 日期范围搜索（必应支持）
+    // 4. 位置性语法 (intitle, inurl, inbody)
+    // 标题搜索
+    if (params.inTitle && params.inTitle.trim()) {
+      query += ` intitle:${params.inTitle.trim()}`
+    }
+
+    // URL搜索
+    if (params.inUrl && params.inUrl.trim()) {
+      query += ` inurl:${params.inUrl.trim()}`
+    }
+
+    // 正文搜索 (Bing使用inbody:而不是intext:)
+    if (params.inText && params.inText.trim()) {
+      query += ` inbody:${params.inText.trim()}`
+    }
+
+    // 注意: Bing不支持allintitle，降级为intitle
+    if (params.allInTitle && params.allInTitle.trim()) {
+      const keywords = params.allInTitle.trim().split(' ')
+      keywords.forEach(keyword => {
+        if (keyword.trim()) {
+          query += ` intitle:${keyword.trim()}`
+        }
+      })
+    }
+
+    // 5. 范围性语法 (日期, 数字)
+    // 日期范围搜索
     if (params.dateRange) {
       const dateFilter = this.buildDateFilter(params.dateRange)
       if (dateFilter) {
         query += ` ${dateFilter}`
       }
     }
+
+    // 数字范围搜索
+    if (params.numberRange) {
+      const { min, max } = params.numberRange
+      if (min !== undefined && max !== undefined) {
+        query += ` ${min}..${max}`
+      }
+    }
+
+    // 6. 逻辑运算符 (OR, exclude)
+    // OR逻辑
+    if (params.orKeywords && params.orKeywords.length > 0) {
+      const orQuery = params.orKeywords
+        .filter(word => word.trim())
+        .join(' OR ')
+      if (orQuery) {
+        query = `${query} OR ${orQuery}`
+      }
+    }
+
+    // 排除关键词
+    if (params.excludeWords && params.excludeWords.length > 0) {
+      params.excludeWords.forEach(word => {
+        if (word.trim()) {
+          query += ` -${word.trim()}`
+        }
+      })
+    }
+
+    // 7. 特殊功能 (related)
+    // 相关网站 (Bing支持)
+    if (params.relatedSite && params.relatedSite.trim()) {
+      const site = this.cleanSiteDomain(params.relatedSite.trim())
+      query += ` related:${site}`
+    }
+
+    // 注意: Bing不支持cache语法
 
     return query
   }
@@ -111,15 +181,54 @@ export class BingAdapter implements SearchEngineAdapter {
    * 验证必应支持的语法
    */
   validateSyntax(syntax: SyntaxType): boolean {
-    const supportedSyntax: SyntaxType[] = ['site', 'filetype', 'exact', 'date_range']
-    return supportedSyntax.includes(syntax)
+    return this.getSupportedSyntax().includes(syntax)
   }
 
   /**
    * 获取支持的语法类型
    */
   getSupportedSyntax(): SyntaxType[] {
-    return ['site', 'filetype', 'exact', 'date_range']
+    return [
+      'site',
+      'filetype',
+      'exact',
+      'date_range',
+      'intitle',
+      'inurl',
+      'exclude',
+      'or',
+      'intext',  // Bing使用inbody实现
+      'number_range',
+      'wildcard',
+      'allintitle',  // 降级为多个intitle
+      'related'
+      // 注意: Bing不支持 'cache'
+    ]
+  }
+
+  /**
+   * 语法兼容性检查
+   */
+  isSyntaxSupported(syntax: SyntaxType): boolean {
+    return this.validateSyntax(syntax)
+  }
+
+  /**
+   * 语法降级处理
+   */
+  degradeSyntax(params: SearchParams): SearchParams {
+    const degradedParams = { ...params }
+
+    // allintitle降级为多个intitle (在buildSearchQuery中处理)
+    // intext使用inbody实现 (在buildSearchQuery中处理)
+    // cache不支持,忽略
+
+    if (params.cacheSite) {
+      console.warn('Bing不支持cache语法,该参数将被忽略')
+      degradedParams.cacheSite = undefined
+    }
+
+    return degradedParams
   }
 
   /**
@@ -165,10 +274,52 @@ export class BingAdapter implements SearchEngineAdapter {
       }
     }
 
+    // 验证数字范围
+    if (params.numberRange) {
+      const { min, max } = params.numberRange
+      if (min !== undefined && max !== undefined && min > max) {
+        errors.push('最小值不能大于最大值')
+      }
+    }
+
+    // 验证相关站点
+    if (params.relatedSite) {
+      const relatedSite = params.relatedSite.trim()
+      if (relatedSite && !this.isValidDomain(relatedSite)) {
+        errors.push('相关网站域名格式不正确')
+      }
+    }
+
+    // Bing不支持cache语法
+    if (params.cacheSite) {
+      warnings.push('必应不支持cache语法，该参数将被忽略')
+    }
+
     // 检查查询长度
     const fullQuery = this.buildSearchQuery(params)
-    if (fullQuery.length > 110) {
+    if (fullQuery.length > 160) {
       warnings.push('搜索查询过长，可能影响搜索结果')
+    }
+
+    // 检查语法数量
+    const syntaxCount = [
+      params.site ? 1 : 0,
+      params.fileType ? 1 : 0,
+      params.exactMatch ? 1 : 0,
+      params.dateRange ? 1 : 0,
+      params.inTitle ? 1 : 0,
+      params.inUrl ? 1 : 0,
+      params.inText ? 1 : 0,
+      params.allInTitle ? 1 : 0,
+      params.numberRange ? 1 : 0,
+      params.excludeWords && params.excludeWords.length > 0 ? 1 : 0,
+      params.orKeywords && params.orKeywords.length > 0 ? 1 : 0,
+      params.wildcardQuery ? 1 : 0,
+      params.relatedSite ? 1 : 0
+    ].reduce((a, b) => a + b, 0)
+
+    if (syntaxCount > 4) {
+      warnings.push('搜索条件过多，可能导致结果过少')
     }
 
     return {

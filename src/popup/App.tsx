@@ -15,9 +15,22 @@ function App() {
   const [searchParams, setSearchParams] = useState<SearchParams>({
     keyword: '',
     engine: 'baidu',
+    // 旧字段
     site: '',
     fileType: '',
-    exactMatch: ''
+    exactMatch: '',
+    // 新增高级语法字段
+    inTitle: '',
+    inUrl: '',
+    excludeWords: [],
+    orKeywords: [],
+    inText: '',
+    numberRange: undefined,
+    wildcardQuery: '',
+    allInTitle: '',
+    relatedSite: '',
+    cacheSite: '',
+    dateRange: undefined
   })
   
   const [generatedQuery, setGeneratedQuery] = useState('')
@@ -98,7 +111,19 @@ function App() {
         syntax: {
           site: searchParams.site,
           fileType: searchParams.fileType,
-          exactMatch: searchParams.exactMatch
+          exactMatch: searchParams.exactMatch,
+          // 新增高级语法字段
+          inTitle: searchParams.inTitle,
+          inUrl: searchParams.inUrl,
+          excludeWords: searchParams.excludeWords,
+          orKeywords: searchParams.orKeywords,
+          inText: searchParams.inText,
+          numberRange: searchParams.numberRange,
+          wildcardQuery: searchParams.wildcardQuery,
+          allInTitle: searchParams.allInTitle,
+          relatedSite: searchParams.relatedSite,
+          cacheSite: searchParams.cacheSite,
+          dateRange: searchParams.dateRange
         },
         generatedQuery,
         timestamp: Date.now()
@@ -141,20 +166,27 @@ function App() {
 
   // 从历史记录中恢复搜索
   const restoreFromHistory = (historyItem: SearchHistoryType) => {
-    setSearchParams({
+    const restoredParams: SearchParams = {
       keyword: historyItem.keyword,
       engine: historyItem.engine,
       site: historyItem.syntax.site || '',
       fileType: historyItem.syntax.fileType || '',
-      exactMatch: historyItem.syntax.exactMatch || ''
-    })
-    generateQuery({
-      keyword: historyItem.keyword,
-      engine: historyItem.engine,
-      site: historyItem.syntax.site,
-      fileType: historyItem.syntax.fileType,
-      exactMatch: historyItem.syntax.exactMatch
-    })
+      exactMatch: historyItem.syntax.exactMatch || '',
+      // 新增高级语法字段
+      inTitle: historyItem.syntax.inTitle || '',
+      inUrl: historyItem.syntax.inUrl || '',
+      excludeWords: historyItem.syntax.excludeWords || [],
+      orKeywords: historyItem.syntax.orKeywords || [],
+      inText: historyItem.syntax.inText || '',
+      numberRange: historyItem.syntax.numberRange,
+      wildcardQuery: historyItem.syntax.wildcardQuery || '',
+      allInTitle: historyItem.syntax.allInTitle || '',
+      relatedSite: historyItem.syntax.relatedSite || '',
+      cacheSite: historyItem.syntax.cacheSite || '',
+      dateRange: historyItem.syntax.dateRange
+    }
+    setSearchParams(restoredParams)
+    generateQuery(restoredParams)
   }
 
   return (

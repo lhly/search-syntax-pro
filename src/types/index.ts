@@ -2,12 +2,30 @@
 export type SearchEngine = 'baidu' | 'google' | 'bing';
 
 // 语法类型
-export type SyntaxType = 'site' | 'filetype' | 'exact' | 'date_range';
+export type SyntaxType =
+  // 已实现
+  | 'site'
+  | 'filetype'
+  | 'exact'
+  | 'date_range'
+  // 新增高级语法
+  | 'intitle'
+  | 'inurl'
+  | 'exclude'
+  | 'or'
+  | 'intext'
+  | 'number_range'
+  | 'wildcard'
+  | 'allintitle'
+  | 'related'
+  | 'cache';
 
 // 搜索参数接口
 export interface SearchParams {
   keyword: string;
   engine: SearchEngine;
+
+  // 已实现的字段
   site?: string;
   fileType?: string;
   exactMatch?: string;
@@ -15,6 +33,21 @@ export interface SearchParams {
     from: string;
     to: string;
   };
+
+  // 新增高级语法字段
+  inTitle?: string;          // 标题搜索
+  inUrl?: string;            // URL搜索
+  excludeWords?: string[];   // 排除关键词
+  orKeywords?: string[];     // OR逻辑关键词
+  inText?: string;           // 正文搜索
+  numberRange?: {            // 数字范围
+    min: number;
+    max: number;
+  };
+  wildcardQuery?: string;    // 通配符查询
+  allInTitle?: string;       // 所有关键词在标题
+  relatedSite?: string;      // 相关网站
+  cacheSite?: string;        // 网页缓存
 }
 
 // 搜索历史记录接口
@@ -30,6 +63,20 @@ export interface SearchHistory {
       from: string;
       to: string;
     };
+    // 新增高级语法字段
+    inTitle?: string;
+    inUrl?: string;
+    excludeWords?: string[];
+    orKeywords?: string[];
+    inText?: string;
+    numberRange?: {
+      min: number;
+      max: number;
+    };
+    wildcardQuery?: string;
+    allInTitle?: string;
+    relatedSite?: string;
+    cacheSite?: string;
   };
   generatedQuery: string;
   timestamp: number;
@@ -54,6 +101,10 @@ export interface SearchEngineAdapter {
   getName(): string;
   validateParams?(params: SearchParams): ValidationResult;
   getSearchSuggestions?(params: SearchParams): string[];
+  // 新增: 语法兼容性检查
+  isSyntaxSupported?(syntax: SyntaxType): boolean;
+  // 新增: 语法降级处理
+  degradeSyntax?(params: SearchParams): SearchParams;
 }
 
 // 验证结果接口
