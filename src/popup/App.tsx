@@ -45,6 +45,18 @@ function App() {
     }
   }, [storedHistory])
 
+  // 监听从 Options 页面传递的待恢复历史记录
+  useEffect(() => {
+    chrome.storage.local.get('pending_restore_history', (data) => {
+      if (data.pending_restore_history) {
+        const historyItem = data.pending_restore_history as SearchHistoryType
+        restoreFromHistory(historyItem)
+        // 清除临时状态
+        chrome.storage.local.remove('pending_restore_history')
+      }
+    })
+  }, [])
+
   // 生成搜索查询
   const generateQuery = (params: SearchParams) => {
     try {

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { SearchHistory } from '@/types'
 import { formatDistanceToNow } from 'date-fns'
 import { zhCN, enUS } from 'date-fns/locale'
@@ -12,6 +13,7 @@ interface SearchHistoryProps {
 export function SearchHistory({ history, onRestore, onClear }: SearchHistoryProps) {
   const { t, language } = useTranslation()
   const locale = language === 'en-US' ? enUS : zhCN
+  const [showAll, setShowAll] = useState(false)
 
   // 获取搜索引擎显示名称
   const getEngineName = (engine: string) => {
@@ -61,6 +63,10 @@ export function SearchHistory({ history, onRestore, onClear }: SearchHistoryProp
     return badges
   }
 
+  // 计算要显示的记录数
+  const displayCount = showAll ? history.length : 10
+  const hasMore = history.length > 10
+
   return (
     <div className="card p-4">
       <div className="flex items-center justify-between mb-3">
@@ -77,7 +83,7 @@ export function SearchHistory({ history, onRestore, onClear }: SearchHistoryProp
       </div>
 
       <div className="space-y-2 max-h-60 overflow-y-auto">
-        {history.slice(0, 10).map((item) => (
+        {history.slice(0, displayCount).map((item) => (
           <div
             key={item.id}
             className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors"
@@ -125,15 +131,35 @@ export function SearchHistory({ history, onRestore, onClear }: SearchHistoryProp
             <p className="text-sm">{t('searchHistory.emptyState')}</p>
           </div>
         )}
-
-        {history.length > 10 && (
-          <div className="text-center py-2">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {t('searchHistory.summary', { count: history.length })}
-            </p>
-          </div>
-        )}
       </div>
+
+      {/* 展开/收起按钮 - 当历史记录超过10条时显示 */}
+      {hasMore && (
+        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+            <p className="text-xs text-blue-700 dark:text-blue-300 text-center mb-2">
+              {showAll
+                ? t('searchHistory.showingAll', { count: history.length })
+                : t('searchHistory.showingRecent', { showing: 10, total: history.length })
+              }
+            </p>
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="w-full btn btn-sm btn-primary"
+            >
+              {showAll
+                ? t('searchHistory.collapse')
+                : t('searchHistory.expandAll', { count: history.length })
+              }
+            </button>
+            {!showAll && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
+                {t('searchHistory.viewAllHint')}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

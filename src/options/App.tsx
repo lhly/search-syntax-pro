@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { ThemeProvider } from '@/hooks/useTheme'
 import { useStorage } from '@/hooks/useStorage'
 import { Logo } from '@/components/Logo'
-import type { UserSettings, Language } from '@/types'
+import { HistoryManager } from '@/components/HistoryManager'
+import type { UserSettings, Language, SearchHistory } from '@/types'
 import { DEFAULT_SETTINGS } from '@/types'
 import { TranslationProvider, useTranslation, translate } from '@/i18n'
 
@@ -12,16 +13,33 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; key: string } | null>(null)
+  const [history, setHistory] = useState<SearchHistory[]>([])
+  const [activeTab, setActiveTab] = useState<'settings' | 'history'>('settings')
 
-  // 从存储中加载设置
+  // 从存储中加载设置和历史记录
   const { data: storedSettings, save: saveSettings } = useStorage<UserSettings>('user_settings', DEFAULT_SETTINGS)
+  const { data: storedHistory } = useStorage<SearchHistory[]>('search_history')
 
   useEffect(() => {
     setSettings(storedSettings || DEFAULT_SETTINGS)
     setLoading(false)
   }, [storedSettings])
 
+  useEffect(() => {
+    if (storedHistory) {
+      setHistory(storedHistory)
+    }
+  }, [storedHistory])
+
   const language = settings?.language ?? 'zh-CN'
+
+  // 清除历史记录
+  const handleClearHistory = () => {
+    if (confirm(translate(language, 'options.confirm.clearHistory'))) {
+      setHistory([])
+      chrome.storage.local.remove('search_history')
+    }
+  }
 
   // 保存设置
   const handleSaveSettings = async () => {
@@ -161,11 +179,15 @@ function App() {
           updateSettings={updateSettings}
           message={message}
           saving={saving}
+          history={history}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
           onReset={handleResetSettings}
           onSave={handleSaveSettings}
           onExport={handleExportData}
           onImport={handleImportData}
           onClearAll={handleClearAllData}
+          onClearHistory={handleClearHistory}
         />
       </TranslationProvider>
     </ThemeProvider>
@@ -179,11 +201,15 @@ interface OptionsContentProps {
   updateSettings: (updater: (prev: UserSettings) => UserSettings) => void
   message: { type: 'success' | 'error'; key: string } | null
   saving: boolean
+  history: SearchHistory[]
+  activeTab: 'settings' | 'history'
+  onTabChange: (tab: 'settings' | 'history') => void
   onReset: () => void
   onSave: () => void
   onExport: () => void
   onImport: () => void
   onClearAll: () => void
+  onClearHistory: () => void
 }
 
 function OptionsContent({
@@ -192,11 +218,15 @@ function OptionsContent({
   updateSettings,
   message,
   saving,
+  history,
+  activeTab,
+  onTabChange,
   onReset,
   onSave,
   onExport,
   onImport,
-  onClearAll
+  onClearAll,
+  onClearHistory
 }: OptionsContentProps) {
   const { t } = useTranslation()
 
@@ -220,13 +250,39 @@ function OptionsContent({
     <div className="space-y-6">
       {/* 头部 */}
       <header className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-        <div className="flex items-center space-x-4">
-          <Logo size={40} color="#3B82F6" />
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {t('options.header.title')}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">{t('options.header.subtitle')}</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Logo size={40} color="#3B82F6" />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {t('options.header.title')}
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">{t('options.header.subtitle')}</p>
+            </div>
+          </div>
+
+          {/* Tab 切换 */}
+          <div className="flex space-x-2">
+            <button
+              onClick={() => onTabChange('settings')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                activeTab === 'settings'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              ⚙️ {t('options.tabs.settings')}
+            </button>
+            <button
+              onClick={() => onTabChange('history')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                activeTab === 'history'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              📜 {t('options.tabs.history')} {history.length > 0 && `(${history.length})`}
+            </button>
           </div>
         </div>
       </header>
@@ -234,13 +290,25 @@ function OptionsContent({
       {/* 消息提示 */}
       {message && (
         <div className={`p-4 rounded-lg ${
-          message.type === 'success' 
-            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+          message.type === 'success'
+            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
             : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
         }`}>
           {t(message.key)}
         </div>
       )}
+
+      {/* Tab 内容 */}
+      {activeTab === 'history' ? (
+        <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            {t('options.sections.historyManagement')}
+          </h2>
+          <HistoryManager history={history} onClear={onClearHistory} />
+        </section>
+      ) : (
+        <>
+          {/* 原有的设置内容 */}
 
       {/* 基本设置 */}
       <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
@@ -460,26 +528,30 @@ function OptionsContent({
         </div>
       </section>
 
-      {/* 关于信息 */}
-      <footer className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          {t('options.footer.title')}
-        </h2>
-        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-          <p>{t('options.footer.version', { version: '1.0.0' })}</p>
-          <p>{t('options.footer.author', { author: '冷火凉烟' })}</p>
-          <p>
-            <a
-              href="https://github.com/lhly/search-syntax-pro"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary-600 hover:text-primary-700"
-            >
-              {t('options.footer.homepage')}
-            </a>
-          </p>
-        </div>
-      </footer>
+      {/* 关于信息 - 仅在设置页面显示 */}
+      {activeTab === 'settings' && (
+        <footer className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            {t('options.footer.title')}
+          </h2>
+          <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <p>{t('options.footer.version', { version: '1.0.0' })}</p>
+            <p>{t('options.footer.author', { author: '冷火凉烟' })}</p>
+            <p>
+              <a
+                href="https://github.com/lhly/search-syntax-pro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-600 hover:text-primary-700"
+              >
+                {t('options.footer.homepage')}
+              </a>
+            </p>
+          </div>
+        </footer>
+      )}
+        </>
+      )}
     </div>
   )
 }
