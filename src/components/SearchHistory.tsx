@@ -63,9 +63,15 @@ export function SearchHistory({ history, onRestore, onClear }: SearchHistoryProp
     return badges
   }
 
+  // Popup页面显示上限配置
+  const POPUP_MAX_DISPLAY = 50  // popup页面最多显示50条记录
+
   // 计算要显示的记录数
-  const displayCount = showAll ? history.length : 10
+  const displayCount = showAll
+    ? Math.min(history.length, POPUP_MAX_DISPLAY)  // 展开时最多显示50条
+    : 10  // 默认显示10条
   const hasMore = history.length > 10
+  const reachedLimit = history.length > POPUP_MAX_DISPLAY  // 是否超过popup显示上限
 
   return (
     <div className="card p-4">
@@ -139,7 +145,9 @@ export function SearchHistory({ history, onRestore, onClear }: SearchHistoryProp
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
             <p className="text-xs text-blue-700 dark:text-blue-300 text-center mb-2">
               {showAll
-                ? t('searchHistory.showingAll', { count: history.length })
+                ? reachedLimit
+                  ? t('searchHistory.showingLimit', { limit: POPUP_MAX_DISPLAY, total: history.length })
+                  : t('searchHistory.showingAll', { count: displayCount })
                 : t('searchHistory.showingRecent', { showing: 10, total: history.length })
               }
             </p>
@@ -149,13 +157,31 @@ export function SearchHistory({ history, onRestore, onClear }: SearchHistoryProp
             >
               {showAll
                 ? t('searchHistory.collapse')
-                : t('searchHistory.expandAll', { count: history.length })
+                : reachedLimit
+                  ? t('searchHistory.expandLimit', { limit: POPUP_MAX_DISPLAY })
+                  : t('searchHistory.expandAll', { count: history.length })
               }
             </button>
             {!showAll && (
               <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
                 {t('searchHistory.viewAllHint')}
               </p>
+            )}
+            {/* 当已展开且超过上限时，显示引导到设置页面的提示 */}
+            {showAll && reachedLimit && (
+              <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
+                <p className="text-xs text-blue-600 dark:text-blue-400 text-center mb-2">
+                  💡 {t('searchHistory.viewAllInSettings', { total: history.length })}
+                </p>
+                <button
+                  onClick={() => {
+                    chrome.runtime.openOptionsPage()
+                  }}
+                  className="w-full btn btn-sm btn-ghost text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                >
+                  {t('searchHistory.goToSettings')} →
+                </button>
+              </div>
             )}
           </div>
         </div>

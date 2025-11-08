@@ -12,7 +12,7 @@ function App() {
   const [settings, setSettings] = useState<UserSettings | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; key: string } | null>(null)
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; key: string; params?: Record<string, string> } | null>(null)
   const [history, setHistory] = useState<SearchHistory[]>([])
   const [activeTab, setActiveTab] = useState<'settings' | 'history'>('settings')
 
@@ -49,13 +49,54 @@ function App() {
     setMessage(null)
 
     try {
+      // 检查是否需要清理历史记录
+      const currentHistoryData = await chrome.storage.local.get('search_history')
+      const currentHistory: SearchHistory[] = currentHistoryData.search_history || []
+      const willDelete = currentHistory.length - settings.historyLimit
+
+      // 如果当前记录超过新限制，需要用户确认
+      if (willDelete > 0) {
+        const confirmed = confirm(
+          translate(language, 'options.confirm.trimHistory', {
+            current: currentHistory.length.toString(),
+            limit: settings.historyLimit.toString(),
+            willDelete: willDelete.toString()
+          })
+        )
+
+        if (!confirmed) {
+          // 用户取消，不保存设置
+          setSaving(false)
+          setMessage({ type: 'error', key: 'options.messages.saveCancelled' })
+          setTimeout(() => setMessage(null), 3000)
+          return
+        }
+
+        // 用户确认，立即清理超出的记录（保留最新的N条）
+        const trimmedHistory = currentHistory.slice(0, settings.historyLimit)
+        await chrome.storage.local.set({ search_history: trimmedHistory })
+
+        // 更新本地状态
+        setHistory(trimmedHistory)
+      }
+
+      // 保存设置
       const success = await saveSettings(settings)
       if (success) {
-        setMessage({ type: 'success', key: 'options.messages.saveSuccess' })
+        if (willDelete > 0) {
+          setMessage({
+            type: 'success',
+            key: 'options.messages.saveSuccessWithTrim',
+            params: { removed: willDelete.toString() }
+          })
+        } else {
+          setMessage({ type: 'success', key: 'options.messages.saveSuccess' })
+        }
       } else {
         setMessage({ type: 'error', key: 'options.messages.saveFailure' })
       }
     } catch (error) {
+      console.error('保存设置失败:', error)
       setMessage({ type: 'error', key: 'options.messages.saveFailure' })
     } finally {
       setSaving(false)
@@ -199,7 +240,7 @@ interface OptionsContentProps {
   loading: boolean
   settings: UserSettings | null
   updateSettings: (updater: (prev: UserSettings) => UserSettings) => void
-  message: { type: 'success' | 'error'; key: string } | null
+  message: { type: 'success' | 'error'; key: string; params?: Record<string, string> } | null
   saving: boolean
   history: SearchHistory[]
   activeTab: 'settings' | 'history'
@@ -294,7 +335,7 @@ function OptionsContent({
             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
             : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
         }`}>
-          {t(message.key)}
+          {t(message.key, message.params)}
         </div>
       )}
 
