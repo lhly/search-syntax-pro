@@ -2,6 +2,7 @@ import type { SearchEngineAdapter, SearchEngine } from '@/types'
 import { BaiduAdapter } from './baidu'
 import { GoogleAdapter } from './google'
 import { BingAdapter } from './bing'
+import { TwitterAdapter } from './twitter'
 
 /**
  * 搜索引擎适配器工厂
@@ -37,6 +38,8 @@ export class SearchAdapterFactory {
         return new GoogleAdapter()
       case 'bing':
         return new BingAdapter()
+      case 'twitter':
+        return new TwitterAdapter()
       default:
         throw new Error(`不支持的搜索引擎: ${engine}`)
     }
@@ -46,7 +49,7 @@ export class SearchAdapterFactory {
    * 获取所有支持的搜索引擎
    */
   static getSupportedEngines(): SearchEngine[] {
-    return ['baidu', 'google', 'bing']
+    return ['baidu', 'google', 'bing', 'twitter']
   }
 
   /**

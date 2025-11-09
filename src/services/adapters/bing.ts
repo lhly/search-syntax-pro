@@ -371,4 +371,55 @@ export class BingAdapter implements SearchEngineAdapter {
 
     return suggestions
   }
+
+  /**
+   * 🔥 获取必应支持的 UI 功能特性
+   * @returns 必应支持的功能特性数组
+   */
+  getSupportedFeatures(): import('@/types').UIFeatureType[] {
+    return [
+      // 位置限定
+      'site',
+      'filetype',
+      'intitle',
+      'inurl',
+      'intext',  // Bing 使用 inbody: 但我们统一为 intext
+
+      // 匹配精度
+      'exact_match',
+
+      // 逻辑运算
+      'exclude',
+      'or_keywords',
+
+      // 范围过滤
+      'date_range',
+
+      // 特殊功能
+      'related'  // Bing 支持 related: 语法
+    ]
+  }
+
+  /**
+   * 🔥 获取必应的功能分组配置
+   * @returns 分组配置，用于 UI 组织
+   */
+  getFeatureGroups(): import('@/types').EngineFeatureGroups {
+    return {
+      // 位置限定组
+      location: ['site', 'filetype', 'intitle', 'inurl', 'intext'],
+
+      // 匹配精度组
+      precision: ['exact_match'],
+
+      // 逻辑运算组
+      logic: ['exclude', 'or_keywords'],
+
+      // 范围过滤组
+      range: ['date_range'],
+
+      // 特殊功能组
+      special: ['related']
+    }
+  }
 }

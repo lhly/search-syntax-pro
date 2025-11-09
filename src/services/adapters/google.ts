@@ -368,4 +368,59 @@ export class GoogleAdapter implements SearchEngineAdapter {
 
     return suggestions
   }
+
+  /**
+   * 🔥 获取 Google 支持的 UI 功能特性
+   * @returns Google 支持的功能特性数组
+   */
+  getSupportedFeatures(): import('@/types').UIFeatureType[] {
+    return [
+      // 位置限定
+      'site',
+      'filetype',
+      'intitle',
+      'inurl',
+      'intext',
+
+      // 匹配精度
+      'exact_match',
+      'wildcard',
+      'allintitle',
+
+      // 逻辑运算
+      'exclude',
+      'or_keywords',
+
+      // 范围过滤
+      'date_range',
+      'number_range',
+
+      // 特殊功能
+      'related',
+      'cache'
+    ]
+  }
+
+  /**
+   * 🔥 获取 Google 的功能分组配置
+   * @returns 分组配置，用于 UI 组织
+   */
+  getFeatureGroups(): import('@/types').EngineFeatureGroups {
+    return {
+      // 位置限定组
+      location: ['site', 'filetype', 'intitle', 'inurl', 'intext'],
+
+      // 匹配精度组
+      precision: ['exact_match', 'wildcard', 'allintitle'],
+
+      // 逻辑运算组
+      logic: ['exclude', 'or_keywords'],
+
+      // 范围过滤组
+      range: ['date_range', 'number_range'],
+
+      // 特殊功能组
+      special: ['related', 'cache']
+    }
+  }
 }

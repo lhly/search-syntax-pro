@@ -6,6 +6,7 @@ import { HistoryManager } from '@/components/HistoryManager'
 import type { UserSettings, Language, SearchHistory } from '@/types'
 import { DEFAULT_SETTINGS } from '@/types'
 import { TranslationProvider, useTranslation, translate } from '@/i18n'
+import { SearchAdapterFactory } from '@/services/adapters'
 
 // 设置页面组件
 function App() {
@@ -374,7 +375,7 @@ function OptionsContent({
               }
               className="input"
             >
-              {(['baidu', 'google', 'bing'] as const).map((engine) => (
+              {SearchAdapterFactory.getSupportedEngines().map((engine) => (
                 <option key={engine} value={engine}>
                   {t(`common.searchEngines.${engine}`)}
                 </option>
