@@ -1,5 +1,9 @@
 # SearchSyntax Pro - 搜索语法大师
 
+[![CI](https://github.com/lhly/search-syntax-pro/actions/workflows/release.yml/badge.svg)](https://github.com/lhly/search-syntax-pro/actions/workflows/release.yml)
+[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](https://github.com/lhly/search-syntax-pro/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 一个基于浏览器扩展的搜索语法可视化工具，旨在降低普通用户使用高级搜索语法的门槛。
 
 ## 功能特点
@@ -171,6 +175,67 @@ npm run test:e2e
 npm run test:coverage
 ```
 
+## 📦 发布流程
+
+### 自动化发布（推荐）
+
+本项目使用 GitHub Actions 实现自动化构建和发布。
+
+#### 快速发布新版本
+
+```bash
+# 1. 更新版本号（自动更新 package.json 和 manifest.json）
+npm version patch   # 补丁版本：1.5.0 -> 1.5.1
+npm version minor   # 次版本：1.5.0 -> 1.6.0
+npm version major   # 主版本：1.5.0 -> 2.0.0
+
+# 2. 推送代码和标签
+git push origin main
+git push origin --tags
+
+# 3. 等待 GitHub Actions 完成（3-5分钟）
+# 访问 https://github.com/lhly/search-syntax-pro/actions 查看进度
+
+# 4. 在 Releases 页面审查并发布
+# 访问 https://github.com/lhly/search-syntax-pro/releases
+
+# 5. 下载 ZIP 文件上传到 Chrome Web Store
+```
+
+#### CI/CD 工作流说明
+
+- **触发条件**：
+  - Tag 推送 (v*.*.*)：触发完整的构建、测试、打包和发布流程
+  - Main 分支推送：仅进行构建和测试（不发布）
+  - Pull Request：代码审查时的质量检查
+
+- **自动化步骤**：
+  1. 🔨 构建和测试（类型检查、Lint、单元测试）
+  2. ✅ 版本一致性验证
+  3. 📦 生成 ZIP 安装包
+  4. 🚀 创建 GitHub Release（草稿状态）
+
+- **构建产物**：
+  - `ssp-v{version}.zip`：Chrome 扩展安装包
+  - 构建日志和测试报告
+
+### 手动发布（传统方式）
+
+如需手动发布，执行以下步骤：
+
+```bash
+# 1. 构建项目
+npm run build
+
+# 2. 打包扩展
+npm run package
+
+# 3. 在 releases/ 目录找到生成的 ZIP 文件
+ls -lh releases/
+
+# 4. 手动上传到 Chrome Web Store
+```
+
 ## 贡献指南
 
 ### 提交代码
@@ -203,6 +268,19 @@ npm run test:coverage
 本项目采用 MIT 协议开源。详见 [LICENSE](LICENSE) 文件。
 
 ## 更新日志
+
+### v1.5.0 (2025-11-10)
+- 🚀 **新增自动化 CI/CD 流程**
+  - GitHub Actions 自动构建和发布
+  - Tag 推送自动创建 Release
+  - 构建产物自动打包为 ZIP
+- ✅ **版本管理优化**
+  - 新增版本一致性检查脚本
+  - 自动验证 package.json 和 manifest.json 版本同步
+- 📝 **文档完善**
+  - 新增自动化发布流程说明
+  - 添加 CI 状态徽章
+  - 完善贡献指南
 
 ### v1.0.0 (2025-11-06)
 - ✨ 初始版本发布

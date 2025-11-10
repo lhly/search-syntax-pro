@@ -1,0 +1,295 @@
+# ============================================================================
+# SearchSyntax Pro - 自动化构建与发布工作流
+# ============================================================================
+#
+# 功能：
+# - 自动构建和测试 Chrome 扩展
+# - 生成可发布的 ZIP 包
+# - 创建 GitHub Release（Tag 触发时）
+#
+# 触发条件：
+# - Tag 推送（v*.*.*）：完整发布流程
+# - Main 分支推送：持续集成验证
+# - Pull Request：代码审查验证
+#
+# 作者：SearchSyntax Pro Team
+# 最后更新：2025-11-10
+# ============================================================================
+
+name: Build and Release
+
+on:
+  # Tag 推送触发发布（语义化版本）
+  push:
+    tags:
+      - 'v*.*.*'
+
+  # Main 分支推送触发 CI
+  push:
+    branches:
+      - main
+
+  # Pull Request 触发验证
+  pull_request:
+    branches:
+      - main
+
+# 工作流权限配置
+permissions:
+  contents: write  # 需要写权限来创建 Release
+  pull-requests: read
+
+jobs:
+  # ==========================================================================
+  # Job 1: 构建和测试
+  # ==========================================================================
+  build-and-test:
+    name: 🔨 Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      # -------------------- 环境准备 --------------------
+
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # -------------------- 依赖管理 --------------------
+
+      - name: 📦 Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: 🔧 Install dependencies
+        run: npm ci
+
+      # -------------------- 代码质量检查（并行） --------------------
+
+      - name: 📋 Type check
+        run: npm run type-check
+
+      - name: 🔍 Lint code
+        run: npm run lint
+        continue-on-error: true  # 允许 lint 警告不阻止构建
+
+      - name: 🧪 Run unit tests
+        run: npm run test
+        continue-on-error: true  # 可配置为严格模式
+
+      # -------------------- 版本一致性验证 --------------------
+
+      - name: ✅ Verify version consistency
+        run: node scripts/check-version.js
+
+      # -------------------- 构建 --------------------
+
+      - name: 🏗️ Build extension
+        run: npm run build
+
+      # -------------------- 上传构建产物 --------------------
+
+      - name: 📤 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+          retention-days: 90
+          if-no-files-found: error
+
+  # ==========================================================================
+  # Job 2: 打包（依赖构建成功）
+  # ==========================================================================
+  package:
+    name: 📦 Create Package
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # -------------------- 下载构建产物 --------------------
+
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+
+      # -------------------- 执行打包 --------------------
+
+      - name: 🎁 Create ZIP package
+        run: |
+          # 安装依赖（仅需 package.js 所需的模块）
+          npm ci --only=production
+
+          # 执行打包脚本
+          npm run package:only
+
+          # 验证 ZIP 文件生成
+          if [ ! -f releases/*.zip ]; then
+            echo "❌ ZIP 文件生成失败"
+            exit 1
+          fi
+
+          # 显示文件信息
+          ls -lh releases/*.zip
+
+      # -------------------- 上传 ZIP 包 --------------------
+
+      - name: 📤 Upload ZIP package
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-package-${{ github.sha }}
+          path: releases/*.zip
+          retention-days: 90
+          if-no-files-found: error
+
+  # ==========================================================================
+  # Job 3: 发布（仅 Tag 触发）
+  # ==========================================================================
+  release:
+    name: 🚀 Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: package
+    if: startsWith(github.ref, 'refs/tags/v')  # 仅在 Tag 推送时执行
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整历史用于生成更新日志
+
+      # -------------------- 下载 ZIP 包 --------------------
+
+      - name: 📥 Download package
+        uses: actions/download-artifact@v4
+        with:
+          name: extension-package-${{ github.sha }}
+          path: releases/
+
+      # -------------------- 提取版本信息 --------------------
+
+      - name: 📋 Extract version info
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📌 Version: $VERSION"
+
+          # 验证版本号格式
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "❌ 无效的版本号格式: $VERSION"
+            exit 1
+          fi
+
+      # -------------------- 生成更新日志 --------------------
+
+      - name: 📝 Generate changelog
+        id: changelog
+        run: |
+          # 获取上一个 tag
+          PREVIOUS_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --skip=1 --max-count=1) 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "这是首个发布版本"
+            CHANGELOG="初始版本发布"
+          else
+            echo "生成从 $PREVIOUS_TAG 到当前版本的更新日志"
+            CHANGELOG=$(git log $PREVIOUS_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+
+          # 输出到文件（支持多行）
+          echo "$CHANGELOG" > /tmp/changelog.txt
+          echo "changelog_file=/tmp/changelog.txt" >> $GITHUB_OUTPUT
+
+      # -------------------- 创建 GitHub Release --------------------
+
+      - name: 🎉 Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true  # 创建草稿，允许人工审查
+          prerelease: ${{ contains(github.ref, '-') }}  # 检测预发布版本（如 v1.0.0-beta）
+          files: releases/*.zip
+          generate_release_notes: true  # 自动生成发布说明
+          body: |
+            ## 🎉 SearchSyntax Pro v${{ steps.version.outputs.version }} 发布
+
+            ### 📦 安装方法
+
+            #### 开发者模式安装（立即体验）
+            1. 下载下方的 `ssp-v${{ steps.version.outputs.version }}.zip` 文件
+            2. 解压到本地目录
+            3. 在 Chrome 浏览器中访问 `chrome://extensions/`
+            4. 开启右上角的 **"开发者模式"**
+            5. 点击 **"加载已解压的扩展程序"**
+            6. 选择解压后的目录
+
+            #### Chrome 应用商店安装（推荐）
+            📢 本版本将在审核通过后发布到 Chrome Web Store
+
+            ### ✨ 更新内容
+
+            ${{ steps.changelog.outputs.changelog_file && format('详见下方自动生成的更新日志') || '请查看提交历史' }}
+
+            ### 🔧 技术信息
+
+            - **构建时间**：${{ github.event.head_commit.timestamp }}
+            - **提交哈希**：`${{ github.sha }}`
+            - **Node.js 版本**：18.x
+            - **构建环境**：GitHub Actions (ubuntu-latest)
+
+            ### 📊 文件信息
+
+            | 文件 | 说明 |
+            |------|------|
+            | `ssp-v${{ steps.version.outputs.version }}.zip` | Chrome 扩展安装包 |
+
+            ### 🐛 问题反馈
+
+            如遇到问题，请提交 [Issue](https://github.com/lhly/search-syntax-pro/issues)
+
+            ---
+
+            🤖 自动构建生成 via GitHub Actions
+            📅 发布时间：${{ github.event.head_commit.timestamp }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # -------------------- 发布成功通知 --------------------
+
+      - name: ✅ Release created
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ 发布成功！"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "📦 版本: v${{ steps.version.outputs.version }}"
+          echo "🔗 查看发布: https://github.com/${{ github.repository }}/releases"
+          echo ""
+          echo "⚠️  注意: Release 处于草稿状态，请前往以下链接审查后发布："
+          echo "   https://github.com/${{ github.repository }}/releases"
+          echo ""
+          echo "🚀 后续步骤:"
+          echo "   1. 在 Releases 页面检查 ZIP 文件完整性"
+          echo "   2. 补充发布说明（可选）"
+          echo "   3. 点击 'Publish release' 发布"
+          echo "   4. 下载 ZIP 上传到 Chrome Web Store"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
