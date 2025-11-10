@@ -19,15 +19,12 @@
 name: Build and Release
 
 on:
-  # Tag 推送触发发布（语义化版本）
+  # Tag 推送或 Main 分支推送触发
   push:
     tags:
-      - 'v*.*.*'
-
-  # Main 分支推送触发 CI
-  push:
+      - 'v*.*.*'  # Tag 推送：触发完整发布流程
     branches:
-      - main
+      - main      # Main 分支推送：触发 CI 验证
 
   # Pull Request 触发验证
   pull_request:
