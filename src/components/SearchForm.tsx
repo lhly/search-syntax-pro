@@ -513,7 +513,7 @@ export function SearchForm({ searchParams, onSearchParamsChange }: SearchFormPro
           )}
 
           {/* 特殊功能组 */}
-          {(isFeatureSupported('related') || isFeatureSupported('cache') || isFeatureSupported('language')) && (
+          {(isFeatureSupported('related') || isFeatureSupported('cache') || adapter.getLanguageOptions?.()) && (
             <CollapsibleSection title="特殊功能" icon="🔧">
               {isFeatureSupported('related') && (
                 <div>
@@ -553,35 +553,36 @@ export function SearchForm({ searchParams, onSearchParamsChange }: SearchFormPro
                 </div>
               )}
 
-              {isFeatureSupported('language') && (
-                <div>
-                  <label htmlFor="language" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    语言筛选 (lang:)
-                  </label>
-                  <select
-                    id="language"
-                    value={searchParams.language || ''}
-                    onChange={(e) => updateParam('language', e.target.value)}
-                    className="input"
-                  >
-                    <option value="">不限制</option>
-                    <option value="zh">中文</option>
-                    <option value="en">English</option>
-                    <option value="ja">日本語</option>
-                    <option value="ko">한국어</option>
-                    <option value="es">Español</option>
-                    <option value="fr">Français</option>
-                    <option value="de">Deutsch</option>
-                    <option value="pt">Português</option>
-                    <option value="it">Italiano</option>
-                    <option value="ru">Русский</option>
-                    <option value="ar">العربية</option>
-                  </select>
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    限制搜索结果的语言
-                  </p>
-                </div>
-              )}
+              {/* 🔥 动态语言选择器 - 根据适配器配置自动适配 */}
+              {(() => {
+                const languageConfig = adapter.getLanguageOptions?.()
+                if (!languageConfig) return null
+
+                return (
+                  <div>
+                    <label htmlFor="language" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      {languageConfig.label}
+                    </label>
+                    <select
+                      id="language"
+                      value={searchParams.language || ''}
+                      onChange={(e) => updateParam('language', e.target.value)}
+                      className="input"
+                    >
+                      <option value="">{languageConfig.placeholder}</option>
+                      {languageConfig.options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      {searchParams.engine === 'twitter' && '限制搜索推文的语言'}
+                      {searchParams.engine === 'github' && '限制搜索代码的编程语言'}
+                    </p>
+                  </div>
+                )
+              })()}
             </CollapsibleSection>
           )}
         </div>

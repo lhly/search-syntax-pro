@@ -1,5 +1,5 @@
 // 搜索引擎类型
-export type SearchEngine = 'baidu' | 'google' | 'bing' | 'twitter';
+export type SearchEngine = 'baidu' | 'google' | 'bing' | 'twitter' | 'duckduckgo' | 'brave' | 'yandex' | 'reddit' | 'github' | 'stackoverflow';
 
 // 语法类型
 export type SyntaxType =
@@ -142,6 +142,19 @@ export type UIFeatureType =
   | 'language'         // lang:
   | 'content_filters'; // filter:
 
+// 语言选项配置 (用于动态生成语言选择器)
+export interface LanguageOption {
+  value: string;   // 实际值 (如: 'zh', 'javascript')
+  label: string;   // 显示文本 (如: '中文', 'JavaScript')
+}
+
+// 语言字段配置 (适配器提供给UI的语言选项配置)
+export interface LanguageFieldConfig {
+  label: string;              // UI标签 (如: '语言筛选', '编程语言')
+  placeholder: string;        // 选择器提示文本
+  options: LanguageOption[];  // 可选的语言列表
+}
+
 // 引擎特性分组配置 (用于 UI 组织)
 export interface EngineFeatureGroups {
   user_filters?: UIFeatureType[];      // 用户筛选 (Twitter)
@@ -172,6 +185,12 @@ export interface SearchEngineAdapter {
 
   // 🔥 新增: 获取功能分组配置 (可选，用于 UI 组织)
   getFeatureGroups?(): EngineFeatureGroups;
+
+  // 🔥 新增: 获取语言字段的UI配置 (可选，用于动态生成语言选择器)
+  // 如果引擎不支持语言筛选功能，返回 undefined
+  // Twitter: 返回自然语言选项 (zh, en, ja...)
+  // GitHub: 返回编程语言选项 (javascript, python, rust...)
+  getLanguageOptions?(): LanguageFieldConfig;
 }
 
 // 验证结果接口

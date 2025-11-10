@@ -383,4 +383,28 @@ export class TwitterAdapter implements SearchEngineAdapter {
       special: ['language']
     }
   }
+
+  /**
+   * 🔥 获取语言字段的UI配置
+   * @returns Twitter的自然语言选项配置
+   */
+  getLanguageOptions(): import('@/types').LanguageFieldConfig {
+    return {
+      label: '语言筛选 (lang:)',
+      placeholder: '选择推文语言',
+      options: [
+        { value: 'zh', label: '中文' },
+        { value: 'en', label: 'English' },
+        { value: 'ja', label: '日本語' },
+        { value: 'ko', label: '한국어' },
+        { value: 'es', label: 'Español' },
+        { value: 'fr', label: 'Français' },
+        { value: 'de', label: 'Deutsch' },
+        { value: 'pt', label: 'Português' },
+        { value: 'it', label: 'Italiano' },
+        { value: 'ru', label: 'Русский' },
+        { value: 'ar', label: 'العربية' }
+      ]
+    }
+  }
 }

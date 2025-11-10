@@ -3,6 +3,12 @@ import { BaiduAdapter } from './baidu'
 import { GoogleAdapter } from './google'
 import { BingAdapter } from './bing'
 import { TwitterAdapter } from './twitter'
+import { DuckDuckGoAdapter } from './duckduckgo'
+import { BraveAdapter } from './brave'
+import { YandexAdapter } from './yandex'
+import { RedditAdapter } from './reddit'
+import { GitHubAdapter } from './github'
+import { StackOverflowAdapter } from './stackoverflow'
 
 /**
  * 搜索引擎适配器工厂
@@ -40,6 +46,18 @@ export class SearchAdapterFactory {
         return new BingAdapter()
       case 'twitter':
         return new TwitterAdapter()
+      case 'duckduckgo':
+        return new DuckDuckGoAdapter()
+      case 'brave':
+        return new BraveAdapter()
+      case 'yandex':
+        return new YandexAdapter()
+      case 'reddit':
+        return new RedditAdapter()
+      case 'github':
+        return new GitHubAdapter()
+      case 'stackoverflow':
+        return new StackOverflowAdapter()
       default:
         throw new Error(`不支持的搜索引擎: ${engine}`)
     }
@@ -49,7 +67,7 @@ export class SearchAdapterFactory {
    * 获取所有支持的搜索引擎
    */
   static getSupportedEngines(): SearchEngine[] {
-    return ['baidu', 'google', 'bing', 'twitter']
+    return ['baidu', 'google', 'bing', 'twitter', 'duckduckgo', 'brave', 'yandex', 'reddit', 'github', 'stackoverflow']
   }
 
   /**
