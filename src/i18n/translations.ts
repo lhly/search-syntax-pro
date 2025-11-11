@@ -27,6 +27,11 @@ const translations: Record<Language, Record<string, string>> = {
     'common.fileTypes.jpg': '图片文件',
     'common.fileTypes.png': '图片文件',
     'common.fileTypes.gif': '图片文件',
+    'common.save': '保存',
+    'common.cancel': '取消',
+    'common.saving': '保存中...',
+    'common.edit': '编辑',
+    'common.reset': '重置',
     'copyButton.tooltipCopy': '复制',
     'copyButton.tooltipCopied': '已复制!',
     'copyButton.copyError': '复制失败',
@@ -68,6 +73,7 @@ const translations: Record<Language, Record<string, string>> = {
     'options.header.title': '搜索语法大师 - 设置',
     'options.header.subtitle': '设置和配置',
     'options.tabs.settings': '设置',
+    'options.tabs.shortcuts': '快捷键',
     'options.tabs.history': '历史记录',
     'options.sections.basic': '基本设置',
     'options.sections.features': '功能设置',
@@ -124,7 +130,35 @@ const translations: Record<Language, Record<string, string>> = {
     'historyManager.noFilterResults': '未找到匹配的历史记录',
     'historyManager.usageTips': '使用提示',
     'historyManager.tip1': '点击历史记录可直接执行搜索',
-    'historyManager.tip2': '点击"编辑后搜索"按钮可在弹窗中修改参数后搜索'
+    'historyManager.tip2': '点击"编辑后搜索"按钮可在弹窗中修改参数后搜索',
+
+    // 快捷键设置
+    'shortcuts.settings.title': '键盘快捷键',
+    'shortcuts.settings.description': '自定义键盘快捷键以提高工作效率。点击快捷键即可编辑。',
+    'shortcuts.settings.globalShortcuts': '全局快捷键',
+    'shortcuts.settings.browserManaged': '浏览器管理',
+    'shortcuts.settings.globalDescription': '全局快捷键（如打开搜索面板）由浏览器管理，无法在此页面修改。请点击下方按钮前往浏览器设置页面进行配置。',
+    'shortcuts.settings.openBrowserSettings': '打开浏览器快捷键设置',
+    'shortcuts.settings.currentGlobalShortcut': '当前全局快捷键配置',
+    'shortcuts.settings.openSearchPanel': '打开搜索面板',
+    'shortcuts.settings.notCustomizable': '此快捷键不可自定义',
+    'shortcuts.settings.fixed': '固定',
+    'shortcuts.settings.conflict': '与 {name} 冲突',
+    'shortcuts.settings.saveSuccess': '快捷键保存成功',
+    'shortcuts.settings.toggleSuccess': '快捷键状态已更新',
+    'shortcuts.settings.resetSuccess': '快捷键已重置',
+    'shortcuts.settings.resetAllSuccess': '所有快捷键已重置为默认值',
+    'shortcuts.settings.confirmReset': '确定要将此快捷键重置为默认值吗？',
+    'shortcuts.settings.confirmResetAll': '确定要将所有快捷键重置为默认值吗？',
+    'shortcuts.settings.resetAll': '重置所有快捷键',
+    'shortcuts.settings.targetEngine': '目标搜索引擎',
+    'shortcuts.settings.notSet': '未设置',
+
+    // 快捷键录制器
+    'shortcuts.recorder.pressKey': '按下任意组合键...',
+    'shortcuts.recorder.placeholder': '点击录制',
+    'shortcuts.recorder.invalid': '无效组合',
+    'shortcuts.recorder.hint': '按 Escape 取消'
   },
   'en-US': {
     'common.languages.zh-CN': 'Simplified Chinese',
@@ -152,6 +186,11 @@ const translations: Record<Language, Record<string, string>> = {
     'common.fileTypes.jpg': 'Image File',
     'common.fileTypes.png': 'Image File',
     'common.fileTypes.gif': 'Image File',
+    'common.save': 'Save',
+    'common.cancel': 'Cancel',
+    'common.saving': 'Saving...',
+    'common.edit': 'Edit',
+    'common.reset': 'Reset',
     'copyButton.tooltipCopy': 'Copy',
     'copyButton.tooltipCopied': 'Copied!',
     'copyButton.copyError': 'Copy failed',
@@ -193,6 +232,7 @@ const translations: Record<Language, Record<string, string>> = {
     'options.header.title': 'SearchSyntax Pro - Settings',
     'options.header.subtitle': 'Settings & configuration',
     'options.tabs.settings': 'Settings',
+    'options.tabs.shortcuts': 'Shortcuts',
     'options.tabs.history': 'History',
     'options.sections.basic': 'Basic settings',
     'options.sections.features': 'Feature settings',
@@ -249,7 +289,35 @@ const translations: Record<Language, Record<string, string>> = {
     'historyManager.noFilterResults': 'No matching history found',
     'historyManager.usageTips': 'Usage Tips',
     'historyManager.tip1': 'Click on a history item to execute the search directly',
-    'historyManager.tip2': 'Click "Edit & Search" button to modify parameters in popup before searching'
+    'historyManager.tip2': 'Click "Edit & Search" button to modify parameters in popup before searching',
+
+    // Shortcut settings
+    'shortcuts.settings.title': 'Keyboard Shortcuts',
+    'shortcuts.settings.description': 'Customize keyboard shortcuts for faster workflow. Click on a shortcut to edit it.',
+    'shortcuts.settings.globalShortcuts': 'Global Shortcuts',
+    'shortcuts.settings.browserManaged': 'Browser Managed',
+    'shortcuts.settings.globalDescription': 'Global shortcuts (e.g., opening the search panel) are managed by your browser and cannot be modified here. Click the button below to open your browser\'s shortcuts settings page.',
+    'shortcuts.settings.openBrowserSettings': 'Open Browser Shortcuts Settings',
+    'shortcuts.settings.currentGlobalShortcut': 'Current Global Shortcut',
+    'shortcuts.settings.openSearchPanel': 'Open Search Panel',
+    'shortcuts.settings.notCustomizable': 'This shortcut cannot be customized',
+    'shortcuts.settings.fixed': 'Fixed',
+    'shortcuts.settings.conflict': 'Conflicts with: {name}',
+    'shortcuts.settings.saveSuccess': 'Shortcut saved successfully',
+    'shortcuts.settings.toggleSuccess': 'Shortcut status updated',
+    'shortcuts.settings.resetSuccess': 'Shortcut reset successfully',
+    'shortcuts.settings.resetAllSuccess': 'All shortcuts reset to default',
+    'shortcuts.settings.confirmReset': 'Reset this shortcut to default?',
+    'shortcuts.settings.confirmResetAll': 'Reset all shortcuts to default?',
+    'shortcuts.settings.resetAll': 'Reset All to Default',
+    'shortcuts.settings.targetEngine': 'Target Search Engine',
+    'shortcuts.settings.notSet': 'Not Set',
+
+    // Shortcut recorder
+    'shortcuts.recorder.pressKey': 'Press any key combination...',
+    'shortcuts.recorder.placeholder': 'Click to record',
+    'shortcuts.recorder.invalid': 'Invalid combination',
+    'shortcuts.recorder.hint': 'Press Escape to cancel'
   }
 }
 

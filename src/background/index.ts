@@ -1,5 +1,32 @@
 // Background Service Worker for SearchSyntax Pro Chrome Extension
 
+/**
+ * 监听快捷键命令
+ *
+ * 注意: _execute_action 是Chrome扩展的特殊命令,会自动打开popup,无需额外处理
+ * 这里仅用于日志记录和未来扩展其他自定义命令
+ */
+chrome.commands.onCommand.addListener((command) => {
+  console.log('快捷键命令触发:', command)
+
+  switch (command) {
+    case '_execute_action':
+      // 自动打开popup,无需手动处理
+      // Chrome会自动执行 action.default_popup 中配置的弹窗
+      console.log('全局快捷键已触发,popup将自动打开')
+      break
+
+    // 未来可以在这里添加其他自定义全局快捷键
+    // 例如:
+    // case 'quick_search':
+    //   chrome.tabs.create({ url: 'https://www.google.com' })
+    //   break
+
+    default:
+      console.warn('未知的快捷键命令:', command)
+  }
+})
+
 // 扩展安装时的处理
 chrome.runtime.onInstalled.addListener((details) => {
   console.log('SearchSyntax Pro 已安装', details.reason)

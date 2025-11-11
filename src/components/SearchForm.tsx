@@ -9,11 +9,23 @@ import { SearchAdapterFactory } from '@/services/adapters'
 interface SearchFormProps {
   searchParams: SearchParams
   onSearchParamsChange: (params: SearchParams) => void
+  // Round 2: 支持外部控制的高级选项状态
+  showAdvanced?: boolean
+  onToggleAdvanced?: (show: boolean) => void
 }
 
-export function SearchForm({ searchParams, onSearchParamsChange }: SearchFormProps) {
-  const [showAdvanced, setShowAdvanced] = useState(false)
+export function SearchForm({
+  searchParams,
+  onSearchParamsChange,
+  showAdvanced: externalShowAdvanced,
+  onToggleAdvanced
+}: SearchFormProps) {
+  const [internalShowAdvanced, setInternalShowAdvanced] = useState(false)
   const { t } = useTranslation()
+
+  // 使用外部状态或内部状态
+  const showAdvanced = externalShowAdvanced !== undefined ? externalShowAdvanced : internalShowAdvanced
+  const setShowAdvanced = onToggleAdvanced || setInternalShowAdvanced
 
   // 🔥 获取当前引擎的适配器和支持的功能
   const adapter = SearchAdapterFactory.getAdapter(searchParams.engine)
@@ -32,7 +44,11 @@ export function SearchForm({ searchParams, onSearchParamsChange }: SearchFormPro
 
   // 切换高级选项
   const toggleAdvanced = () => {
-    setShowAdvanced(!showAdvanced)
+    if (onToggleAdvanced) {
+      onToggleAdvanced(!showAdvanced)
+    } else {
+      setShowAdvanced(!showAdvanced)
+    }
   }
 
   return (

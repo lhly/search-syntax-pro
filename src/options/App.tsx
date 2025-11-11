@@ -3,10 +3,12 @@ import { ThemeProvider } from '@/hooks/useTheme'
 import { useStorage } from '@/hooks/useStorage'
 import { Logo } from '@/components/Logo'
 import { HistoryManager } from '@/components/HistoryManager'
+import { ShortcutSettings } from '@/components/ShortcutSettings'
 import type { UserSettings, Language, SearchHistory } from '@/types'
 import { DEFAULT_SETTINGS } from '@/types'
 import { TranslationProvider, useTranslation, translate } from '@/i18n'
 import { SearchAdapterFactory } from '@/services/adapters'
+import { useExtensionVersion } from '@/utils/version'
 
 // 设置页面组件
 function App() {
@@ -15,7 +17,8 @@ function App() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; key: string; params?: Record<string, string> } | null>(null)
   const [history, setHistory] = useState<SearchHistory[]>([])
-  const [activeTab, setActiveTab] = useState<'settings' | 'history'>('settings')
+  const [activeTab, setActiveTab] = useState<'settings' | 'history' | 'shortcuts'>('settings')
+  const version = useExtensionVersion()
 
   // 从存储中加载设置和历史记录
   const { data: storedSettings, save: saveSettings } = useStorage<UserSettings>('user_settings', DEFAULT_SETTINGS)
@@ -138,7 +141,7 @@ function App() {
   const handleExportData = () => {
     chrome.storage.local.get(null, (data) => {
       const exportData = {
-        version: '1.0.0',
+        version: version,
         timestamp: Date.now(),
         data: data
       }
@@ -223,6 +226,7 @@ function App() {
           saving={saving}
           history={history}
           activeTab={activeTab}
+          version={version}
           onTabChange={setActiveTab}
           onReset={handleResetSettings}
           onSave={handleSaveSettings}
@@ -244,8 +248,9 @@ interface OptionsContentProps {
   message: { type: 'success' | 'error'; key: string; params?: Record<string, string> } | null
   saving: boolean
   history: SearchHistory[]
-  activeTab: 'settings' | 'history'
-  onTabChange: (tab: 'settings' | 'history') => void
+  activeTab: 'settings' | 'history' | 'shortcuts'
+  version: string
+  onTabChange: (tab: 'settings' | 'history' | 'shortcuts') => void
   onReset: () => void
   onSave: () => void
   onExport: () => void
@@ -262,6 +267,7 @@ function OptionsContent({
   saving,
   history,
   activeTab,
+  version,
   onTabChange,
   onReset,
   onSave,
@@ -316,6 +322,16 @@ function OptionsContent({
               ⚙️ {t('options.tabs.settings')}
             </button>
             <button
+              onClick={() => onTabChange('shortcuts')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                activeTab === 'shortcuts'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              ⌨️ {t('options.tabs.shortcuts')}
+            </button>
+            <button
               onClick={() => onTabChange('history')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 activeTab === 'history'
@@ -341,7 +357,9 @@ function OptionsContent({
       )}
 
       {/* Tab 内容 */}
-      {activeTab === 'history' ? (
+      {activeTab === 'shortcuts' ? (
+        <ShortcutSettings />
+      ) : activeTab === 'history' ? (
         <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
             {t('options.sections.historyManagement')}
@@ -577,7 +595,7 @@ function OptionsContent({
             {t('options.footer.title')}
           </h2>
           <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-            <p>{t('options.footer.version', { version: '1.0.0' })}</p>
+            <p>{t('options.footer.version', { version: version })}</p>
             <p>{t('options.footer.author', { author: '冷火凉烟' })}</p>
             <p>
               <a

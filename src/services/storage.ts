@@ -1,4 +1,5 @@
 import type { SearchHistory } from '@/types'
+import { getExtensionVersion } from '@/utils/version'
 
 // 存储服务类
 export class StorageService {
@@ -80,7 +81,7 @@ export class StorageService {
     try {
       const allData = await chrome.storage.local.get(null)
       const backup = {
-        version: '1.0.0',
+        version: getExtensionVersion(),
         timestamp: Date.now(),
         data: allData
       }

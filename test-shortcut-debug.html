@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>快捷键调试测试</title>
+  <style>
+    body { font-family: monospace; padding: 20px; }
+    .log { margin: 10px 0; padding: 10px; background: #f0f0f0; }
+    .error { background: #ffcccc; }
+    .success { background: #ccffcc; }
+  </style>
+</head>
+<body>
+  <h1>快捷键"?"调试测试</h1>
+  <p>请按下 <kbd>Shift + /</kbd> (即 "?" 字符)</p>
+
+  <div id="log"></div>
+
+  <script>
+    const log = document.getElementById('log');
+
+    document.addEventListener('keydown', (event) => {
+      const info = document.createElement('div');
+      info.className = 'log';
+
+      const details = `
+        <strong>按键事件:</strong><br>
+        event.key: "${event.key}"<br>
+        event.shiftKey: ${event.shiftKey}<br>
+        event.ctrlKey: ${event.ctrlKey}<br>
+        event.altKey: ${event.altKey}<br>
+        <br>
+        <strong>原始条件检查:</strong><br>
+        event.key === '?': ${event.key === '?'}<br>
+        !event.shiftKey: ${!event.shiftKey}<br>
+        event.key === '?' && !event.shiftKey: <span class="${event.key === '?' && !event.shiftKey ? 'success' : 'error'}">${event.key === '?' && !event.shiftKey}</span><br>
+        <br>
+        <strong>修正后的检查:</strong><br>
+        event.key === '?': <span class="${event.key === '?' ? 'success' : ''}">${event.key === '?'}</span><br>
+      `;
+
+      info.innerHTML = details;
+      log.insertBefore(info, log.firstChild);
+
+      // 只保留最近5条记录
+      while (log.children.length > 5) {
+        log.removeChild(log.lastChild);
+      }
+    });
+  </script>
+</body>
+</html>
