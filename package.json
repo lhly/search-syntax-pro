@@ -15,7 +15,12 @@
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "type-check": "tsc --noEmit",
-    "check-version": "node scripts/check-version.js"
+    "check-version": "node scripts/check-version.js",
+    "resize:screenshots": "node scripts/resize-screenshots.js screenshot ./screenshots ./store-assets",
+    "resize:logo": "node scripts/resize-screenshots.js logo ./screenshots ./store-assets",
+    "resize:promo-small": "node scripts/resize-screenshots.js small-promo ./screenshots ./store-assets",
+    "resize:promo-large": "node scripts/resize-screenshots.js large-promo ./screenshots ./store-assets",
+    "resize:all": "npm run resize:screenshots && npm run resize:logo && npm run resize:promo-small && npm run resize:promo-large"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
