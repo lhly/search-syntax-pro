@@ -1,23 +1,20 @@
 {
   "manifest_version": 3,
   "name": "__MSG_app_name__",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "__MSG_app_description__",
   "default_locale": "zh_CN",
 
   "permissions": [
     "storage",
     "activeTab",
-    "scripting",
     "contextMenus"
   ],
 
   "host_permissions": [
     "https://www.baidu.com/*",
     "https://www.google.com/*",
-    "https://www.bing.com/*",
-    "https://www.sogou.com/*",
-    "https://www.so.com/*"
+    "https://www.bing.com/*"
   ],
 
   "background": {
@@ -52,9 +49,7 @@
       "matches": [
         "https://www.baidu.com/*",
         "https://www.google.com/*",
-        "https://www.bing.com/*",
-        "https://www.sogou.com/*",
-        "https://www.so.com/*"
+        "https://www.bing.com/*"
       ],
       "js": ["content.js"],
       "run_at": "document_end"

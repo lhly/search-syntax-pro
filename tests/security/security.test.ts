@@ -174,13 +174,13 @@ describe('安全性测试', () => {
       const requiredPermissions = [
         'storage',
         'activeTab',
-        'scripting'
+        'contextMenus'
       ]
 
       const actualPermissions = [
         'storage',
         'activeTab',
-        'scripting'
+        'contextMenus'
       ]
 
       // 验证权限列表匹配

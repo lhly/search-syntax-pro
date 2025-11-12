@@ -1,13 +1,18 @@
 // Content Script for SearchSyntax Pro Chrome Extension
 
+// ========== 功能开关配置 ==========
+// 注意：这些开关控制实验性功能的启用状态
+const FEATURE_FLAGS = {
+  // 悬浮按钮功能开关（开发中，未来版本启用）
+  enableFloatingButton: false
+}
+
 // 检查是否在搜索引擎页面
 function isSearchEnginePage(): boolean {
   const searchEngines = [
     'www.baidu.com',
     'www.google.com',
-    'www.bing.com',
-    'www.sogou.com',
-    'www.so.com'
+    'www.bing.com'
   ]
   
   return searchEngines.some(engine => 
@@ -16,6 +21,8 @@ function isSearchEnginePage(): boolean {
 }
 
 // 在搜索引擎页面注入功能
+// TODO: 此功能为未来版本规划，当前通过FEATURE_FLAGS.enableFloatingButton控制
+// 计划功能：在搜索引擎页面添加悬浮按钮，提供快速访问入口
 function injectSearchFeatures() {
   // 创建悬浮按钮
   const floatingButton = document.createElement('div')
@@ -217,13 +224,16 @@ function highlightSearchSyntax() {
 // 初始化content script
 function init() {
   console.log('SearchSyntax Pro Content Script 已加载')
-  
+
   if (isSearchEnginePage()) {
     console.log('检测到搜索引擎页面，注入功能')
-    
+
     // 延迟注入，确保页面加载完成
     setTimeout(() => {
-      injectSearchFeatures()
+      // 根据功能开关决定是否注入悬浮按钮
+      if (FEATURE_FLAGS.enableFloatingButton) {
+        injectSearchFeatures()
+      }
       analyzeSearchQuery()
     }, 1000)
   }

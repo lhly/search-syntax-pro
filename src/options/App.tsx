@@ -504,6 +504,25 @@ function OptionsContent({
             />
           </div>
 
+          {/* 悬浮按钮功能（开发中） */}
+          <div className="flex items-center justify-between opacity-50">
+            <div>
+              <label htmlFor="enableFloatingButton" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                启用悬浮按钮 (开发中)
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                此功能正在开发中，将在未来版本启用
+              </p>
+            </div>
+            <input
+              id="enableFloatingButton"
+              type="checkbox"
+              checked={false}
+              disabled
+              className="h-4 w-4 text-gray-400 border-gray-300 rounded cursor-not-allowed"
+            />
+          </div>
+
           {/* 历史记录限制 */}
           <div>
             <label htmlFor="historyLimit" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
