@@ -39,8 +39,11 @@ export interface KeyboardShortcut {
   /** 快捷键组合 (例: 'Ctrl+K', 'Alt+Shift+F') */
   key: string;
 
-  /** 快捷键描述 */
+  /** 快捷键描述 (已弃用，请使用 descriptionKey) */
   description: string;
+
+  /** 快捷键描述的翻译键 */
+  descriptionKey?: string;
 
   /** 执行的动作 */
   action: ShortcutAction;
@@ -67,7 +70,14 @@ export interface KeyboardShortcut {
  * 快捷键分组
  */
 export interface ShortcutGroup {
+  /** 分组名称 (fallback) */
   name: string;
+  /** 分组名称的翻译键 */
+  nameKey?: string;
+  /** 分组描述 (fallback) */
   description: string;
+  /** 分组描述的翻译键 */
+  descriptionKey?: string;
+  /** 该分组包含的快捷键 */
   shortcuts: KeyboardShortcut[];
 }

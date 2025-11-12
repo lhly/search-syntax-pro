@@ -16,6 +16,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'execute_search': {
     key: 'Ctrl+Enter',
     description: '执行搜索',
+    descriptionKey: 'shortcuts.execute_search.description',
     action: 'EXECUTE_SEARCH',
     scope: 'popup',
     customizable: true,
@@ -25,6 +26,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'open_history': {
     key: 'Ctrl+Shift+H',
     description: '打开搜索历史',
+    descriptionKey: 'shortcuts.open_history.description',
     action: 'OPEN_HISTORY',
     scope: 'popup',
     customizable: true,
@@ -34,6 +36,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'open_templates': {
     key: 'Ctrl+Shift+T',
     description: '打开模板选择器',
+    descriptionKey: 'shortcuts.open_templates.description',
     action: 'OPEN_TEMPLATES',
     scope: 'popup',
     customizable: true,
@@ -43,6 +46,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'copy_query': {
     key: 'Ctrl+Shift+C',
     description: '复制生成的查询',
+    descriptionKey: 'shortcuts.copy_query.description',
     action: 'COPY_QUERY',
     scope: 'popup',
     customizable: true,
@@ -52,6 +56,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'toggle_advanced': {
     key: 'Ctrl+Shift+A',
     description: '切换高级选项',
+    descriptionKey: 'shortcuts.toggle_advanced.description',
     action: 'TOGGLE_ADVANCED',
     scope: 'popup',
     customizable: true,
@@ -61,6 +66,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'close_popup': {
     key: 'Escape',
     description: '关闭面板',
+    descriptionKey: 'shortcuts.close_popup.description',
     action: 'CLOSE_POPUP',
     scope: 'popup',
     customizable: false,
@@ -70,6 +76,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'focus_keyword': {
     key: 'Ctrl+K',
     description: '聚焦关键词输入框',
+    descriptionKey: 'shortcuts.focus_keyword.description',
     action: 'FOCUS_KEYWORD',
     scope: 'popup',
     customizable: true,
@@ -79,6 +86,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'next_field': {
     key: 'Tab',
     description: '下一个输入框',
+    descriptionKey: 'shortcuts.next_field.description',
     action: 'NEXT_FIELD',
     scope: 'popup',
     customizable: false,
@@ -88,6 +96,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'prev_field': {
     key: 'Shift+Tab',
     description: '上一个输入框',
+    descriptionKey: 'shortcuts.prev_field.description',
     action: 'PREV_FIELD',
     scope: 'popup',
     customizable: false,
@@ -97,6 +106,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'show_shortcuts': {
     key: '?',
     description: '显示快捷键帮助',
+    descriptionKey: 'shortcuts.show_shortcuts.description',
     action: 'SHOW_SHORTCUTS_HELP',
     scope: 'popup',
     customizable: false,
@@ -106,6 +116,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'clear_form': {
     key: 'Ctrl+L',
     description: '清空表单',
+    descriptionKey: 'shortcuts.clear_form.description',
     action: 'CLEAR_FORM',
     scope: 'popup',
     customizable: true,
@@ -116,6 +127,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'switch_engine_1': {
     key: 'Ctrl+1',
     description: '切换到百度搜索',
+    descriptionKey: 'shortcuts.switch_engine_baidu.description',
     action: 'SWITCH_ENGINE',
     actionParam: 'baidu',
     targetEngine: 'baidu',
@@ -127,6 +139,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'switch_engine_2': {
     key: 'Ctrl+2',
     description: '切换到谷歌搜索',
+    descriptionKey: 'shortcuts.switch_engine_google.description',
     action: 'SWITCH_ENGINE',
     actionParam: 'google',
     targetEngine: 'google',
@@ -138,6 +151,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'switch_engine_3': {
     key: 'Ctrl+3',
     description: '切换到必应搜索',
+    descriptionKey: 'shortcuts.switch_engine_bing.description',
     action: 'SWITCH_ENGINE',
     actionParam: 'bing',
     targetEngine: 'bing',
@@ -149,6 +163,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'switch_engine_4': {
     key: 'Ctrl+4',
     description: '切换到推特搜索',
+    descriptionKey: 'shortcuts.switch_engine_twitter.description',
     action: 'SWITCH_ENGINE',
     actionParam: 'twitter',
     targetEngine: 'twitter',
@@ -160,6 +175,7 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
   'switch_engine_5': {
     key: 'Ctrl+5',
     description: '切换到鸭鸭搜索',
+    descriptionKey: 'shortcuts.switch_engine_duckduckgo.description',
     action: 'SWITCH_ENGINE',
     actionParam: 'duckduckgo',
     targetEngine: 'duckduckgo',
@@ -177,7 +193,9 @@ export const DEFAULT_SHORTCUTS: Record<string, KeyboardShortcut> = {
 export const SHORTCUT_GROUPS: ShortcutGroup[] = [
   {
     name: '搜索操作',
+    nameKey: 'shortcuts.group.search_operations.name',
     description: '执行搜索和查询相关操作',
+    descriptionKey: 'shortcuts.group.search_operations.description',
     shortcuts: [
       DEFAULT_SHORTCUTS['execute_search'],
       DEFAULT_SHORTCUTS['copy_query'],
@@ -186,7 +204,9 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
   },
   {
     name: '导航和界面',
+    nameKey: 'shortcuts.group.navigation.name',
     description: '界面导航和面板控制',
+    descriptionKey: 'shortcuts.group.navigation.description',
     shortcuts: [
       DEFAULT_SHORTCUTS['focus_keyword'],
       DEFAULT_SHORTCUTS['next_field'],
@@ -197,7 +217,9 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
   },
   {
     name: '功能面板',
+    nameKey: 'shortcuts.group.panels.name',
     description: '打开各种功能面板',
+    descriptionKey: 'shortcuts.group.panels.description',
     shortcuts: [
       DEFAULT_SHORTCUTS['open_history'],
       DEFAULT_SHORTCUTS['open_templates'],
@@ -206,7 +228,9 @@ export const SHORTCUT_GROUPS: ShortcutGroup[] = [
   },
   {
     name: '引擎切换',
+    nameKey: 'shortcuts.group.engine_switch.name',
     description: '快速切换搜索引擎',
+    descriptionKey: 'shortcuts.group.engine_switch.description',
     shortcuts: [
       DEFAULT_SHORTCUTS['switch_engine_1'],
       DEFAULT_SHORTCUTS['switch_engine_2'],

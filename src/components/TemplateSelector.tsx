@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from '@/i18n';
 import { templateManager } from '@/services/template-manager';
 import type { SearchTemplate, TemplateCategory } from '@/types/template';
 import type { SearchParams } from '@/types';
@@ -13,11 +14,12 @@ interface TemplateSelectorProps {
   onClose: () => void;
 }
 
-export function TemplateSelector({ 
-  currentParams, 
+export function TemplateSelector({
+  currentParams,
   onApplyTemplate,
   onClose
 }: TemplateSelectorProps) {
+  const { t } = useTranslation();
   const [templates, setTemplates] = useState<SearchTemplate[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -77,7 +79,7 @@ export function TemplateSelector({
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-              📋 搜索模板
+              {t('template.selector.title')}
             </h2>
             <button
               onClick={onClose}
@@ -92,7 +94,7 @@ export function TemplateSelector({
           {/* 搜索框 */}
           <input
             type="text"
-            placeholder="搜索模板..."
+            placeholder={t('template.selector.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="input w-full"
@@ -106,10 +108,10 @@ export function TemplateSelector({
             onChange={(e) => setSelectedCategory(e.target.value as TemplateCategory | 'all')}
             className="select w-full"
           >
-            <option value="all">📋 全部分类</option>
+            <option value="all">{t('template.selector.allCategories')}</option>
             {categoryMeta.slice(0, -1).map((meta) => (
               <option key={meta.category} value={meta.category}>
-                {meta.icon} {meta.name}
+                {meta.icon} {t(`template.category.${meta.category}`)}
               </option>
             ))}
           </select>
@@ -119,53 +121,66 @@ export function TemplateSelector({
         <div className="flex-1 overflow-y-auto p-4">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="text-gray-500">加载中...</div>
+              <div className="text-gray-500">{t('template.selector.loading')}</div>
             </div>
           ) : filteredTemplates.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              未找到匹配的模板
+              {t('template.selector.noResults')}
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-3">
-              {filteredTemplates.map((template) => (
-                <div
-                  key={template.id}
-                  className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                  onClick={() => handleApply(template.id)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xl">{template.icon}</span>
-                        <h4 className="font-medium text-gray-900 dark:text-white">
-                          {template.name}
-                        </h4>
-                        {!template.isBuiltIn && (
-                          <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-0.5 rounded">
-                            自定义
-                          </span>
-                        )}
+              {filteredTemplates.map((template) => {
+                // 使用国际化键或原始文本
+                const templateName = template.isBuiltIn
+                  ? t(`template.${template.id}.name`, {}, template.name)
+                  : template.name;
+                const templateDesc = template.isBuiltIn
+                  ? t(`template.${template.id}.description`, {}, template.description)
+                  : template.description;
+                const templateTags = template.isBuiltIn
+                  ? t(`template.${template.id}.tags`, {}, template.tags.join(',')).split(',')
+                  : template.tags;
+
+                return (
+                  <div
+                    key={template.id}
+                    className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                    onClick={() => handleApply(template.id)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xl">{template.icon}</span>
+                          <h4 className="font-medium text-gray-900 dark:text-white">
+                            {templateName}
+                          </h4>
+                          {!template.isBuiltIn && (
+                            <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-0.5 rounded">
+                              {t('template.selector.customLabel')}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                          {templateDesc}
+                        </p>
+                        <div className="flex gap-1 flex-wrap">
+                          {templateTags.map((tag) => (
+                            <span
+                              key={tag}
+                              className="text-xs bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                        {template.description}
-                      </p>
-                      <div className="flex gap-1 flex-wrap">
-                        {template.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="text-xs bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded"
-                          >
-                            {tag}
-                          </span>
-                        ))}
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {t('template.selector.usageCount', { count: template.usageCount })}
                       </div>
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      使用 {template.usageCount} 次
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -173,7 +188,7 @@ export function TemplateSelector({
         {/* 底部提示 */}
         <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-            💡 提示: 点击模板即可快速应用 | 按 Esc 关闭
+            {t('template.selector.hint')}
           </p>
         </div>
       </div>

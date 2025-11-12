@@ -477,10 +477,10 @@ export function ShortcutSettings() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {group.name}
+                {group.nameKey ? t(group.nameKey, {}, group.name) : group.name}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {group.description}
+                {group.descriptionKey ? t(group.descriptionKey, {}, group.description) : group.description}
               </p>
             </div>
           </div>
@@ -524,8 +524,8 @@ export function ShortcutSettings() {
                       <div className="flex items-center gap-3 mb-2">
                         <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                           {shortcut.action === 'SWITCH_ENGINE' && shortcut.targetEngine
-                            ? `切换到${t(`common.searchEngines.${shortcut.targetEngine}`, {}, shortcut.targetEngine)}搜索`
-                            : shortcut.description}
+                            ? t('shortcutHint.switchEngine', { engine: t(`common.searchEngines.${shortcut.targetEngine}`, {}, shortcut.targetEngine) })
+                            : (shortcut.descriptionKey ? t(shortcut.descriptionKey, {}, shortcut.description) : shortcut.description)}
                         </span>
                         {!shortcut.customizable && (
                           <span className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">

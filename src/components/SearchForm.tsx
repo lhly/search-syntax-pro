@@ -113,22 +113,22 @@ export function SearchForm({
 
           {/* 用户筛选组 */}
           {isFeatureSupported('from_user') && (
-            <CollapsibleSection title="用户筛选" icon="👤" defaultOpen={true}>
+            <CollapsibleSection title={t('searchForm.userFiltering.title')} icon="👤" defaultOpen={true}>
               {isFeatureSupported('from_user') && (
                 <div>
                   <label htmlFor="fromUser" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    来自用户 (from:@user)
+                    {t('searchForm.fromUser.label')}
                   </label>
                   <input
                     id="fromUser"
                     type="text"
                     value={searchParams.fromUser || ''}
                     onChange={(e) => updateParam('fromUser', e.target.value)}
-                    placeholder="例如: @elonmusk"
+                    placeholder={t('searchForm.fromUser.placeholder')}
                     className="input"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    搜索来自特定用户的推文
+                    {t('searchForm.fromUser.description')}
                   </p>
                 </div>
               )}
@@ -136,18 +136,18 @@ export function SearchForm({
               {isFeatureSupported('to_user') && (
                 <div>
                   <label htmlFor="toUser" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    发送给 (to:@user)
+                    {t('searchForm.toUser.label')}
                   </label>
                   <input
                     id="toUser"
                     type="text"
                     value={searchParams.toUser || ''}
                     onChange={(e) => updateParam('toUser', e.target.value)}
-                    placeholder="例如: @openai"
+                    placeholder={t('searchForm.toUser.placeholder')}
                     className="input"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    搜索发送给特定用户的推文
+                    {t('searchForm.toUser.description')}
                   </p>
                 </div>
               )}
@@ -156,23 +156,23 @@ export function SearchForm({
 
           {/* 互动筛选组 */}
           {isFeatureSupported('min_retweets') && (
-            <CollapsibleSection title="互动筛选" icon="❤️">
+            <CollapsibleSection title={t('searchForm.interactionFiltering.title')} icon="❤️">
               {isFeatureSupported('min_retweets') && (
                 <div>
                   <label htmlFor="minRetweets" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    最少转发数 (min_retweets:)
+                    {t('searchForm.minRetweets.label')}
                   </label>
                   <input
                     id="minRetweets"
                     type="number"
                     value={searchParams.minRetweets ?? ''}
                     onChange={(e) => updateParam('minRetweets', Number(e.target.value))}
-                    placeholder="例如: 100"
+                    placeholder={t('searchForm.minRetweets.placeholder')}
                     className="input"
                     min="0"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    筛选至少被转发指定次数的推文
+                    {t('searchForm.minRetweets.description')}
                   </p>
                 </div>
               )}
@@ -180,19 +180,19 @@ export function SearchForm({
               {isFeatureSupported('min_faves') && (
                 <div>
                   <label htmlFor="minFaves" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    最少点赞数 (min_faves:)
+                    {t('searchForm.minFaves.label')}
                   </label>
                   <input
                     id="minFaves"
                     type="number"
                     value={searchParams.minFaves ?? ''}
                     onChange={(e) => updateParam('minFaves', Number(e.target.value))}
-                    placeholder="例如: 500"
+                    placeholder={t('searchForm.minFaves.placeholder')}
                     className="input"
                     min="0"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    筛选至少被点赞指定次数的推文
+                    {t('searchForm.minFaves.description')}
                   </p>
                 </div>
               )}
@@ -200,7 +200,7 @@ export function SearchForm({
               {isFeatureSupported('content_filters') && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    内容过滤器 (filter:)
+                    {t('searchForm.contentFilters.label')}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {(['images', 'videos', 'links', 'media', 'replies', 'retweets', 'news'] as const).map((filter) => (
@@ -222,7 +222,7 @@ export function SearchForm({
                     ))}
                   </div>
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    筛选包含特定内容类型的推文
+                    {t('searchForm.contentFilters.description')}
                   </p>
                 </div>
               )}
@@ -233,22 +233,22 @@ export function SearchForm({
 
           {/* 位置限定组 */}
           {isFeatureSupported('site') && (
-            <CollapsibleSection title="位置限定" icon="📍" defaultOpen={true}>
+            <CollapsibleSection title={t('searchForm.locationFiltering.title')} icon="📍" defaultOpen={true}>
               {isFeatureSupported('site') && (
                 <div>
                   <label htmlFor="site" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    网站内搜索 (site:)
+                    {t('searchForm.site.label')}
                   </label>
                   <input
                     id="site"
                     type="text"
                     value={searchParams.site || ''}
                     onChange={(e) => updateParam('site', e.target.value)}
-                    placeholder="例如: github.com"
+                    placeholder={t('searchForm.site.placeholder')}
                     className="input"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    限制搜索结果仅来自指定网站
+                    {t('searchForm.site.description')}
                   </p>
                 </div>
               )}
@@ -256,7 +256,7 @@ export function SearchForm({
               {isFeatureSupported('filetype') && (
                 <div>
                   <label htmlFor="fileType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    文件类型 (filetype:)
+                    {t('searchForm.fileType.label')}
                   </label>
                   <select
                     id="fileType"
@@ -264,7 +264,7 @@ export function SearchForm({
                     onChange={(e) => updateParam('fileType', e.target.value)}
                     className="input"
                   >
-                    <option value="">不限制</option>
+                    <option value="">{t('searchForm.fileType.any')}</option>
                     {COMMON_FILE_TYPES.map((type) => (
                       <option key={type.value} value={type.value}>
                         {t(type.labelKey)}
@@ -272,7 +272,7 @@ export function SearchForm({
                     ))}
                   </select>
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    搜索特定格式的文档
+                    {t('searchForm.fileType.description')}
                   </p>
                 </div>
               )}
@@ -280,18 +280,18 @@ export function SearchForm({
               {isFeatureSupported('intitle') && (
                 <div>
                   <label htmlFor="inTitle" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    标题搜索 (intitle:)
+                    {t('searchForm.inTitle.label')}
                   </label>
                   <input
                     id="inTitle"
                     type="text"
                     value={searchParams.inTitle || ''}
                     onChange={(e) => updateParam('inTitle', e.target.value)}
-                    placeholder="例如: 教程"
+                    placeholder={t('searchForm.inTitle.placeholder')}
                     className="input"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    搜索标题中包含指定关键词的网页
+                    {t('searchForm.inTitle.description')}
                   </p>
                 </div>
               )}
@@ -299,18 +299,18 @@ export function SearchForm({
               {isFeatureSupported('inurl') && (
                 <div>
                   <label htmlFor="inUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    URL搜索 (inurl:)
+                    {t('searchForm.inUrl.label')}
                   </label>
                   <input
                     id="inUrl"
                     type="text"
                     value={searchParams.inUrl || ''}
                     onChange={(e) => updateParam('inUrl', e.target.value)}
-                    placeholder="例如: blog"
+                    placeholder={t('searchForm.inUrl.placeholder')}
                     className="input"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    搜索URL中包含指定关键词的网页
+                    {t('searchForm.inUrl.description')}
                   </p>
                 </div>
               )}
@@ -318,18 +318,18 @@ export function SearchForm({
               {isFeatureSupported('intext') && (
                 <div>
                   <label htmlFor="inText" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    正文搜索 (intext:/inbody:)
+                    {t('searchForm.inText.label')}
                   </label>
                   <input
                     id="inText"
                     type="text"
                     value={searchParams.inText || ''}
                     onChange={(e) => updateParam('inText', e.target.value)}
-                    placeholder="例如: 使用方法"
+                    placeholder={t('searchForm.inText.placeholder')}
                     className="input"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    搜索正文中包含指定关键词 (Bing使用inbody)
+                    {t('searchForm.inText.description')}
                   </p>
                 </div>
               )}
@@ -338,22 +338,22 @@ export function SearchForm({
 
           {/* 匹配精度组 */}
           {isFeatureSupported('exact_match') && (
-            <CollapsibleSection title="匹配精度" icon="🎯">
+            <CollapsibleSection title={t('searchForm.matchPrecision.title')} icon="🎯">
               {isFeatureSupported('exact_match') && (
                 <div>
                   <label htmlFor="exactMatch" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    精确匹配 ("...")
+                    {t('searchForm.exactMatch.label')}
                   </label>
                   <input
                     id="exactMatch"
                     type="text"
                     value={searchParams.exactMatch || ''}
                     onChange={(e) => updateParam('exactMatch', e.target.value)}
-                    placeholder="例如: React Hooks 完整指南"
+                    placeholder={t('searchForm.exactMatch.placeholder')}
                     className="input"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    搜索包含完整短语的结果
+                    {t('searchForm.exactMatch.description')}
                   </p>
                 </div>
               )}
@@ -361,18 +361,18 @@ export function SearchForm({
               {isFeatureSupported('wildcard') && (
                 <div>
                   <label htmlFor="wildcardQuery" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    通配符查询 (*)
+                    {t('searchForm.wildcardQuery.label')}
                   </label>
                   <input
                     id="wildcardQuery"
                     type="text"
                     value={searchParams.wildcardQuery || ''}
                     onChange={(e) => updateParam('wildcardQuery', e.target.value)}
-                    placeholder='例如: "React is * framework"'
+                    placeholder={t('searchForm.wildcardQuery.placeholder')}
                     className="input"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    使用 * 代替未知词汇
+                    {t('searchForm.wildcardQuery.description')}
                   </p>
                 </div>
               )}
@@ -380,18 +380,18 @@ export function SearchForm({
               {isFeatureSupported('allintitle') && (
                 <div>
                   <label htmlFor="allInTitle" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    所有关键词在标题 (allintitle:)
+                    {t('searchForm.allInTitle.label')}
                   </label>
                   <input
                     id="allInTitle"
                     type="text"
                     value={searchParams.allInTitle || ''}
                     onChange={(e) => updateParam('allInTitle', e.target.value)}
-                    placeholder="例如: Python 机器学习 教程"
+                    placeholder={t('searchForm.allInTitle.placeholder')}
                     className="input"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    标题中包含所有指定关键词 (Bing自动降级)
+                    {t('searchForm.allInTitle.description')}
                   </p>
                 </div>
               )}
@@ -400,20 +400,20 @@ export function SearchForm({
 
           {/* 逻辑运算组 */}
           {(isFeatureSupported('or_keywords') || isFeatureSupported('exclude')) && (
-            <CollapsibleSection title="逻辑运算" icon="🔀">
+            <CollapsibleSection title={t('searchForm.logicalOperations.title')} icon="🔀">
               {isFeatureSupported('or_keywords') && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    OR逻辑关键词
+                    {t('searchForm.orKeywords.label')}
                   </label>
                   <TagInput
                     tags={searchParams.orKeywords || []}
                     onChange={(tags) => updateParam('orKeywords', tags)}
-                    placeholder="输入关键词后按回车"
+                    placeholder={t('searchForm.orKeywords.placeholder')}
                     maxTags={5}
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    搜索包含任一关键词的结果 (OR)
+                    {t('searchForm.orKeywords.description')}
                   </p>
                 </div>
               )}
@@ -421,16 +421,16 @@ export function SearchForm({
               {isFeatureSupported('exclude') && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    排除关键词 (-)
+                    {t('searchForm.excludeWords.label')}
                   </label>
                   <TagInput
                     tags={searchParams.excludeWords || []}
                     onChange={(tags) => updateParam('excludeWords', tags)}
-                    placeholder="输入要排除的词后按回车"
+                    placeholder={t('searchForm.excludeWords.placeholder')}
                     maxTags={10}
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    从搜索结果中排除包含这些词的页面
+                    {t('searchForm.excludeWords.description')}
                   </p>
                 </div>
               )}
@@ -439,11 +439,11 @@ export function SearchForm({
 
           {/* 范围过滤组 */}
           {(isFeatureSupported('date_range') || isFeatureSupported('number_range')) && (
-            <CollapsibleSection title="范围过滤" icon="📅">
+            <CollapsibleSection title={t('searchForm.rangeFiltering.title')} icon="📅">
               {isFeatureSupported('date_range') && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    日期范围
+                    {t('searchForm.dateRange.label')}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
@@ -457,9 +457,9 @@ export function SearchForm({
                           })
                         }
                         className="input"
-                        placeholder="开始日期"
+                        placeholder={t('searchForm.dateRange.from')}
                       />
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">开始日期</p>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t('searchForm.dateRange.from')}</p>
                     </div>
                     <div>
                       <input
@@ -472,13 +472,13 @@ export function SearchForm({
                           })
                         }
                         className="input"
-                        placeholder="结束日期"
+                        placeholder={t('searchForm.dateRange.to')}
                       />
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">结束日期</p>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t('searchForm.dateRange.to')}</p>
                     </div>
                   </div>
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    限制搜索结果的发布日期范围
+                    {t('searchForm.dateRange.description')}
                   </p>
                 </div>
               )}
@@ -486,7 +486,7 @@ export function SearchForm({
               {isFeatureSupported('number_range') && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    数字范围 (..)
+                    {t('searchForm.numberRange.label')}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
@@ -500,9 +500,9 @@ export function SearchForm({
                           } as any)
                         }
                         className="input"
-                        placeholder="最小值"
+                        placeholder={t('searchForm.numberRange.min')}
                       />
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">最小值</p>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t('searchForm.numberRange.min')}</p>
                     </div>
                     <div>
                       <input
@@ -515,13 +515,13 @@ export function SearchForm({
                           } as any)
                         }
                         className="input"
-                        placeholder="最大值"
+                        placeholder={t('searchForm.numberRange.max')}
                       />
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">最大值</p>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t('searchForm.numberRange.max')}</p>
                     </div>
                   </div>
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    搜索包含指定数字范围的结果 (如价格、年份)
+                    {t('searchForm.numberRange.description')}
                   </p>
                 </div>
               )}
@@ -530,22 +530,22 @@ export function SearchForm({
 
           {/* 特殊功能组 */}
           {(isFeatureSupported('related') || isFeatureSupported('cache') || adapter.getLanguageOptions?.()) && (
-            <CollapsibleSection title="特殊功能" icon="🔧">
+            <CollapsibleSection title={t('searchForm.specialFeatures.title')} icon="🔧">
               {isFeatureSupported('related') && (
                 <div>
                   <label htmlFor="relatedSite" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    相关网站 (related:)
+                    {t('searchForm.relatedSite.label')}
                   </label>
                   <input
                     id="relatedSite"
                     type="text"
                     value={searchParams.relatedSite || ''}
                     onChange={(e) => updateParam('relatedSite', e.target.value)}
-                    placeholder="例如: github.com"
+                    placeholder={t('searchForm.relatedSite.placeholder')}
                     className="input"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    查找与指定网站相关的其他网站 (Google/Bing)
+                    {t('searchForm.relatedSite.description')}
                   </p>
                 </div>
               )}
@@ -553,18 +553,18 @@ export function SearchForm({
               {isFeatureSupported('cache') && (
                 <div>
                   <label htmlFor="cacheSite" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    网页缓存 (cache:)
+                    {t('searchForm.cacheSite.label')}
                   </label>
                   <input
                     id="cacheSite"
                     type="text"
                     value={searchParams.cacheSite || ''}
                     onChange={(e) => updateParam('cacheSite', e.target.value)}
-                    placeholder="例如: https://example.com"
+                    placeholder={t('searchForm.cacheSite.placeholder')}
                     className="input"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    查看搜索引擎保存的网页快照 (百度/Google)
+                    {t('searchForm.cacheSite.description')}
                   </p>
                 </div>
               )}
@@ -593,8 +593,8 @@ export function SearchForm({
                       ))}
                     </select>
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      {searchParams.engine === 'twitter' && '限制搜索推文的语言'}
-                      {searchParams.engine === 'github' && '限制搜索代码的编程语言'}
+                      {searchParams.engine === 'twitter' && t('searchForm.language.description.twitter')}
+                      {searchParams.engine === 'github' && t('searchForm.language.description.github')}
                     </p>
                   </div>
                 )

@@ -19,6 +19,7 @@ import type { SearchParams, SearchHistory as SearchHistoryType, UserSettings, Va
 import { DEFAULT_SETTINGS } from '@/types'
 
 function App() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useState<SearchParams>({
     keyword: '',
     engine: 'baidu',
@@ -95,11 +96,11 @@ function App() {
       console.error('生成搜索查询失败:', error)
       setValidation({
         isValid: false,
-        errors: ['搜索引擎适配器加载失败'],
+        errors: [t('popup.adapterLoadError')],
         warnings: []
       })
     }
-  }, [])
+  }, [t])
 
   // 执行搜索 - 使用 useCallback
   const executeSearch = useCallback(() => {
@@ -498,7 +499,7 @@ function PopupContent({
           className="btn btn-ghost w-full flex items-center justify-center gap-2 border border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-500 transition-colors"
         >
           <span>📋</span>
-          <span>使用搜索模板 ({getShortcutDisplayText(DEFAULT_SHORTCUTS.open_templates.key)})</span>
+          <span>{t('popup.useTemplateButton', { shortcut: getShortcutDisplayText(DEFAULT_SHORTCUTS.open_templates.key) })}</span>
         </button>
 
         {/* 验证结果 */}
@@ -580,7 +581,7 @@ function PopupContent({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">搜索历史 ({getShortcutDisplayText(DEFAULT_SHORTCUTS.open_history.key)})</h2>
+              <h2 className="text-lg font-semibold">{t('popup.historyModalTitle', { shortcut: getShortcutDisplayText(DEFAULT_SHORTCUTS.open_history.key) })}</h2>
               <button
                 onClick={() => setShowHistory(false)}
                 className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
@@ -603,7 +604,7 @@ function PopupContent({
                 />
               ) : (
                 <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-                  暂无搜索历史
+                  {t('popup.historyEmptyState')}
                 </div>
               )}
             </div>

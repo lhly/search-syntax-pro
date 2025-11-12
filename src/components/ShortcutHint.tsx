@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from '@/i18n';
 import { SHORTCUT_GROUPS, getShortcutDisplayText } from '@/config/keyboard-shortcuts';
 import { shortcutManager } from '@/services/shortcut-manager';
 import type { ShortcutGroup } from '@/types/shortcut';
@@ -12,6 +13,7 @@ interface ShortcutHintProps {
 }
 
 export function ShortcutHint({ onClose }: ShortcutHintProps) {
+  const { t } = useTranslation();
   const [groups, setGroups] = useState<ShortcutGroup[]>([]);
 
   useEffect(() => {
@@ -61,7 +63,7 @@ export function ShortcutHint({ onClose }: ShortcutHintProps) {
             <div className="flex items-center gap-2">
               <span className="text-2xl">⌨️</span>
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                键盘快捷键
+                {t('shortcutHint.title')}
               </h2>
             </div>
             <button
@@ -82,38 +84,46 @@ export function ShortcutHint({ onClose }: ShortcutHintProps) {
               <div key={groupIndex} className="space-y-3">
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-gray-900 dark:text-white">
-                    {group.name}
+                    {group.nameKey ? t(group.nameKey, {}, group.name) : group.name}
                   </h3>
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {group.description}
+                    {group.descriptionKey ? t(group.descriptionKey, {}, group.description) : group.description}
                   </span>
                 </div>
 
                 <div className="space-y-2">
-                  {group.shortcuts.map((shortcut, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 flex-1">
-                        <kbd className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded shadow-sm border border-gray-300 dark:border-gray-600 font-mono text-sm font-semibold text-gray-800 dark:text-gray-200 min-w-[100px] text-center">
-                          {getShortcutDisplayText(shortcut.key)}
-                        </kbd>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {shortcut.action === 'SWITCH_ENGINE' && shortcut.targetEngine
-                              ? `切换到${shortcut.targetEngine}搜索`
-                              : shortcut.description}
-                          </span>
+                  {group.shortcuts.map((shortcut, index) => {
+                    // 获取引擎的国际化名称
+                    const engineName = shortcut.targetEngine
+                      ? t(`common.searchEngines.${shortcut.targetEngine}`, {}, shortcut.targetEngine)
+                      : '';
+                    const description = shortcut.action === 'SWITCH_ENGINE' && shortcut.targetEngine
+                      ? t('shortcutHint.switchEngine', { engine: engineName })
+                      : (shortcut.descriptionKey ? t(shortcut.descriptionKey, {}, shortcut.description) : shortcut.description);
+
+                    return (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <kbd className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded shadow-sm border border-gray-300 dark:border-gray-600 font-mono text-sm font-semibold text-gray-800 dark:text-gray-200 min-w-[100px] text-center">
+                            {getShortcutDisplayText(shortcut.key)}
+                          </kbd>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              {description}
+                            </span>
+                          </div>
                         </div>
+                        {!shortcut.enabled && (
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                            {t('shortcutHint.disabled')}
+                          </span>
+                        )}
                       </div>
-                      {!shortcut.enabled && (
-                        <span className="text-xs text-gray-400 dark:text-gray-500">
-                          已禁用
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -124,12 +134,12 @@ export function ShortcutHint({ onClose }: ShortcutHintProps) {
         <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-4">
-              <span>💡 在设置中可自定义快捷键</span>
+              <span>{t('shortcutHint.customizeHint')}</span>
               <button
                 onClick={() => chrome.runtime.openOptionsPage()}
                 className="text-primary-600 dark:text-primary-400 hover:underline"
               >
-                打开设置 →
+                {t('shortcutHint.openSettings')}
               </button>
             </div>
           </div>
@@ -143,12 +153,14 @@ export function ShortcutHint({ onClose }: ShortcutHintProps) {
  * 快捷键提示触发器组件（显示在Header中）
  */
 export function ShortcutHintTrigger({ onClick }: { onClick: () => void }) {
+  const { t } = useTranslation();
+
   return (
     <button
       onClick={onClick}
       className="btn btn-header"
-      title="显示快捷键帮助 (?)"
-      aria-label="显示快捷键帮助"
+      title={t('shortcutHint.triggerTitle')}
+      aria-label={t('shortcutHint.triggerLabel')}
     >
       <span className="text-lg font-bold">?</span>
     </button>
