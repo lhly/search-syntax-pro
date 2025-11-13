@@ -71,6 +71,27 @@ export class SearchAdapterFactory {
   }
 
   /**
+   * 🔥 新增：根据用户偏好获取可见的搜索引擎列表
+   * @param preferences 用户偏好设置（可选）
+   * @returns 按用户偏好排序的可见引擎列表
+   * @deprecated 建议使用 EnginePreferenceService.getVisibleEngines()
+   */
+  static getVisibleEngines(preferences?: Array<{ engine: SearchEngine; visible: boolean; order: number }>): SearchEngine[] {
+    // 为了保持向后兼容，这里简单实现
+    // 实际业务逻辑在 EnginePreferenceService 中
+    if (!preferences || preferences.length === 0) {
+      return this.getSupportedEngines()
+    }
+
+    const validEngines = this.getSupportedEngines()
+    return preferences
+      .filter(pref => pref.visible)
+      .sort((a, b) => a.order - b.order)
+      .map(pref => pref.engine)
+      .filter(engine => validEngines.includes(engine))
+  }
+
+  /**
    * 获取搜索引擎的显示名称
    */
   static getEngineName(engine: SearchEngine): string {

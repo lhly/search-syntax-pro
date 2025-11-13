@@ -104,9 +104,17 @@ export interface SearchHistory {
   timestamp: number;
 }
 
+// 🔥 引擎偏好设置接口 (新增)
+export interface EnginePreference {
+  engine: SearchEngine;
+  visible: boolean;
+  order: number;  // 排序权重，数字越小越靠前
+}
+
 // 用户设置接口
 export interface UserSettings {
-  defaultEngine: SearchEngine;
+  // 🔥 移除 defaultEngine - 现在使用 enginePreferences 的第一位作为默认引擎
+  enginePreferences: EnginePreference[];  // 必需字段，排序第一位即为默认引擎
   language: 'zh-CN' | 'en-US';
   enableHistory: boolean;
   theme: 'light' | 'dark' | 'auto';
@@ -207,9 +215,9 @@ export const STORAGE_KEYS = {
   CACHE: 'app_cache'
 } as const;
 
-// 默认设置
-export const DEFAULT_SETTINGS: UserSettings = {
-  defaultEngine: 'baidu',
+// 默认设置 - enginePreferences 需要在运行时通过 EnginePreferenceService 生成
+// 这里提供一个基础配置,实际使用时应调用 getDefaultUserSettings()
+export const DEFAULT_SETTINGS: Omit<UserSettings, 'enginePreferences'> = {
   language: 'zh-CN',
   enableHistory: true,
   theme: 'auto',

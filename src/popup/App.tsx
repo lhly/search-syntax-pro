@@ -10,13 +10,14 @@ import { ShortcutHint, ShortcutHintTrigger } from '@/components/ShortcutHint'
 import { useStorage } from '@/hooks/useStorage'
 import { ThemeProvider } from '@/hooks/useTheme'
 import { SearchAdapterFactory } from '@/services/adapters'
+import { EnginePreferenceService } from '@/services/engine-preference'
 import { templateManager } from '@/services/template-manager'
 import { shortcutManager } from '@/services/shortcut-manager'
 import { TranslationProvider, useTranslation } from '@/i18n'
 import { useExtensionVersion } from '@/utils/version'
+import { autoMigrateStorage } from '@/utils/migration'
 import { DEFAULT_SHORTCUTS, getShortcutDisplayText } from '@/config/keyboard-shortcuts'
 import type { SearchParams, SearchHistory as SearchHistoryType, UserSettings, ValidationResult, SearchEngine } from '@/types'
-import { DEFAULT_SETTINGS } from '@/types'
 
 function App() {
   const { t } = useTranslation();
@@ -56,15 +57,21 @@ function App() {
   const [shortcutConfigVersion, setShortcutConfigVersion] = useState(0)
   
   // 从存储中加载用户设置和历史记录
-  const { data: storedSettings } = useStorage<UserSettings>('user_settings', DEFAULT_SETTINGS)
+  const { data: storedSettings } = useStorage<UserSettings>('user_settings')
   const { data: storedHistory } = useStorage<SearchHistoryType[]>('search_history')
 
+  // 🔥 自动迁移旧版本数据
   useEffect(() => {
-    const effectiveSettings = storedSettings || DEFAULT_SETTINGS
+    autoMigrateStorage().catch(console.error)
+  }, [])
+
+  useEffect(() => {
+    const effectiveSettings = storedSettings || EnginePreferenceService.getDefaultUserSettings()
     setSettings(effectiveSettings)
     setSearchParams(prev => ({
       ...prev,
-      engine: effectiveSettings.defaultEngine
+      // 🔥 使用排序第一位的引擎作为默认引擎
+      engine: EnginePreferenceService.getDefaultEngine(effectiveSettings.enginePreferences)
     }))
   }, [storedSettings])
 
@@ -217,9 +224,14 @@ function App() {
   }, [searchParams, generateQuery])
 
   const handleClearForm = useCallback(() => {
+    // 🔥 使用排序第一位的引擎作为默认引擎
+    const defaultEngine = settings?.enginePreferences
+      ? EnginePreferenceService.getDefaultEngine(settings.enginePreferences)
+      : 'google'
+
     setSearchParams({
       keyword: '',
-      engine: settings?.defaultEngine || 'baidu',
+      engine: defaultEngine,
       site: '',
       fileType: '',
       exactMatch: '',

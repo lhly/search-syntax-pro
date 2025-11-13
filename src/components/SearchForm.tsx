@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import type { SearchParams } from '@/types'
+import type { SearchParams, UserSettings } from '@/types'
 import { COMMON_FILE_TYPES } from '@/types'
 import { useTranslation } from '@/i18n'
 import { CollapsibleSection } from './CollapsibleSection'
 import { TagInput } from './TagInput'
 import { SearchAdapterFactory } from '@/services/adapters'
+import { EnginePreferenceService } from '@/services/engine-preference'
+import { useStorage } from '@/hooks/useStorage'
 
 interface SearchFormProps {
   searchParams: SearchParams
@@ -26,6 +28,12 @@ export function SearchForm({
   // 使用外部状态或内部状态
   const showAdvanced = externalShowAdvanced !== undefined ? externalShowAdvanced : internalShowAdvanced
   const setShowAdvanced = onToggleAdvanced || setInternalShowAdvanced
+
+  // 🔥 从用户设置中获取引擎偏好
+  const { data: settings } = useStorage<UserSettings>('user_settings')
+
+  // 🔥 使用用户偏好的可见引擎列表（已排序）
+  const visibleEngines = EnginePreferenceService.getVisibleEngines(settings?.enginePreferences)
 
   // 🔥 获取当前引擎的适配器和支持的功能
   const adapter = SearchAdapterFactory.getAdapter(searchParams.engine)
@@ -80,7 +88,7 @@ export function SearchForm({
           onChange={(e) => updateParam('engine', e.target.value as any)}
           className="input"
         >
-          {SearchAdapterFactory.getSupportedEngines().map((engine) => (
+          {visibleEngines.map((engine) => (
             <option key={engine} value={engine}>
               {t(`common.searchEngines.${engine}`)}
             </option>

@@ -4,10 +4,11 @@ import { useStorage } from '@/hooks/useStorage'
 import { Logo } from '@/components/Logo'
 import { HistoryManager } from '@/components/HistoryManager'
 import { ShortcutSettings } from '@/components/ShortcutSettings'
+import { EngineManager } from '@/components/EngineManager'
 import type { UserSettings, Language, SearchHistory } from '@/types'
-import { DEFAULT_SETTINGS } from '@/types'
+import { EnginePreferenceService } from '@/services/engine-preference'
+import { autoMigrateStorage } from '@/utils/migration'
 import { TranslationProvider, useTranslation, translate } from '@/i18n'
-import { SearchAdapterFactory } from '@/services/adapters'
 import { useExtensionVersion } from '@/utils/version'
 
 // 设置页面组件
@@ -17,15 +18,21 @@ function App() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; key: string; params?: Record<string, string> } | null>(null)
   const [history, setHistory] = useState<SearchHistory[]>([])
+  // 🔥 移除 'engines' tab
   const [activeTab, setActiveTab] = useState<'settings' | 'history' | 'shortcuts'>('settings')
   const version = useExtensionVersion()
 
   // 从存储中加载设置和历史记录
-  const { data: storedSettings, save: saveSettings } = useStorage<UserSettings>('user_settings', DEFAULT_SETTINGS)
+  const { data: storedSettings, save: saveSettings } = useStorage<UserSettings>('user_settings')
   const { data: storedHistory } = useStorage<SearchHistory[]>('search_history')
 
+  // 🔥 自动迁移旧版本数据
   useEffect(() => {
-    setSettings(storedSettings || DEFAULT_SETTINGS)
+    autoMigrateStorage().catch(console.error)
+  }, [])
+
+  useEffect(() => {
+    setSettings(storedSettings || EnginePreferenceService.getDefaultUserSettings())
     setLoading(false)
   }, [storedSettings])
 
@@ -113,7 +120,7 @@ function App() {
   // 重置设置
   const handleResetSettings = async () => {
     if (confirm(translate(language, 'options.confirm.reset'))) {
-      const defaultSettings = { ...DEFAULT_SETTINGS }
+      const defaultSettings = EnginePreferenceService.getDefaultUserSettings()
       setSettings(defaultSettings)
 
       // 自动保存重置后的设置
@@ -248,6 +255,7 @@ interface OptionsContentProps {
   message: { type: 'success' | 'error'; key: string; params?: Record<string, string> } | null
   saving: boolean
   history: SearchHistory[]
+  // 🔥 移除 'engines' tab
   activeTab: 'settings' | 'history' | 'shortcuts'
   version: string
   onTabChange: (tab: 'settings' | 'history' | 'shortcuts') => void
@@ -368,39 +376,29 @@ function OptionsContent({
         </section>
       ) : (
         <>
-          {/* 原有的设置内容 */}
+          {/* 🔥 设置内容 */}
+
+      {/* 🔥 搜索引擎管理 */}
+      <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        {/* 引擎排序管理 - 标题已移至EngineManager组件内部 */}
+        <EngineManager
+          preferences={settings.enginePreferences}
+          onChange={(newPreferences) => {
+            updateSettings((prev) => ({
+              ...prev,
+              enginePreferences: newPreferences
+            }))
+          }}
+        />
+      </section>
 
       {/* 基本设置 */}
       <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
           {t('options.sections.basic')}
         </h2>
-        
-        <div className="space-y-4">
-          {/* 默认搜索引擎 */}
-          <div>
-            <label htmlFor="defaultEngine" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {t('options.fields.defaultEngine.label')}
-            </label>
-            <select
-              id="defaultEngine"
-              value={settings.defaultEngine}
-              onChange={(e) =>
-                updateSettings((prev) => ({
-                  ...prev,
-                  defaultEngine: e.target.value as UserSettings['defaultEngine']
-                }))
-              }
-              className="input"
-            >
-              {SearchAdapterFactory.getSupportedEngines().map((engine) => (
-                <option key={engine} value={engine}>
-                  {t(`common.searchEngines.${engine}`)}
-                </option>
-              ))}
-            </select>
-          </div>
 
+        <div className="space-y-4">
           {/* 界面语言 */}
           <div>
             <label htmlFor="language" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

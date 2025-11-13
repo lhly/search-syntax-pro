@@ -1,5 +1,8 @@
 // Background Service Worker for SearchSyntax Pro Chrome Extension
 
+import { autoMigrateStorage } from '@/utils/migration'
+import { EnginePreferenceService } from '@/services/engine-preference'
+
 /**
  * 监听快捷键命令
  *
@@ -28,25 +31,33 @@ chrome.commands.onCommand.addListener((command) => {
 })
 
 // 扩展安装时的处理
-chrome.runtime.onInstalled.addListener((details) => {
+chrome.runtime.onInstalled.addListener(async (details) => {
   console.log('SearchSyntax Pro 已安装', details.reason)
-  
+
   // 设置默认设置
   if (details.reason === 'install') {
-    chrome.storage.local.set({
-      user_settings: {
-        defaultEngine: 'baidu',
-        language: 'zh-CN',
-        enableHistory: true,
-        theme: 'auto',
-        historyLimit: 1000,
-        autoOpenInNewTab: true
-      }
+    // 🔥 新安装：使用新的设置结构（无 defaultEngine）
+    const defaultSettings = EnginePreferenceService.getDefaultUserSettings()
+
+    await chrome.storage.local.set({
+      user_settings: defaultSettings
     })
+
+    console.log('✅ 默认设置已初始化:', defaultSettings)
+  } else if (details.reason === 'update') {
+    // 🔥 更新时：执行数据迁移
+    console.log('[Update] 扩展已更新，执行数据迁移...')
+    await autoMigrateStorage()
   }
-  
+
   // 创建右键菜单
   createContextMenus()
+})
+
+// 🔥 扩展启动时也执行一次迁移检查
+chrome.runtime.onStartup.addListener(async () => {
+  console.log('[Startup] 扩展启动，检查是否需要迁移数据...')
+  await autoMigrateStorage()
 })
 
 // 创建右键菜单
@@ -81,19 +92,19 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         })
       })
       return true // 保持消息通道开启
-      
+
     case 'cleanup_expired_data':
       cleanupExpiredData()
       sendResponse({ success: true })
       break
-      
+
     case 'open_search':
       if (message.url) {
         chrome.tabs.create({ url: message.url })
         sendResponse({ success: true })
       }
       break
-      
+
     default:
       break
   }
@@ -102,22 +113,22 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 // 清理过期数据
 function cleanupExpiredData() {
   const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000)
-  
+
   chrome.storage.local.get(null, (items) => {
     const updatedItems = { ...items }
-    
+
     // 清理过期历史记录
     if (items.search_history && Array.isArray(items.search_history)) {
       updatedItems.search_history = items.search_history.filter(
         (item: any) => item.timestamp > thirtyDaysAgo
       )
     }
-    
+
     // 清理过期缓存
     if (items.app_cache && items.app_cache.timestamp < thirtyDaysAgo) {
       delete updatedItems.app_cache
     }
-    
+
     chrome.storage.local.set(updatedItems)
   })
 }
@@ -126,7 +137,7 @@ function cleanupExpiredData() {
 chrome.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === 'local') {
     console.log('存储变化:', changes)
-    
+
     // 如果设置改变，可以在这里执行相关操作
     if (changes.user_settings) {
       console.log('用户设置已更新')
