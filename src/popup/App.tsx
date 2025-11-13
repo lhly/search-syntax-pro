@@ -3,6 +3,7 @@ import { SearchForm } from '@/components/SearchForm'
 import { QueryPreview } from '@/components/QueryPreview'
 import { SearchHistory as SearchHistoryComponent } from '@/components/SearchHistory'
 import { SettingsButton } from '@/components/SettingsButton'
+import { PopoutButton } from '@/components/PopoutButton'
 import { LogoIcon } from '@/components/Logo'
 import { TemplateSelector } from '@/components/TemplateSelector'
 import { SuggestionPanel } from '@/components/SuggestionPanel'
@@ -13,6 +14,7 @@ import { SearchAdapterFactory } from '@/services/adapters'
 import { EnginePreferenceService } from '@/services/engine-preference'
 import { templateManager } from '@/services/template-manager'
 import { shortcutManager } from '@/services/shortcut-manager'
+import { WindowManager } from '@/services/window-manager'
 import { TranslationProvider, useTranslation } from '@/i18n'
 import { useExtensionVersion } from '@/utils/version'
 import { autoMigrateStorage } from '@/utils/migration'
@@ -304,6 +306,11 @@ function App() {
       try {
         await templateManager.initialize()
         await shortcutManager.initialize('popup')
+
+        // v1.6.2: 如果是 detached 窗口，启用窗口位置追踪
+        if (WindowManager.isDetachedWindow()) {
+          WindowManager.setupWindowPositionTracking()
+        }
       } catch (error) {
         console.error('初始化服务失败:', error)
       }
@@ -480,6 +487,7 @@ function PopupContent({
           <h1 className="text-lg font-semibold">{t('popup.headerTitle')}</h1>
         </div>
         <div className="flex items-center space-x-2">
+          <PopoutButton />
           <ShortcutHintTrigger onClick={() => setShowShortcutHint(true)} />
           <SettingsButton />
         </div>

@@ -1,7 +1,7 @@
 {
   "app_name": {
-    "message": "搜索语法大师",
-    "description": "搜索语法大师 - SearchSyntax Pro"
+    "message": "SearchSyntax Pro",
+    "description": "SearchSyntax Pro - Advanced Search Syntax Tool"
   },
   "app_description": {
     "message": "搜索语法可视化工具，降低高级搜索语法使用门槛",
@@ -98,5 +98,17 @@
   "clear_all_data": {
     "message": "清除所有数据",
     "description": "清除所有数据按钮"
+  },
+  "popup_title": {
+    "message": "SearchSyntax Pro",
+    "description": "Popup window title"
+  },
+  "detached_title": {
+    "message": "SearchSyntax Pro - 独立窗口",
+    "description": "Detached window title"
+  },
+  "options_title": {
+    "message": "SearchSyntax Pro - 设置",
+    "description": "Options page title"
   }
 }

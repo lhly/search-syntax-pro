@@ -66,7 +66,7 @@
 
   "web_accessible_resources": [
     {
-      "resources": ["icons/*"],
+      "resources": ["icons/*", "src/detached/index.html"],
       "matches": ["<all_urls>"]
     }
   ],

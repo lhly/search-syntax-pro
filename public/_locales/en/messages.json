@@ -98,5 +98,17 @@
   "clear_all_data": {
     "message": "Clear All Data",
     "description": "Clear all data button"
+  },
+  "popup_title": {
+    "message": "SearchSyntax Pro",
+    "description": "Popup window title"
+  },
+  "detached_title": {
+    "message": "SearchSyntax Pro - Detached Window",
+    "description": "Detached window title"
+  },
+  "options_title": {
+    "message": "SearchSyntax Pro - Settings",
+    "description": "Options page title"
   }
 }
