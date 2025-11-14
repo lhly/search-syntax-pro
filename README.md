@@ -1,301 +1,434 @@
-# SearchSyntax Pro - 搜索语法大师
+# SearchSyntax Pro
+
+<div align="center">
 
 [![CI](https://github.com/lhly/search-syntax-pro/actions/workflows/release.yml/badge.svg)](https://github.com/lhly/search-syntax-pro/actions/workflows/release.yml)
-[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](https://github.com/lhly/search-syntax-pro/releases)
+[![Version](https://img.shields.io/badge/version-1.7.0-blue.svg)](https://github.com/lhly/search-syntax-pro/releases)
+[![Edge Add-ons](https://img.shields.io/badge/Edge-Install-blue?logo=microsoft-edge)](https://microsoftedge.microsoft.com/addons/detail/搜索语法大师/jhbaiiccckiclmgmoclidimjfcneeofh)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-一个基于浏览器扩展的搜索语法可视化工具，旨在降低普通用户使用高级搜索语法的门槛。
+**English** | [简体中文](README.zh-CN.md)
 
-## 功能特点
+</div>
 
-### 🔍 智能搜索语法生成
-- **网站内搜索**: 支持 `site:` 语法，轻松在指定网站内搜索
-- **文件类型搜索**: 支持 `filetype:` 语法，查找特定格式的文件
-- **精确匹配**: 支持 `"` 精确匹配语法
-- **日期范围**: 支持按时间范围筛选搜索结果
+**A professional search syntax visualization tool** that supports 10 search engines and 28 advanced search syntax features, making complex searches simple and accessible.
 
-### 🌐 多搜索引擎支持
-- **百度**: 完全支持中文搜索优化
-- **谷歌**: 支持谷歌高级搜索语法
-- **必应**: 支持必应搜索特性
+## Why Choose SearchSyntax Pro?
 
-### 💡 智能验证与建议
-- **实时验证**: 自动检查搜索语法的正确性
-- **智能建议**: 根据搜索内容提供优化建议
-- **错误提示**: 友好的错误和警告信息
+### 📊 Feature Comparison
 
-### 📝 用户友好特性
-- **搜索历史**: 自动保存搜索记录，支持快速重用
-- **一键复制**: 快速复制生成的搜索查询
-- **多语言**: 支持中英文界面切换
-- **响应式设计**: 适配不同屏幕尺寸
+| Traditional Search | SearchSyntax Pro |
+|-------------------|------------------|
+| ❌ Limited to basic keywords | ✅ **28 advanced syntax** features for professional search |
+| ❌ Requires memorizing complex syntax | ✅ **Visual interface** with zero learning curve |
+| ❌ Manual input prone to errors | ✅ **Smart validation** with real-time error correction |
+| ❌ Limited to single search engine | ✅ **10 engines** with seamless switching |
+| ❌ Incompatible syntax across engines | ✅ **Auto-adaptation** to different engine features |
 
-## 技术架构
+### 🌟 Core Advantages
 
-### 核心技术栈
-- **TypeScript 5.x**: 类型安全的开发体验
-- **React 18.x**: 现代化UI组件开发
-- **Vite 5.x**: 快速构建工具
-- **Tailwind CSS**: 实用优先的CSS框架
+**Scale Advantages**:
+- 🌐 **10 Search Engines** - 6 general-purpose + 4 specialized platforms
+- 🔍 **28 Advanced Syntax** - 14 universal + 14+ platform-specific
+- 📄 **13 File Formats** - Full coverage of Office, PDF, images, archives
 
-### Chrome扩展技术
-- **Manifest V3**: 最新Chrome扩展标准
-- **Service Worker**: 后台服务处理
-- **Content Scripts**: 页面内容注入
-- **Chrome Storage API**: 本地数据存储
+**Experience Advantages**:
+- ⚡ **Zero Learning Curve** - Visual forms replace complex syntax memorization
+- 🎯 **Smart Adaptation** - Auto-adjust syntax support based on search engine
+- 🔄 **One-Click Switching** - Seamlessly reuse queries across different engines
 
-### 搜索引擎适配器
-- **适配器模式**: 可扩展的搜索引擎架构
-- **统一接口**: 一致的API设计
-- **专用优化**: 针对不同搜索引擎的特性优化
+---
 
-## 安装方法
+## Features
 
-### 开发者模式安装
-1. 克隆本项目到本地
+### 🌐 Powerful Search Engine Support
+
+**10 mainstream search engines** to meet different scenario needs:
+
+| Category | Supported Engines |
+|----------|-------------------|
+| **General Search** | Baidu, Google, Bing, DuckDuckGo, Brave, Yandex |
+| **Specialized Platforms** | Twitter/X, Reddit, GitHub, Stack Overflow |
+
+### 🔍 28 Professional Search Syntax
+
+Search like an expert with precision:
+
+#### **Universal Syntax (14 Types)**
+
+**✅ Implemented (4 Types)**
+- **Site Search** (`site:`) - Limit to specific website or domain
+- **File Type** (`filetype:`) - Support 13 common formats (PDF, DOCX, XLSX, PPT, images, archives, etc.)
+- **Exact Match** (`"..."`) - Complete phrase search without keyword splitting
+- **Date Range** - Filter results by publication time
+
+**🔜 Planned (10 Types)**
+- **Title Search** (`intitle:`) - Find keywords in page titles
+- **URL Search** (`inurl:`) - Find keywords in URLs
+- **Exclude Keywords** (`-`) - Filter out unwanted results
+- **Logical OR** (`OR` / `|`) - Match any of multiple keywords
+- **Body Search** (`intext:`) - Find in page content
+- **Number Range** (`..`) - Search within specified numeric range
+- **Wildcard** (`*`) - Fuzzy matching for unknown parts
+- **All in Title** (`allintitle:`) - All keywords in title
+- **Related Sites** (`related:`) - Find similar websites
+- **Cache** (`cache:`) - View historical snapshots
+
+#### **Platform-Specific Syntax (14+ Types)**
+
+**Twitter/X Specific (8 Types)**
+- `from:@user` - Tweets from specific user
+- `to:@user` - Tweets to specific user
+- `filter:images/videos/links/media` - Content type filtering
+- `min_retweets:N` - Minimum retweet count
+- `min_faves:N` - Minimum like count
+- `lang:xx` - Language filtering
+- Date range and exclude keyword support
+
+**GitHub Specific**
+- Repository search, issue filtering, user lookup, etc.
+
+**Reddit Specific**
+- Subreddit filtering, author filtering, score filtering, etc.
+
+**Stack Overflow Specific**
+- Tag filtering, vote count filtering, answer status filtering, etc.
+
+### 💡 Smart Assistant System
+
+- **Real-time Validation** - Auto-check syntax correctness to avoid search errors
+- **Smart Suggestions** - Provide optimization tips based on search engine features
+- **Error Prevention** - Friendly error and warning messages
+
+### 📝 User-Friendly Features
+
+- **Search History** - Auto-save and quickly reuse past searches
+- **One-Click Copy** - Generated query ready to copy and use
+- **Multi-language UI** - Full Chinese and English support
+- **Responsive Design** - Adapt to all screen sizes
+
+### 🪟 Window Management
+
+- **Detached Window Mode** - Dedicated search without occupying browser tabs
+- **Keyboard Shortcuts** - `Ctrl+Shift+F` (Win/Linux) or `Cmd+Shift+F` (Mac)
+- **Flexible Switching** - Freely switch between popup and detached modes
+- **State Persistence** - Auto-save window position and settings
+
+### ⚙️ Personalized Configuration
+
+- **Engine Management** - Customize display order and visibility
+- **Drag-and-Drop Sorting** - Intuitive drag-and-drop to reorder
+- **Preference Saving** - Remember your choices and configurations
+- **Interface Customization** - Hide infrequently used engines to simplify UI
+
+## Technical Architecture
+
+### Core Tech Stack
+- **TypeScript 5.x**: Type-safe development experience
+- **React 18.x**: Modern UI component development
+- **Vite 5.x**: Fast build tooling
+- **Tailwind CSS**: Utility-first CSS framework
+
+### Chrome Extension Technologies
+- **Manifest V3**: Latest Chrome extension standard
+- **Service Worker**: Background service handling
+- **Content Scripts**: Page content injection
+- **Chrome Storage API**: Local data storage
+- **Internationalization**: Complete i18n architecture for multi-language support
+
+### Search Engine Adapters
+- **Adapter Pattern**: Extensible search engine architecture
+- **Unified Interface**: Consistent API design
+- **Specialized Optimization**: Tailored optimizations for different search engines
+
+## Installation
+
+### Browser Extension Store (Recommended)
+
+#### Microsoft Edge
+[![Edge Add-ons](https://img.shields.io/badge/Edge-Install-blue?logo=microsoft-edge)](https://microsoftedge.microsoft.com/addons/detail/搜索语法大师/jhbaiiccckiclmgmoclidimjfcneeofh)
+
+Visit [Edge Add-ons Store](https://microsoftedge.microsoft.com/addons/detail/搜索语法大师/jhbaiiccckiclmgmoclidimjfcneeofh) and click "Get" to install.
+
+#### Chrome Web Store
+🚧 Chrome Web Store version coming soon!
+
+### Developer Mode Installation
+
+For developers or those wanting the latest development version:
+
+1. Clone the repository
 ```bash
 git clone https://github.com/lhly/search-syntax-pro.git
 cd search-syntax-pro
 ```
 
-2. 安装依赖
+2. Install dependencies
 ```bash
 npm install
 ```
 
-3. 构建项目
+3. Build the project
 ```bash
 npm run build
 ```
 
-4. 在Chrome中加载扩展
-   - 打开Chrome浏览器
-   - 访问 `chrome://extensions/`
-   - 开启"开发者模式"
-   - 点击"加载已解压的扩展程序"
-   - 选择项目的 `dist` 目录
+4. Load the extension in your browser
 
-## 使用方法
+   **Chrome/Edge**:
+   - Visit `chrome://extensions/` or `edge://extensions/`
+   - Enable "Developer mode"
+   - Click "Load unpacked"
+   - Select the `dist` directory
 
-### 基础搜索
-1. 点击扩展图标打开搜索面板
-2. 输入搜索关键词
-3. 选择搜索引擎
-4. 点击"执行搜索"查看结果
+## Usage
 
-### 高级搜索
-1. 展开"高级搜索选项"
-2. **网站内搜索**: 输入网站域名（如 wikipedia.org）
-3. **文件类型**: 选择特定文件格式（如 PDF、DOCX）
-4. **精确匹配**: 输入要精确匹配的短语
-5. 查看实时生成的搜索查询
-6. 点击"执行搜索"
+### Basic Search
+1. Click the extension icon to open the search panel
+2. Enter your search keywords
+3. Select a search engine
+4. Click "Search" to view results
 
-### 搜索历史
-1. 在主界面查看最近的搜索记录
-2. 点击历史记录快速恢复搜索设置
-3. 使用"清除历史"清理记录
+### Advanced Search
+1. Expand "Advanced Search Options"
+2. **Site Search**: Enter domain name (e.g., wikipedia.org)
+3. **File Type**: Select specific file format (e.g., PDF, DOCX)
+4. **Exact Match**: Enter phrase to match exactly
+5. View the generated search query in real-time
+6. Click "Search"
 
-## 开发指南
+### Search History
+1. View recent searches in the main interface
+2. Click history items to quickly restore search settings
+3. Use "Clear History" to clean up records
 
-### 项目结构
+## Development Guide
+
+### Project Structure
 ```
 src/
-├── components/          # React组件
-├── services/           # 业务逻辑服务
-│   ├── adapters/       # 搜索引擎适配器
-│   └── storage.ts      # 数据存储服务
-├── hooks/              # 自定义React Hooks
-├── types/              # TypeScript类型定义
-├── popup/              # 弹窗界面
-├── options/            # 设置页面
-├── background/         # 后台脚本
-└── content/            # 内容脚本
+├── components/          # React components
+├── services/           # Business logic services
+│   ├── adapters/       # Search engine adapters
+│   └── storage.ts      # Data storage service
+├── hooks/              # Custom React Hooks
+├── types/              # TypeScript type definitions
+├── popup/              # Popup interface
+├── options/            # Settings page
+├── background/         # Background scripts
+└── content/            # Content scripts
 ```
 
-### 开发命令
+### Development Commands
 ```bash
-# 开发模式（带热重载）
+# Development mode (with hot reload)
 npm run dev
 
-# 构建生产版本
+# Build production version
 npm run build
 
-# 类型检查
+# Type checking
 npm run type-check
 
-# 代码格式化
+# Code formatting
 npm run format
 
-# 运行测试
+# Run tests
 npm run test
 
-# E2E测试
+# E2E tests
 npm run test:e2e
 
-# 代码检查
+# Linting
 npm run lint
 ```
 
-### 添加新搜索引擎
-1. 在 `src/services/adapters/` 目录创建新的适配器文件
-2. 实现 `SearchEngineAdapter` 接口
-3. 在 `SearchAdapterFactory` 中注册新适配器
-4. 更新类型定义中的搜索引擎类型
+### Adding New Search Engines
+1. Create new adapter file in `src/services/adapters/`
+2. Implement `SearchEngineAdapter` interface
+3. Register new adapter in `SearchAdapterFactory`
+4. Update search engine types in type definitions
 
-### 自定义UI主题
-1. 修改 `tailwind.config.js` 中的主题配置
-2. 在组件中使用主题变量
-3. 测试深色/浅色模式切换
+### Customizing UI Theme
+1. Modify theme configuration in `tailwind.config.js`
+2. Use theme variables in components
+3. Test light/dark mode switching
 
-## 测试
+## Testing
 
-### 单元测试
-- 使用 Jest + React Testing Library
-- 覆盖核心业务逻辑
-- 测试组件渲染和交互
+### Unit Tests
+- Using Jest + React Testing Library
+- Coverage of core business logic
+- Testing component rendering and interactions
 
-### E2E测试
-- 使用 Playwright 进行端到端测试
-- 模拟真实用户操作
-- 测试Chrome扩展功能
+### E2E Tests
+- Using Playwright for end-to-end testing
+- Simulating real user operations
+- Testing Chrome extension functionality
 
-### 运行测试
+### Running Tests
 ```bash
-# 运行所有测试
+# Run all tests
 npm test
 
-# 运行特定测试文件
+# Run specific test file
 npm test -- SearchForm.test.tsx
 
-# 运行E2E测试
+# Run E2E tests
 npm run test:e2e
 
-# 测试覆盖率
+# Test coverage
 npm run test:coverage
 ```
 
-## 📦 发布流程
+## 📦 Release Process
 
-### 自动化发布（推荐）
+### Automated Release (Recommended)
 
-本项目使用 GitHub Actions 实现自动化构建和发布。
+This project uses GitHub Actions for automated builds and releases.
 
-#### 快速发布新版本
+#### Quick Release New Version
 
 ```bash
-# 1. 更新版本号（自动更新 package.json 和 manifest.json）
-npm version patch   # 补丁版本：1.5.0 -> 1.5.1
-npm version minor   # 次版本：1.5.0 -> 1.6.0
-npm version major   # 主版本：1.5.0 -> 2.0.0
+# 1. Update version (automatically updates package.json and manifest.json)
+npm version patch   # Patch version: 1.5.0 -> 1.5.1
+npm version minor   # Minor version: 1.5.0 -> 1.6.0
+npm version major   # Major version: 1.5.0 -> 2.0.0
 
-# 2. 推送代码和标签
+# 2. Push code and tags
 git push origin main
 git push origin --tags
 
-# 3. 等待 GitHub Actions 完成（3-5分钟）
-# 访问 https://github.com/lhly/search-syntax-pro/actions 查看进度
+# 3. Wait for GitHub Actions to complete (3-5 minutes)
+# Visit https://github.com/lhly/search-syntax-pro/actions to check progress
 
-# 4. 在 Releases 页面审查并发布
-# 访问 https://github.com/lhly/search-syntax-pro/releases
+# 4. Review and publish on Releases page
+# Visit https://github.com/lhly/search-syntax-pro/releases
 
-# 5. 下载 ZIP 文件上传到 Chrome Web Store
+# 5. Download ZIP file and upload to Chrome Web Store
 ```
 
-#### CI/CD 工作流说明
+#### CI/CD Workflow Description
 
-- **触发条件**：
-  - Tag 推送 (v*.*.*)：触发完整的构建、测试、打包和发布流程
-  - Main 分支推送：仅进行构建和测试（不发布）
-  - Pull Request：代码审查时的质量检查
+- **Trigger Conditions**:
+  - Tag push (v*.*.*): Triggers full build, test, package, and release workflow
+  - Main branch push: Build and test only (no release)
+  - Pull Request: Quality checks during code review
 
-- **自动化步骤**：
-  1. 🔨 构建和测试（类型检查、Lint、单元测试）
-  2. ✅ 版本一致性验证
-  3. 📦 生成 ZIP 安装包
-  4. 🚀 创建 GitHub Release（草稿状态）
+- **Automated Steps**:
+  1. 🔨 Build and test (type check, lint, unit tests)
+  2. ✅ Version consistency verification
+  3. 📦 Generate ZIP package
+  4. 🚀 Create GitHub Release (draft status)
 
-- **构建产物**：
-  - `ssp-v{version}.zip`：Chrome 扩展安装包
-  - 构建日志和测试报告
+- **Build Artifacts**:
+  - `ssp-v{version}.zip`: Chrome extension package
+  - Build logs and test reports
 
-### 手动发布（传统方式）
+### Manual Release (Traditional Method)
 
-如需手动发布，执行以下步骤：
+For manual releases:
 
 ```bash
-# 1. 构建项目
+# 1. Build project
 npm run build
 
-# 2. 打包扩展
+# 2. Package extension
 npm run package
 
-# 3. 在 releases/ 目录找到生成的 ZIP 文件
+# 3. Find generated ZIP file in releases/ directory
 ls -lh releases/
 
-# 4. 手动上传到 Chrome Web Store
+# 4. Manually upload to Chrome Web Store
 ```
 
-## 贡献指南
+## Contributing
 
-### 提交代码
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
+### Submitting Code
+1. Fork the project
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
 
-### 代码规范
-- 遵循 ESLint 和 Prettier 配置
-- 添加适当的类型注释
-- 编写单元测试
-- 更新相关文档
+### Code Standards
+- Follow ESLint and Prettier configurations
+- Add appropriate type annotations
+- Write unit tests
+- Update relevant documentation
 
-### Issue 报告
-- 使用 GitHub Issues 报告问题
-- 提供详细的复现步骤
-- 包含浏览器版本和系统信息
+### Issue Reporting
+- Use GitHub Issues to report problems
+- Provide detailed reproduction steps
+- Include browser version and system information
 
-## 隐私政策
+## Privacy Policy
 
-- 本扩展不收集任何用户个人信息
-- 所有数据仅存储在用户本地设备
-- 不会向第三方服务器传输任何数据
-- 用户可以随时清除所有本地存储的数据
+- This extension does not collect any personal user information
+- All data is stored only on the user's local device
+- No data is transmitted to third-party servers
+- Users can clear all locally stored data at any time
 
-## 开源协议
+## License
 
-本项目采用 MIT 协议开源。详见 [LICENSE](LICENSE) 文件。
+This project is open source under the MIT License. See [LICENSE](LICENSE) file for details.
 
-## 更新日志
+## Changelog
+
+### v1.7.0 (2025-11-13)
+- 🪟 **Detached Window Feature**
+  - Support for using search in a dedicated window without occupying browser tabs
+  - Quick access via keyboard shortcut (`Ctrl+Shift+F` / `Cmd+Shift+F`)
+  - Auto-save and restore window state
+  - Flexible switching between popup and detached window modes
+- 🌐 **Full Internationalization Support**
+  - Added English language pack (`en`)
+  - Improved multi-language switching experience
+  - All UI text supports internationalization
+  - Auto-select interface language based on browser language
+- 🏪 **Store Release**
+  - Officially launched on Microsoft Edge Add-ons Store
+  - Completed store assets and user guide documentation
+
+### v1.6.0 (2025-11-12)
+- ⚙️ **Search Engine Management**
+  - Customize search engine display order
+  - Drag-and-drop sorting support
+  - Show/hide engine configuration
+  - Auto-save user preferences
+- 📝 **Documentation Improvements**
+  - Added complete Edge store submission guide
+  - Added store assets creation guide
+  - Improved privacy policy and store listing content
+  - Added search engine documentation
 
 ### v1.5.0 (2025-11-10)
-- 🚀 **新增自动化 CI/CD 流程**
-  - GitHub Actions 自动构建和发布
-  - Tag 推送自动创建 Release
-  - 构建产物自动打包为 ZIP
-- ✅ **版本管理优化**
-  - 新增版本一致性检查脚本
-  - 自动验证 package.json 和 manifest.json 版本同步
-- 📝 **文档完善**
-  - 新增自动化发布流程说明
-  - 添加 CI 状态徽章
-  - 完善贡献指南
+- 🚀 **Automated CI/CD Workflow**
+  - GitHub Actions for automated builds and releases
+  - Tag push auto-creates releases
+  - Build artifacts auto-packaged as ZIP
+- ✅ **Version Management Optimization**
+  - Added version consistency check script
+  - Auto-verify package.json and manifest.json version sync
+- 📝 **Documentation Improvements**
+  - Added automated release workflow instructions
+  - Added CI status badges
+  - Improved contribution guidelines
 
 ### v1.0.0 (2025-11-06)
-- ✨ 初始版本发布
-- 🔍 支持百度、谷歌、必应搜索引擎
-- 💡 智能搜索语法生成和验证
-- 📝 搜索历史管理
-- 🌐 中英文界面支持
-- 🎨 现代化UI设计
+- ✨ Initial release
+- 🔍 Support for 10 search engines (Baidu, Google, Bing, DuckDuckGo, Brave, Yandex, Twitter/X, Reddit, GitHub, Stack Overflow)
+- 💡 Smart search syntax generation and validation
+- 📝 Search history management
+- 🌐 Chinese and English UI support
+- 🎨 Modern UI design
 
-## 联系我们
+## Contact
 
-- **项目主页**: https://github.com/lhly/search-syntax-pro
-- **问题反馈**: https://github.com/lhly/search-syntax-pro/issues
-- **邮箱**: lhlyzh@qq.com
+- **Project Homepage**: https://github.com/lhly/search-syntax-pro
+- **Issue Tracker**: https://github.com/lhly/search-syntax-pro/issues
+- **Email**: lhlyzh@qq.com
 
 ---
 
-> **SearchSyntax Pro（搜索语法大师）** - 让高级搜索变得简单易用
+> **SearchSyntax Pro** - Making advanced search simple and accessible
