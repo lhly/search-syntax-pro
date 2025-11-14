@@ -45,20 +45,32 @@ export class TwitterAdapter implements SearchEngineAdapter {
       queryParts.push(params.keyword.trim())
     }
 
-    // 2. 精确匹配（使用引号）
-    if (params.exactMatch && params.exactMatch.trim()) {
-      queryParts.push(`"${params.exactMatch.trim()}"`)
+    // 2. 精确匹配 - 🔥 支持多关键词（原生并列）
+    const exactMatches = params.exactMatches?.filter(m => m.trim()) ||
+                         (params.exactMatch ? [params.exactMatch] : [])
+    if (exactMatches.length > 0) {
+      exactMatches.forEach(match => {
+        queryParts.push(`"${match.trim()}"`)
+      })
     }
 
-    // 3. 用户相关筛选
-    if (params.fromUser && params.fromUser.trim()) {
-      const user = this.cleanUsername(params.fromUser.trim())
-      queryParts.push(`from:${user}`)
+    // 3. 用户相关筛选 - 🔥 支持多用户（OR组合）
+    const fromUsers = params.fromUsers?.filter(u => u.trim()) ||
+                      (params.fromUser ? [params.fromUser] : [])
+    if (fromUsers.length > 0) {
+      const fromQuery = fromUsers
+        .map(u => `from:${this.cleanUsername(u.trim())}`)
+        .join(' OR ')
+      queryParts.push(fromUsers.length > 1 ? `(${fromQuery})` : fromQuery)
     }
 
-    if (params.toUser && params.toUser.trim()) {
-      const user = this.cleanUsername(params.toUser.trim())
-      queryParts.push(`to:${user}`)
+    const toUsers = params.toUsers?.filter(u => u.trim()) ||
+                    (params.toUser ? [params.toUser] : [])
+    if (toUsers.length > 0) {
+      const toQuery = toUsers
+        .map(u => `to:${this.cleanUsername(u.trim())}`)
+        .join(' OR ')
+      queryParts.push(toUsers.length > 1 ? `(${toQuery})` : toQuery)
     }
 
     // 4. 日期范围筛选

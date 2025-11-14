@@ -32,10 +32,51 @@ export interface SearchParams {
   keyword: string;
   engine: SearchEngine;
 
-  // 已实现的字段
+  // ========================================
+  // 🔥 多关键词支持字段（技术对等性改造）
+  // ========================================
+
+  // 精确匹配 - 原生多关键词支持 (8/10引擎)
+  exactMatches?: string[];      // 多个精确短语: "phrase1" "phrase2"
+
+  // 网站搜索 - OR组合多关键词 (10/10引擎)
+  sites?: string[];             // 多个网站: (site:a.com OR site:b.com)
+
+  // 文件类型 - OR组合多关键词 (10/10引擎)
+  fileTypes?: string[];         // 多个文件类型: (filetype:pdf OR filetype:doc)
+
+  // Twitter用户筛选 - OR组合多关键词
+  fromUsers?: string[];         // 多个发送者: (from:userA OR from:userB)
+  toUsers?: string[];           // 多个接收者: (to:userA OR to:userB)
+
+  // 平台特定多值字段
+  subreddits?: string[];        // Reddit: 多个版块 (subreddit:a OR subreddit:b)
+  languages?: string[];         // GitHub: 多个编程语言 (language:js OR language:python)
+  tags?: string[];              // StackOverflow: 多个标签 [tag1] [tag2]
+
+  // ========================================
+  // ⚠️ 向后兼容字段（已弃用，保留以防破坏性更改）
+  // ========================================
+
+  /** @deprecated 使用 sites[] 替代 */
   site?: string;
+
+  /** @deprecated 使用 fileTypes[] 替代 */
   fileType?: string;
+
+  /** @deprecated 使用 exactMatches[] 替代 */
   exactMatch?: string;
+
+  /** @deprecated 使用 fromUsers[] 替代（仅Twitter） */
+  fromUser?: string;
+
+  /** @deprecated 使用 toUsers[] 替代（仅Twitter） */
+  toUser?: string;
+
+  // ========================================
+  // 现有字段（保持不变）
+  // ========================================
+
   dateRange?: {
     from: string;
     to: string;
@@ -57,11 +98,9 @@ export interface SearchParams {
   cacheSite?: string;        // 网页缓存
 
   // Twitter 专属字段
-  fromUser?: string;         // Twitter: 来自用户 (from:@user)
-  toUser?: string;           // Twitter: 发送给用户 (to:@user)
   minRetweets?: number;      // Twitter: 最少转发数
   minFaves?: number;         // Twitter: 最少点赞数
-  language?: string;         // Twitter: 语言筛选
+  language?: string;         // 语言筛选 (Twitter自然语言/GitHub编程语言)
   contentFilters?: Array<'images' | 'videos' | 'links' | 'media' | 'replies' | 'retweets' | 'news'>; // Twitter: 内容过滤器
 }
 
@@ -71,9 +110,30 @@ export interface SearchHistory {
   keyword: string;
   engine: SearchEngine;
   syntax: {
-    site?: string;
-    fileType?: string;
-    exactMatch?: string;
+    // ========================================
+    // 🔥 多关键词支持字段
+    // ========================================
+    exactMatches?: string[];
+    sites?: string[];
+    fileTypes?: string[];
+    fromUsers?: string[];
+    toUsers?: string[];
+    subreddits?: string[];
+    languages?: string[];
+    tags?: string[];
+
+    // ========================================
+    // ⚠️ 向后兼容字段（已弃用）
+    // ========================================
+    /** @deprecated */ site?: string;
+    /** @deprecated */ fileType?: string;
+    /** @deprecated */ exactMatch?: string;
+    /** @deprecated */ fromUser?: string;
+    /** @deprecated */ toUser?: string;
+
+    // ========================================
+    // 现有字段
+    // ========================================
     dateRange?: {
       from: string;
       to: string;
@@ -93,8 +153,6 @@ export interface SearchHistory {
     relatedSite?: string;
     cacheSite?: string;
     // Twitter 专属字段
-    fromUser?: string;
-    toUser?: string;
     minRetweets?: number;
     minFaves?: number;
     language?: string;

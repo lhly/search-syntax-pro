@@ -45,15 +45,20 @@ export class StackOverflowAdapter implements SearchEngineAdapter {
       queryParts.push(params.keyword.trim())
     }
 
-    // 2. 精确匹配
-    if (params.exactMatch && params.exactMatch.trim()) {
-      queryParts.push(`"${params.exactMatch.trim()}"`)
+    // 2. 精确匹配 - 🔥 支持多关键词（原生并列）
+    const exactMatches = params.exactMatches?.filter(m => m.trim()) ||
+                         (params.exactMatch ? [params.exactMatch] : [])
+    if (exactMatches.length > 0) {
+      exactMatches.forEach(match => {
+        queryParts.push(`"${match.trim()}"`)
+      })
     }
 
-    // 3. 标签筛选 (使用site字段作为标签)
-    // Stack Overflow 使用 [tag] 格式
-    if (params.site && params.site.trim()) {
-      const tags = params.site.split(',').map(tag => tag.trim()).filter(Boolean)
+    // 3. 标签筛选 - 🔥 支持多标签（原生并列，Stack Overflow特殊语法）
+    // Stack Overflow 使用 [tag] 格式，多标签直接并列
+    const tags = params.tags?.filter(t => t.trim()) ||
+                 (params.site ? params.site.split(',').map(t => t.trim()).filter(Boolean) : [])
+    if (tags.length > 0) {
       tags.forEach(tag => {
         // 移除可能存在的方括号
         const cleanTag = tag.replace(/^\[|\]$/g, '')
@@ -61,14 +66,22 @@ export class StackOverflowAdapter implements SearchEngineAdapter {
       })
     }
 
-    // 4. 用户筛选 (使用fromUser作为user:)
-    if (params.fromUser && params.fromUser.trim()) {
-      const userId = params.fromUser.replace(/^@/, '').trim()
-      // Stack Overflow使用user:ID格式，这里简化处理
-      if (/^\d+$/.test(userId)) {
-        queryParts.push(`user:${userId}`)
-      } else if (userId.toLowerCase() === 'me') {
-        queryParts.push('user:me')
+    // 4. 用户筛选 - 🔥 支持多用户（OR组合）
+    const fromUsers = params.fromUsers?.filter(u => u.trim()) ||
+                      (params.fromUser ? [params.fromUser] : [])
+    if (fromUsers.length > 0) {
+      const validUsers = fromUsers.filter(u => {
+        const userId = u.replace(/^@/, '').trim()
+        return /^\d+$/.test(userId) || userId.toLowerCase() === 'me'
+      })
+      if (validUsers.length > 0) {
+        const userQuery = validUsers
+          .map(u => {
+            const userId = u.replace(/^@/, '').trim()
+            return `user:${userId}`
+          })
+          .join(' OR ')
+        queryParts.push(validUsers.length > 1 ? `(${userQuery})` : userQuery)
       }
     }
 

@@ -28,12 +28,12 @@ export class BingAdapter implements SearchEngineAdapter {
   private buildSearchQuery(params: SearchParams): string {
     let query = params.keyword.trim()
 
-    // 1. 精确匹配优先级最高
-    if (params.exactMatch && params.exactMatch.trim()) {
-      query = `"${params.exactMatch.trim()}"`
-      if (params.keyword.trim()) {
-        query = `${query} ${params.keyword.trim()}`
-      }
+    // 1. 精确匹配优先级最高 - 🔥 支持多关键词（原生并列）
+    const exactMatches = params.exactMatches?.filter(m => m.trim()) ||
+                         (params.exactMatch ? [params.exactMatch] : [])
+    if (exactMatches.length > 0) {
+      const exactQuery = exactMatches.map(m => `"${m.trim()}"`).join(' ')
+      query = query ? `${exactQuery} ${query}` : exactQuery
     }
 
     // 2. 通配符查询（如果存在则替换主查询）
@@ -41,16 +41,25 @@ export class BingAdapter implements SearchEngineAdapter {
       query = params.wildcardQuery
     }
 
-    // 3. 限定性语法 (site, filetype)
-    // 网站内搜索
-    if (params.site && params.site.trim()) {
-      const site = this.cleanSiteDomain(params.site.trim())
-      query += ` site:${site}`
+    // 3. 限定性语法 (site, filetype) - 🔥 支持多关键词（OR组合）
+    // 网站内搜索 - OR组合多个站点
+    const sites = params.sites?.filter(s => s.trim()) ||
+                  (params.site ? [params.site] : [])
+    if (sites.length > 0) {
+      const siteQuery = sites
+        .map(s => `site:${this.cleanSiteDomain(s.trim())}`)
+        .join(' OR ')
+      query += sites.length > 1 ? ` (${siteQuery})` : ` ${siteQuery}`
     }
 
-    // 文件类型搜索
-    if (params.fileType && params.fileType.trim()) {
-      query += ` filetype:${params.fileType.trim()}`
+    // 文件类型搜索 - OR组合多个类型
+    const fileTypes = params.fileTypes?.filter(ft => ft.trim()) ||
+                      (params.fileType ? [params.fileType] : [])
+    if (fileTypes.length > 0) {
+      const fileTypeQuery = fileTypes
+        .map(ft => `filetype:${ft.trim()}`)
+        .join(' OR ')
+      query += fileTypes.length > 1 ? ` (${fileTypeQuery})` : ` ${fileTypeQuery}`
     }
 
     // 4. 位置性语法 (intitle, inurl, inbody)

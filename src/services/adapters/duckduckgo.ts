@@ -40,20 +40,33 @@ export class DuckDuckGoAdapter implements SearchEngineAdapter {
       queryParts.push(params.keyword.trim())
     }
 
-    // 2. 精确匹配
-    if (params.exactMatch && params.exactMatch.trim()) {
-      queryParts.push(`"${params.exactMatch.trim()}"`)
+    // 2. 精确匹配 - 🔥 支持多关键词（原生并列）
+    const exactMatches = params.exactMatches?.filter(m => m.trim()) ||
+                         (params.exactMatch ? [params.exactMatch] : [])
+    if (exactMatches.length > 0) {
+      exactMatches.forEach(match => {
+        queryParts.push(`"${match.trim()}"`)
+      })
     }
 
-    // 3. 网站内搜索
-    if (params.site && params.site.trim()) {
-      const site = this.cleanSiteDomain(params.site.trim())
-      queryParts.push(`site:${site}`)
+    // 3. 网站内搜索 - 🔥 支持多网站（OR组合）
+    const sites = params.sites?.filter(s => s.trim()) ||
+                  (params.site ? [params.site] : [])
+    if (sites.length > 0) {
+      const siteQuery = sites
+        .map(s => `site:${this.cleanSiteDomain(s.trim())}`)
+        .join(' OR ')
+      queryParts.push(sites.length > 1 ? `(${siteQuery})` : siteQuery)
     }
 
-    // 4. 文件类型搜索
-    if (params.fileType && params.fileType.trim()) {
-      queryParts.push(`filetype:${params.fileType.trim()}`)
+    // 4. 文件类型搜索 - 🔥 支持多类型（OR组合）
+    const fileTypes = params.fileTypes?.filter(ft => ft.trim()) ||
+                      (params.fileType ? [params.fileType] : [])
+    if (fileTypes.length > 0) {
+      const fileQuery = fileTypes
+        .map(ft => `filetype:${ft.trim()}`)
+        .join(' OR ')
+      queryParts.push(fileTypes.length > 1 ? `(${fileQuery})` : fileQuery)
     }
 
     // 5. 标题搜索

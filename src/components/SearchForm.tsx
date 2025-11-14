@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import type { SearchParams, UserSettings } from '@/types'
-import { COMMON_FILE_TYPES } from '@/types'
 import { useTranslation } from '@/i18n'
 import { CollapsibleSection } from './CollapsibleSection'
 import { TagInput } from './TagInput'
@@ -124,38 +123,34 @@ export function SearchForm({
             <CollapsibleSection title={t('searchForm.userFiltering.title')} icon="👤" defaultOpen={true}>
               {isFeatureSupported('from_user') && (
                 <div>
-                  <label htmlFor="fromUser" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t('searchForm.fromUser.label')}
+                  <label htmlFor="fromUsers" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t('searchForm.fromUser.label')} 🔥
                   </label>
-                  <input
-                    id="fromUser"
-                    type="text"
-                    value={searchParams.fromUser || ''}
-                    onChange={(e) => updateParam('fromUser', e.target.value)}
-                    placeholder={t('searchForm.fromUser.placeholder')}
-                    className="input"
+                  <TagInput
+                    tags={searchParams.fromUsers || []}
+                    onChange={(tags) => updateParam('fromUsers', tags)}
+                    placeholder={t('searchForm.fromUser.placeholder') + ' (支持多个用户)'}
+                    maxTags={10}
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {t('searchForm.fromUser.description')}
+                    {t('searchForm.fromUser.description')} • 按回车添加多个用户
                   </p>
                 </div>
               )}
 
               {isFeatureSupported('to_user') && (
                 <div>
-                  <label htmlFor="toUser" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t('searchForm.toUser.label')}
+                  <label htmlFor="toUsers" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t('searchForm.toUser.label')} 🔥
                   </label>
-                  <input
-                    id="toUser"
-                    type="text"
-                    value={searchParams.toUser || ''}
-                    onChange={(e) => updateParam('toUser', e.target.value)}
-                    placeholder={t('searchForm.toUser.placeholder')}
-                    className="input"
+                  <TagInput
+                    tags={searchParams.toUsers || []}
+                    onChange={(tags) => updateParam('toUsers', tags)}
+                    placeholder={t('searchForm.toUser.placeholder') + ' (支持多个用户)'}
+                    maxTags={10}
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {t('searchForm.toUser.description')}
+                    {t('searchForm.toUser.description')} • 按回车添加多个用户
                   </p>
                 </div>
               )}
@@ -244,43 +239,34 @@ export function SearchForm({
             <CollapsibleSection title={t('searchForm.locationFiltering.title')} icon="📍" defaultOpen={true}>
               {isFeatureSupported('site') && (
                 <div>
-                  <label htmlFor="site" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t('searchForm.site.label')}
+                  <label htmlFor="sites" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t('searchForm.site.label')} 🔥
                   </label>
-                  <input
-                    id="site"
-                    type="text"
-                    value={searchParams.site || ''}
-                    onChange={(e) => updateParam('site', e.target.value)}
-                    placeholder={t('searchForm.site.placeholder')}
-                    className="input"
+                  <TagInput
+                    tags={searchParams.sites || []}
+                    onChange={(tags) => updateParam('sites', tags)}
+                    placeholder={t('searchForm.site.placeholder') + ' (支持多个域名)'}
+                    maxTags={10}
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {t('searchForm.site.description')}
+                    {t('searchForm.site.description')} • 按回车添加多个网站
                   </p>
                 </div>
               )}
 
               {isFeatureSupported('filetype') && (
                 <div>
-                  <label htmlFor="fileType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t('searchForm.fileType.label')}
+                  <label htmlFor="fileTypes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t('searchForm.fileType.label')} 🔥
                   </label>
-                  <select
-                    id="fileType"
-                    value={searchParams.fileType || ''}
-                    onChange={(e) => updateParam('fileType', e.target.value)}
-                    className="input"
-                  >
-                    <option value="">{t('searchForm.fileType.any')}</option>
-                    {COMMON_FILE_TYPES.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {t(type.labelKey)}
-                      </option>
-                    ))}
-                  </select>
+                  <TagInput
+                    tags={searchParams.fileTypes || []}
+                    onChange={(tags) => updateParam('fileTypes', tags)}
+                    placeholder="输入文件类型 (pdf, doc, etc.) 支持多个"
+                    maxTags={5}
+                  />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {t('searchForm.fileType.description')}
+                    {t('searchForm.fileType.description')} • 按回车添加多个文件类型
                   </p>
                 </div>
               )}
@@ -349,19 +335,17 @@ export function SearchForm({
             <CollapsibleSection title={t('searchForm.matchPrecision.title')} icon="🎯">
               {isFeatureSupported('exact_match') && (
                 <div>
-                  <label htmlFor="exactMatch" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {t('searchForm.exactMatch.label')}
+                  <label htmlFor="exactMatches" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {t('searchForm.exactMatch.label')} 🔥
                   </label>
-                  <input
-                    id="exactMatch"
-                    type="text"
-                    value={searchParams.exactMatch || ''}
-                    onChange={(e) => updateParam('exactMatch', e.target.value)}
-                    placeholder={t('searchForm.exactMatch.placeholder')}
-                    className="input"
+                  <TagInput
+                    tags={searchParams.exactMatches || []}
+                    onChange={(tags) => updateParam('exactMatches', tags)}
+                    placeholder={t('searchForm.exactMatch.placeholder') + ' (支持多个短语)'}
+                    maxTags={5}
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {t('searchForm.exactMatch.description')}
+                    {t('searchForm.exactMatch.description')} • 按回车添加多个短语
                   </p>
                 </div>
               )}
@@ -533,6 +517,66 @@ export function SearchForm({
                   </p>
                 </div>
               )}
+            </CollapsibleSection>
+          )}
+
+          {/* 🔥 Reddit专属 - 板块筛选 */}
+          {searchParams.engine === 'reddit' && (
+            <CollapsibleSection title="Reddit板块筛选" icon="📋">
+              <div>
+                <label htmlFor="subreddits" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  板块筛选 (Subreddit) 🔥
+                </label>
+                <TagInput
+                  tags={searchParams.subreddits || []}
+                  onChange={(tags) => updateParam('subreddits', tags)}
+                  placeholder="输入版块名称 (如: programming, javascript) 支持多个"
+                  maxTags={10}
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  在指定的Reddit版块内搜索 • 按回车添加多个版块
+                </p>
+              </div>
+            </CollapsibleSection>
+          )}
+
+          {/* 🔥 GitHub专属 - 编程语言筛选 */}
+          {searchParams.engine === 'github' && (
+            <CollapsibleSection title="GitHub编程语言" icon="💻">
+              <div>
+                <label htmlFor="languages" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  编程语言筛选 🔥
+                </label>
+                <TagInput
+                  tags={searchParams.languages || []}
+                  onChange={(tags) => updateParam('languages', tags)}
+                  placeholder="输入编程语言 (如: javascript, python, rust) 支持多个"
+                  maxTags={5}
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  在指定编程语言的仓库中搜索 • 按回车添加多个语言
+                </p>
+              </div>
+            </CollapsibleSection>
+          )}
+
+          {/* 🔥 Stack Overflow专属 - 标签筛选 */}
+          {searchParams.engine === 'stackoverflow' && (
+            <CollapsibleSection title="Stack Overflow标签" icon="🏷️">
+              <div>
+                <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  标签筛选 (Tags) 🔥
+                </label>
+                <TagInput
+                  tags={searchParams.tags || []}
+                  onChange={(tags) => updateParam('tags', tags)}
+                  placeholder="输入标签 (如: react, node.js, typescript) 支持多个"
+                  maxTags={10}
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  在指定标签的问题中搜索 • 按回车添加多个标签
+                </p>
+              </div>
             </CollapsibleSection>
           )}
 

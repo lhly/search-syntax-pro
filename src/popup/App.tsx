@@ -26,15 +26,29 @@ function App() {
   const [searchParams, setSearchParams] = useState<SearchParams>({
     keyword: '',
     engine: 'baidu',
-    // 旧字段
+
+    // ===== 保留旧字段以向后兼容 =====
     site: '',
     fileType: '',
     exactMatch: '',
-    // 新增高级语法字段
+    fromUser: '',
+    toUser: '',
+
+    // ===== 新增多值字段 (P0优先级) =====
+    exactMatches: [],      // 多个精确短语
+    sites: [],             // 多个网站
+    fileTypes: [],         // 多个文件类型
+    fromUsers: [],         // Twitter/GitHub/Reddit多用户
+    toUsers: [],           // Twitter多接收者
+    subreddits: [],        // Reddit多版块
+    languages: [],         // GitHub多编程语言
+    tags: [],              // Stack Overflow多标签
+
+    // ===== 其他已有字段保持不变 =====
     inTitle: '',
     inUrl: '',
-    excludeWords: [],
-    orKeywords: [],
+    excludeWords: [],      // 已有
+    orKeywords: [],        // 已有
     inText: '',
     numberRange: undefined,
     wildcardQuery: '',
@@ -83,6 +97,47 @@ function App() {
     }
   }, [storedHistory])
 
+  // 自动迁移旧单值字段到新数组字段
+  useEffect(() => {
+    const migrateOldFieldsToNew = () => {
+      const updates: Partial<SearchParams> = {}
+
+      // 迁移 exactMatch -> exactMatches
+      if (searchParams.exactMatch && (!searchParams.exactMatches || searchParams.exactMatches.length === 0)) {
+        updates.exactMatches = [searchParams.exactMatch]
+      }
+
+      // 迁移 site -> sites
+      if (searchParams.site && (!searchParams.sites || searchParams.sites.length === 0)) {
+        updates.sites = [searchParams.site]
+      }
+
+      // 迁移 fileType -> fileTypes
+      if (searchParams.fileType && (!searchParams.fileTypes || searchParams.fileTypes.length === 0)) {
+        updates.fileTypes = [searchParams.fileType]
+      }
+
+      // 迁移 fromUser -> fromUsers
+      if (searchParams.fromUser && (!searchParams.fromUsers || searchParams.fromUsers.length === 0)) {
+        updates.fromUsers = [searchParams.fromUser]
+      }
+
+      // 迁移 toUser -> toUsers
+      if (searchParams.toUser && (!searchParams.toUsers || searchParams.toUsers.length === 0)) {
+        updates.toUsers = [searchParams.toUser]
+      }
+
+      if (Object.keys(updates).length > 0) {
+        const newParams = { ...searchParams, ...updates }
+        setSearchParams(newParams)
+        generateQuery(newParams)
+        console.log('[Migration] 已自动迁移旧字段到新数组:', updates)
+      }
+    }
+
+    migrateOldFieldsToNew()
+  }, []) // 空依赖,只在挂载时执行一次
+
   // 生成搜索查询 - 使用 useCallback
   const generateQuery = useCallback((params: SearchParams) => {
     try {
@@ -122,10 +177,22 @@ function App() {
         keyword: searchParams.keyword,
         engine: searchParams.engine,
         syntax: {
+          // 旧字段（向后兼容）
           site: searchParams.site,
           fileType: searchParams.fileType,
           exactMatch: searchParams.exactMatch,
-          // 新增高级语法字段
+          fromUser: searchParams.fromUser,
+          toUser: searchParams.toUser,
+          // 新多值字段
+          exactMatches: searchParams.exactMatches,
+          sites: searchParams.sites,
+          fileTypes: searchParams.fileTypes,
+          fromUsers: searchParams.fromUsers,
+          toUsers: searchParams.toUsers,
+          subreddits: searchParams.subreddits,
+          languages: searchParams.languages,
+          tags: searchParams.tags,
+          // 其他高级语法字段
           inTitle: searchParams.inTitle,
           inUrl: searchParams.inUrl,
           excludeWords: searchParams.excludeWords,
@@ -234,9 +301,22 @@ function App() {
     setSearchParams({
       keyword: '',
       engine: defaultEngine,
+      // 旧字段（向后兼容）
       site: '',
       fileType: '',
       exactMatch: '',
+      fromUser: '',
+      toUser: '',
+      // 新多值字段
+      exactMatches: [],
+      sites: [],
+      fileTypes: [],
+      fromUsers: [],
+      toUsers: [],
+      subreddits: [],
+      languages: [],
+      tags: [],
+      // 其他字段
       inTitle: '',
       inUrl: '',
       excludeWords: [],
@@ -257,10 +337,22 @@ function App() {
     const restoredParams: SearchParams = {
       keyword: historyItem.keyword,
       engine: historyItem.engine,
+      // 旧字段（向后兼容）
       site: historyItem.syntax.site || '',
       fileType: historyItem.syntax.fileType || '',
       exactMatch: historyItem.syntax.exactMatch || '',
-      // 新增高级语法字段
+      fromUser: historyItem.syntax.fromUser || '',
+      toUser: historyItem.syntax.toUser || '',
+      // 新多值字段
+      exactMatches: historyItem.syntax.exactMatches || [],
+      sites: historyItem.syntax.sites || [],
+      fileTypes: historyItem.syntax.fileTypes || [],
+      fromUsers: historyItem.syntax.fromUsers || [],
+      toUsers: historyItem.syntax.toUsers || [],
+      subreddits: historyItem.syntax.subreddits || [],
+      languages: historyItem.syntax.languages || [],
+      tags: historyItem.syntax.tags || [],
+      // 其他高级语法字段
       inTitle: historyItem.syntax.inTitle || '',
       inUrl: historyItem.syntax.inUrl || '',
       excludeWords: historyItem.syntax.excludeWords || [],

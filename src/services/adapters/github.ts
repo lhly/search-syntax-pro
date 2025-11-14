@@ -46,20 +46,34 @@ export class GitHubAdapter implements SearchEngineAdapter {
       queryParts.push(params.keyword.trim())
     }
 
-    // 2. 精确匹配
-    if (params.exactMatch && params.exactMatch.trim()) {
-      queryParts.push(`"${params.exactMatch.trim()}"`)
+    // 2. 精确匹配 - 🔥 支持多关键词（原生并列）
+    const exactMatches = params.exactMatches?.filter(m => m.trim()) ||
+                         (params.exactMatch ? [params.exactMatch] : [])
+    if (exactMatches.length > 0) {
+      exactMatches.forEach(match => {
+        queryParts.push(`"${match.trim()}"`)
+      })
     }
 
-    // 3. 仓库筛选 (使用site字段作为repo:)
+    // 3. 仓库筛选 - 🔥 支持多仓库（OR组合）
     // 格式: user/repo 或 org/repo
-    if (params.site && params.site.trim()) {
-      queryParts.push(`repo:${params.site.trim()}`)
+    const sites = params.sites?.filter(s => s.trim()) ||
+                  (params.site ? [params.site] : [])
+    if (sites.length > 0) {
+      const repoQuery = sites
+        .map(s => `repo:${s.trim()}`)
+        .join(' OR ')
+      queryParts.push(sites.length > 1 ? `(${repoQuery})` : repoQuery)
     }
 
-    // 4. 语言筛选
-    if (params.language && params.language.trim()) {
-      queryParts.push(`language:${params.language.trim()}`)
+    // 4. 语言筛选 - 🔥 支持多语言（OR组合）
+    const languages = params.languages?.filter(lang => lang.trim()) ||
+                      (params.language ? [params.language] : [])
+    if (languages.length > 0) {
+      const langQuery = languages
+        .map(lang => `language:${lang.trim()}`)
+        .join(' OR ')
+      queryParts.push(languages.length > 1 ? `(${langQuery})` : langQuery)
     }
 
     // 5. 文件路径筛选 (使用inUrl作为path:)
@@ -67,15 +81,24 @@ export class GitHubAdapter implements SearchEngineAdapter {
       queryParts.push(`path:${params.inUrl.trim()}`)
     }
 
-    // 6. 文件名筛选 (使用fileType作为filename:)
-    if (params.fileType && params.fileType.trim()) {
-      queryParts.push(`filename:${params.fileType.trim()}`)
+    // 6. 文件名筛选 - 🔥 支持多文件名（OR组合）
+    const fileTypes = params.fileTypes?.filter(ft => ft.trim()) ||
+                      (params.fileType ? [params.fileType] : [])
+    if (fileTypes.length > 0) {
+      const fileQuery = fileTypes
+        .map(ft => `filename:${ft.trim()}`)
+        .join(' OR ')
+      queryParts.push(fileTypes.length > 1 ? `(${fileQuery})` : fileQuery)
     }
 
-    // 7. 用户筛选 (使用fromUser作为user:)
-    if (params.fromUser && params.fromUser.trim()) {
-      const username = params.fromUser.replace('@', '').trim()
-      queryParts.push(`user:${username}`)
+    // 7. 用户筛选 - 🔥 支持多用户（OR组合）
+    const fromUsers = params.fromUsers?.filter(u => u.trim()) ||
+                      (params.fromUser ? [params.fromUser] : [])
+    if (fromUsers.length > 0) {
+      const userQuery = fromUsers
+        .map(u => `user:${u.replace('@', '').trim()}`)
+        .join(' OR ')
+      queryParts.push(fromUsers.length > 1 ? `(${userQuery})` : userQuery)
     }
 
     // 8. 排除关键词

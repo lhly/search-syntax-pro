@@ -47,21 +47,33 @@ export class RedditAdapter implements SearchEngineAdapter {
       queryParts.push(params.keyword.trim())
     }
 
-    // 2. 精确匹配
-    if (params.exactMatch && params.exactMatch.trim()) {
-      queryParts.push(`"${params.exactMatch.trim()}"`)
+    // 2. 精确匹配 - 🔥 支持多关键词（原生并列）
+    const exactMatches = params.exactMatches?.filter(m => m.trim()) ||
+                         (params.exactMatch ? [params.exactMatch] : [])
+    if (exactMatches.length > 0) {
+      exactMatches.forEach(match => {
+        queryParts.push(`"${match.trim()}"`)
+      })
     }
 
-    // 3. Subreddit筛选 (使用site字段映射为subreddit:)
-    if (params.site && params.site.trim()) {
-      const subreddit = params.site.replace(/^r\//, '').trim()
-      queryParts.push(`subreddit:${subreddit}`)
+    // 3. Subreddit筛选 - 🔥 支持多版块（OR组合）
+    const subreddits = params.subreddits?.filter(s => s.trim()) ||
+                       (params.site ? [params.site] : [])
+    if (subreddits.length > 0) {
+      const subQuery = subreddits
+        .map(s => `subreddit:${s.replace(/^r\//, '').trim()}`)
+        .join(' OR ')
+      queryParts.push(subreddits.length > 1 ? `(${subQuery})` : subQuery)
     }
 
-    // 4. 作者筛选 (使用fromUser字段映射为author:)
-    if (params.fromUser && params.fromUser.trim()) {
-      const author = params.fromUser.replace(/^u\/|^@/, '').trim()
-      queryParts.push(`author:${author}`)
+    // 4. 作者筛选 - 🔥 支持多作者（OR组合）
+    const fromUsers = params.fromUsers?.filter(u => u.trim()) ||
+                      (params.fromUser ? [params.fromUser] : [])
+    if (fromUsers.length > 0) {
+      const authorQuery = fromUsers
+        .map(u => `author:${u.replace(/^u\/|^@/, '').trim()}`)
+        .join(' OR ')
+      queryParts.push(fromUsers.length > 1 ? `(${authorQuery})` : authorQuery)
     }
 
     // 5. URL筛选
