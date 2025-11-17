@@ -1,4 +1,17 @@
-import type { SearchEngineAdapter, SearchParams, SyntaxType, ValidationResult, UIFeatureType, EngineFeatureGroups } from '@/types'
+import type { SearchEngineAdapter, SearchParams, SyntaxType, ValidationResult, UIFeatureType, EngineFeatureGroups, Language } from '@/types'
+import { translate } from '@/i18n/translations'
+
+/**
+ * 获取当前语言设置
+ */
+async function getCurrentLanguage(): Promise<Language> {
+  try {
+    const result = await chrome.storage.local.get('user_settings')
+    return result.user_settings?.language || 'zh-CN'
+  } catch {
+    return 'zh-CN'
+  }
+}
 
 /**
  * GitHub 搜索引擎适配器
@@ -191,14 +204,15 @@ export class GitHubAdapter implements SearchEngineAdapter {
   /**
    * 验证搜索参数
    */
-  validateParams(params: SearchParams): ValidationResult {
+  async validateParams(params: SearchParams): Promise<ValidationResult> {
+    const language = await getCurrentLanguage()
     const errors: string[] = []
     const warnings: string[] = []
 
     // 检查基本关键词
     if (!params.keyword || !params.keyword.trim()) {
       if (!params.exactMatch && !params.site) {
-        errors.push('请输入搜索关键词')
+        errors.push(translate(language, 'adapter.validation.keywordRequired'))
       }
     }
 
@@ -206,7 +220,7 @@ export class GitHubAdapter implements SearchEngineAdapter {
     if (params.site && params.site.trim()) {
       const repoPattern = /^[a-zA-Z0-9_-]+\/[a-zA-Z0-9_.-]+$/
       if (!repoPattern.test(params.site.trim())) {
-        warnings.push('仓库格式应为: 用户名/仓库名 (例如: facebook/react)')
+        warnings.push(translate(language, 'adapter.validation.repoInvalid'))
       }
     }
 
@@ -215,7 +229,7 @@ export class GitHubAdapter implements SearchEngineAdapter {
       const username = params.fromUser.replace('@', '').trim()
       const usernamePattern = /^[a-zA-Z0-9_-]+$/
       if (!usernamePattern.test(username)) {
-        warnings.push('用户名格式不正确（仅支持字母、数字、连字符和下划线）')
+        warnings.push(translate(language, 'adapter.validation.usernameInvalid'))
       }
     }
 
@@ -227,14 +241,14 @@ export class GitHubAdapter implements SearchEngineAdapter {
       ]
       const lang = params.language.toLowerCase()
       if (!validLangs.includes(lang)) {
-        warnings.push(`语言 "${params.language}" 可能不被 GitHub 支持`)
+        warnings.push(translate(language, 'adapter.validation.languageUnsupported', { language: params.language }))
       }
     }
 
     // 检查查询复杂度
     const fullQuery = this.buildSearchQuery(params)
     if (fullQuery.length > 256) {
-      warnings.push('搜索查询过长，可能影响搜索结果')
+      warnings.push(translate(language, 'adapter.validation.queryTooLong'))
     }
 
     return {
@@ -282,28 +296,30 @@ export class GitHubAdapter implements SearchEngineAdapter {
    * @returns GitHub的编程语言选项配置
    */
   getLanguageOptions(): import('@/types').LanguageFieldConfig {
+    // Note: Language labels are kept in English as they are programming language names
+    // The label and placeholder use i18n keys which will be translated in the UI
     return {
-      label: '编程语言 (language:)',
-      placeholder: '选择编程语言',
+      label: 'github.language.label',
+      placeholder: 'github.language.placeholder',
       options: [
-        { value: 'javascript', label: 'JavaScript' },
-        { value: 'typescript', label: 'TypeScript' },
-        { value: 'python', label: 'Python' },
-        { value: 'java', label: 'Java' },
-        { value: 'go', label: 'Go' },
-        { value: 'rust', label: 'Rust' },
-        { value: 'cpp', label: 'C++' },
-        { value: 'c', label: 'C' },
-        { value: 'csharp', label: 'C#' },
-        { value: 'ruby', label: 'Ruby' },
-        { value: 'php', label: 'PHP' },
-        { value: 'swift', label: 'Swift' },
-        { value: 'kotlin', label: 'Kotlin' },
-        { value: 'dart', label: 'Dart' },
-        { value: 'shell', label: 'Shell' },
-        { value: 'html', label: 'HTML' },
-        { value: 'css', label: 'CSS' },
-        { value: 'vue', label: 'Vue' }
+        { value: 'javascript', label: 'github.language.javascript' },
+        { value: 'typescript', label: 'github.language.typescript' },
+        { value: 'python', label: 'github.language.python' },
+        { value: 'java', label: 'github.language.java' },
+        { value: 'go', label: 'github.language.go' },
+        { value: 'rust', label: 'github.language.rust' },
+        { value: 'cpp', label: 'github.language.cpp' },
+        { value: 'c', label: 'github.language.c' },
+        { value: 'csharp', label: 'github.language.csharp' },
+        { value: 'ruby', label: 'github.language.ruby' },
+        { value: 'php', label: 'github.language.php' },
+        { value: 'swift', label: 'github.language.swift' },
+        { value: 'kotlin', label: 'github.language.kotlin' },
+        { value: 'dart', label: 'github.language.dart' },
+        { value: 'shell', label: 'github.language.shell' },
+        { value: 'html', label: 'github.language.html' },
+        { value: 'css', label: 'github.language.css' },
+        { value: 'vue', label: 'github.language.vue' }
       ]
     }
   }

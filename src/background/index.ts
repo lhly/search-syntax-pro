@@ -2,6 +2,8 @@
 
 import { autoMigrateStorage } from '@/utils/migration'
 import { EnginePreferenceService } from '@/services/engine-preference'
+import { translate } from '@/i18n/translations'
+import type { Language } from '@/types'
 
 /**
  * 监听快捷键命令
@@ -60,24 +62,60 @@ chrome.runtime.onStartup.addListener(async () => {
   await autoMigrateStorage()
 })
 
-// 创建右键菜单
-function createContextMenus() {
+// 创建右键菜单（根据用户设置）
+async function createContextMenus() {
+  // 🔥 读取用户设置，判断是否启用右键菜单和获取语言设置
+  const { user_settings } = await chrome.storage.local.get('user_settings')
+  const enableContextMenu = user_settings?.enableContextMenu ?? true // 默认启用
+  const language: Language = user_settings?.language ?? 'zh-CN' // 默认中文
+
+  // 移除所有现有菜单
   chrome.contextMenus.removeAll(() => {
-    chrome.contextMenus.create({
-      id: 'ssp-search-selection',
-      title: '使用 SearchSyntax Pro 搜索 "%s"',
-      contexts: ['selection']
-    })
+    // 🔥 只在启用时创建右键菜单
+    if (enableContextMenu) {
+      // 🌐 使用translate函数获取当前语言的菜单文本
+      const menuTitle = translate(
+        language,
+        'contextMenu.searchSelection',
+        undefined,
+        '使用 SearchSyntax Pro 搜索 "%s"' // fallback文本
+      )
+
+      chrome.contextMenus.create({
+        id: 'ssp-search-selection',
+        title: menuTitle,
+        contexts: ['selection']
+      })
+      console.log(`✅ 右键菜单已创建 (语言: ${language})`)
+    } else {
+      console.log('⚠️ 右键菜单已禁用（用户设置）')
+    }
   })
 }
 
 // 右键菜单点击事件
-chrome.contextMenus.onClicked.addListener((info, _tab) => {
+chrome.contextMenus.onClicked.addListener(async (info, _tab) => {
   if (info.menuItemId === 'ssp-search-selection' && info.selectionText) {
-    // 保存选中的文本到存储
-    chrome.storage.local.set({
-      quick_search_text: info.selectionText
+    // 保存选中的文本到存储，并添加触发标记
+    await chrome.storage.local.set({
+      quick_search_text: info.selectionText,
+      quick_search_trigger: Date.now() // 添加时间戳作为触发标记
     })
+
+    console.log('✅ 右键菜单触发: 选中文本已保存', info.selectionText)
+
+    // 尝试打开 popup
+    // 注意: 在 Manifest V3 中，只有在用户操作（如点击右键菜单）的上下文中才能调用 openPopup()
+    try {
+      await chrome.action.openPopup()
+      console.log('✅ Popup 已打开')
+    } catch (error) {
+      // 如果无法打开 popup（例如在某些特殊页面），则在新标签页中打开扩展
+      console.warn('⚠️ 无法打开 popup，尝试其他方式:', error)
+
+      // 备用方案：通过发送消息通知用户或在新标签页打开扩展
+      // 这里我们选择静默处理，用户下次打开 popup 时会自动填充
+    }
   }
 })
 
@@ -141,6 +179,21 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     // 如果设置改变，可以在这里执行相关操作
     if (changes.user_settings) {
       console.log('用户设置已更新')
+
+      // 🔥 检查右键菜单开关或语言是否改变
+      const oldSettings = changes.user_settings.oldValue
+      const newSettings = changes.user_settings.newValue
+
+      const contextMenuChanged = oldSettings?.enableContextMenu !== newSettings?.enableContextMenu
+      const languageChanged = oldSettings?.language !== newSettings?.language
+
+      if (contextMenuChanged) {
+        console.log('🔄 右键菜单开关已改变，重新创建菜单')
+        createContextMenus() // 重新创建/移除右键菜单
+      } else if (languageChanged) {
+        console.log(`🌐 界面语言已改变: ${oldSettings?.language} → ${newSettings?.language}，更新右键菜单`)
+        createContextMenus() // 重新创建菜单以更新语言
+      }
     }
   }
 })

@@ -9,15 +9,15 @@ describe('TwitterAdapter', () => {
   })
 
   describe('基础功能测试', () => {
-    test('应该返回正确的搜索引擎名称', () => {
+    test('应该返回正确的搜索引擎名称', async () => {
       expect(adapter.getName()).toBe('X (Twitter)')
     })
 
-    test('应该返回正确的基础 URL', () => {
+    test('应该返回正确的基础 URL', async () => {
       expect(adapter.getBaseUrl()).toBe('https://twitter.com/search')
     })
 
-    test('应该返回支持的语法列表', () => {
+    test('应该返回支持的语法列表', async () => {
       const supportedSyntax = adapter.getSupportedSyntax()
       expect(supportedSyntax).toContain('exact')
       expect(supportedSyntax).toContain('from_user')
@@ -30,7 +30,7 @@ describe('TwitterAdapter', () => {
   })
 
   describe('查询构建测试', () => {
-    test('应该正确构建基础关键词搜索', () => {
+    test('应该正确构建基础关键词搜索', async () => {
       const params: SearchParams = {
         keyword: 'JavaScript',
         engine: 'twitter'
@@ -40,7 +40,7 @@ describe('TwitterAdapter', () => {
       expect(url).toContain('q=JavaScript')
     })
 
-    test('应该正确处理用户搜索（from:）', () => {
+    test('应该正确处理用户搜索（from:）', async () => {
       const params: SearchParams = {
         keyword: 'AI',
         engine: 'twitter',
@@ -50,7 +50,7 @@ describe('TwitterAdapter', () => {
       expect(decodeURIComponent(url)).toContain('from:elonmusk')
     })
 
-    test('应该正确处理用户搜索（to:）', () => {
+    test('应该正确处理用户搜索（to:）', async () => {
       const params: SearchParams = {
         keyword: 'question',
         engine: 'twitter',
@@ -60,7 +60,7 @@ describe('TwitterAdapter', () => {
       expect(decodeURIComponent(url)).toContain('to:support')
     })
 
-    test('应该正确构建日期范围搜索', () => {
+    test('应该正确构建日期范围搜索', async () => {
       const params: SearchParams = {
         keyword: 'news',
         engine: 'twitter',
@@ -75,7 +75,7 @@ describe('TwitterAdapter', () => {
       expect(decodedUrl).toContain('until:2024-12-31')
     })
 
-    test('应该正确处理内容过滤器', () => {
+    test('应该正确处理内容过滤器', async () => {
       const params: SearchParams = {
         keyword: 'tech',
         engine: 'twitter',
@@ -87,7 +87,7 @@ describe('TwitterAdapter', () => {
       expect(decodedUrl).toContain('filter:videos')
     })
 
-    test('应该正确处理互动数据筛选', () => {
+    test('应该正确处理互动数据筛选', async () => {
       const params: SearchParams = {
         keyword: 'viral',
         engine: 'twitter',
@@ -100,7 +100,7 @@ describe('TwitterAdapter', () => {
       expect(decodedUrl).toContain('min_faves:500')
     })
 
-    test('应该正确处理语言筛选', () => {
+    test('应该正确处理语言筛选', async () => {
       const params: SearchParams = {
         keyword: 'news',
         engine: 'twitter',
@@ -110,7 +110,7 @@ describe('TwitterAdapter', () => {
       expect(decodeURIComponent(url)).toContain('lang:zh')
     })
 
-    test('应该正确处理排除关键词', () => {
+    test('应该正确处理排除关键词', async () => {
       const params: SearchParams = {
         keyword: 'JavaScript',
         engine: 'twitter',
@@ -122,7 +122,7 @@ describe('TwitterAdapter', () => {
       expect(decodedUrl).toContain('-library')
     })
 
-    test('应该正确处理精确匹配', () => {
+    test('应该正确处理精确匹配', async () => {
       const params: SearchParams = {
         keyword: 'AI',
         engine: 'twitter',
@@ -132,7 +132,7 @@ describe('TwitterAdapter', () => {
       expect(decodeURIComponent(url)).toContain('"machine learning"')
     })
 
-    test('应该正确处理 OR 逻辑', () => {
+    test('应该正确处理 OR 逻辑', async () => {
       const params: SearchParams = {
         keyword: 'tech',
         engine: 'twitter',
@@ -142,7 +142,7 @@ describe('TwitterAdapter', () => {
       expect(decodeURIComponent(url)).toContain('(AI OR ML OR DL)')
     })
 
-    test('应该正确处理复杂查询组合', () => {
+    test('应该正确处理复杂查询组合', async () => {
       const params: SearchParams = {
         keyword: 'TypeScript',
         engine: 'twitter',
@@ -171,49 +171,49 @@ describe('TwitterAdapter', () => {
   })
 
   describe('参数验证测试', () => {
-    test('应该验证通过有效的基础搜索', () => {
+    test('应该验证通过有效的基础搜索', async () => {
       const params: SearchParams = {
         keyword: 'test',
         engine: 'twitter'
       }
-      const result = adapter.validateParams(params)
+      const result = await adapter.validateParams(params)
       expect(result.isValid).toBe(true)
       expect(result.errors).toHaveLength(0)
     })
 
-    test('应该拒绝空关键词（无用户指定）', () => {
+    test('应该拒绝空关键词（无用户指定）', async () => {
       const params: SearchParams = {
         keyword: '',
         engine: 'twitter'
       }
-      const result = adapter.validateParams(params)
+      const result = await adapter.validateParams(params)
       expect(result.isValid).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
     })
 
-    test('应该允许仅用户搜索（带警告）', () => {
+    test('应该允许仅用户搜索（带警告）', async () => {
       const params: SearchParams = {
         keyword: '',
         engine: 'twitter',
         fromUser: '@user'
       }
-      const result = adapter.validateParams(params)
+      const result = await adapter.validateParams(params)
       expect(result.isValid).toBe(true)
       expect(result.warnings.length).toBeGreaterThan(0)
     })
 
-    test('应该验证用户名格式', () => {
+    test('应该验证用户名格式', async () => {
       const params: SearchParams = {
         keyword: 'test',
         engine: 'twitter',
         fromUser: '@invalid user name'
       }
-      const result = adapter.validateParams(params)
+      const result = await adapter.validateParams(params)
       expect(result.isValid).toBe(false)
       expect(result.errors.some(e => e.includes('用户名格式'))).toBe(true)
     })
 
-    test('应该验证日期范围', () => {
+    test('应该验证日期范围', async () => {
       const params: SearchParams = {
         keyword: 'test',
         engine: 'twitter',
@@ -222,23 +222,23 @@ describe('TwitterAdapter', () => {
           to: '2024-01-01'
         }
       }
-      const result = adapter.validateParams(params)
+      const result = await adapter.validateParams(params)
       expect(result.isValid).toBe(false)
       expect(result.errors.some(e => e.includes('开始日期不能晚于结束日期'))).toBe(true)
     })
 
-    test('应该验证互动数据为非负数', () => {
+    test('应该验证互动数据为非负数', async () => {
       const params: SearchParams = {
         keyword: 'test',
         engine: 'twitter',
         minRetweets: -10
       }
-      const result = adapter.validateParams(params)
+      const result = await adapter.validateParams(params)
       expect(result.isValid).toBe(false)
       expect(result.errors.some(e => e.includes('不能为负数'))).toBe(true)
     })
 
-    test('应该警告过多的搜索条件', () => {
+    test('应该警告过多的搜索条件', async () => {
       const params: SearchParams = {
         keyword: 'test',
         engine: 'twitter',
@@ -251,13 +251,13 @@ describe('TwitterAdapter', () => {
         contentFilters: ['images'],
         excludeWords: ['spam']
       }
-      const result = adapter.validateParams(params)
+      const result = await adapter.validateParams(params)
       expect(result.warnings.some(w => w.includes('搜索条件过多'))).toBe(true)
     })
   })
 
   describe('语法支持测试', () => {
-    test('应该支持 Twitter 特定语法', () => {
+    test('应该支持 Twitter 特定语法', async () => {
       expect(adapter.validateSyntax('from_user')).toBe(true)
       expect(adapter.validateSyntax('to_user')).toBe(true)
       expect(adapter.validateSyntax('filter')).toBe(true)
@@ -265,20 +265,20 @@ describe('TwitterAdapter', () => {
       expect(adapter.validateSyntax('min_faves')).toBe(true)
     })
 
-    test('应该不支持不相关的语法', () => {
+    test('应该不支持不相关的语法', async () => {
       expect(adapter.validateSyntax('site')).toBe(false)
       expect(adapter.validateSyntax('filetype')).toBe(false)
       expect(adapter.validateSyntax('cache')).toBe(false)
     })
 
-    test('isSyntaxSupported 应该与 validateSyntax 一致', () => {
+    test('isSyntaxSupported 应该与 validateSyntax 一致', async () => {
       expect(adapter.isSyntaxSupported('from_user')).toBe(true)
       expect(adapter.isSyntaxSupported('site')).toBe(false)
     })
   })
 
   describe('搜索建议测试', () => {
-    test('应该建议添加用户筛选', () => {
+    test('应该建议添加用户筛选', async () => {
       const params: SearchParams = {
         keyword: 'JavaScript',
         engine: 'twitter'
@@ -287,7 +287,7 @@ describe('TwitterAdapter', () => {
       expect(suggestions.some(s => s.includes('用户筛选'))).toBe(true)
     })
 
-    test('应该建议添加日期范围', () => {
+    test('应该建议添加日期范围', async () => {
       const params: SearchParams = {
         keyword: 'news',
         engine: 'twitter'
@@ -296,7 +296,7 @@ describe('TwitterAdapter', () => {
       expect(suggestions.some(s => s.includes('时间限制'))).toBe(true)
     })
 
-    test('应该建议使用内容过滤器', () => {
+    test('应该建议使用内容过滤器', async () => {
       const params: SearchParams = {
         keyword: 'tech',
         engine: 'twitter'
@@ -307,7 +307,7 @@ describe('TwitterAdapter', () => {
   })
 
   describe('边界情况测试', () => {
-    test('应该处理用户名带 @ 符号', () => {
+    test('应该处理用户名带 @ 符号', async () => {
       const params: SearchParams = {
         keyword: 'test',
         engine: 'twitter',
@@ -318,7 +318,7 @@ describe('TwitterAdapter', () => {
       expect(decodeURIComponent(url)).not.toContain('from:@user123')
     })
 
-    test('应该处理用户名不带 @ 符号', () => {
+    test('应该处理用户名不带 @ 符号', async () => {
       const params: SearchParams = {
         keyword: 'test',
         engine: 'twitter',
@@ -328,7 +328,7 @@ describe('TwitterAdapter', () => {
       expect(decodeURIComponent(url)).toContain('from:user123')
     })
 
-    test('应该忽略空字符串参数', () => {
+    test('应该忽略空字符串参数', async () => {
       const params: SearchParams = {
         keyword: 'test',
         engine: 'twitter',
@@ -341,7 +341,7 @@ describe('TwitterAdapter', () => {
       expect(decodedUrl).not.toContain('lang:')
     })
 
-    test('应该处理空数组', () => {
+    test('应该处理空数组', async () => {
       const params: SearchParams = {
         keyword: 'test',
         engine: 'twitter',
@@ -352,7 +352,7 @@ describe('TwitterAdapter', () => {
       expect(url).toContain('q=test')
     })
 
-    test('应该处理互动数据为 0', () => {
+    test('应该处理互动数据为 0', async () => {
       const params: SearchParams = {
         keyword: 'test',
         engine: 'twitter',

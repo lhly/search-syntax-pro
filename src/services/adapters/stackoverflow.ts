@@ -1,4 +1,17 @@
-import type { SearchEngineAdapter, SearchParams, SyntaxType, ValidationResult, UIFeatureType, EngineFeatureGroups } from '@/types'
+import type { SearchEngineAdapter, SearchParams, SyntaxType, ValidationResult, UIFeatureType, EngineFeatureGroups, Language } from '@/types'
+import { translate } from '@/i18n/translations'
+
+/**
+ * 获取当前语言设置
+ */
+async function getCurrentLanguage(): Promise<Language> {
+  try {
+    const result = await chrome.storage.local.get('user_settings')
+    return result.user_settings?.language || 'zh-CN'
+  } catch {
+    return 'zh-CN'
+  }
+}
 
 /**
  * Stack Overflow 搜索引擎适配器
@@ -183,14 +196,15 @@ export class StackOverflowAdapter implements SearchEngineAdapter {
   /**
    * 验证搜索参数
    */
-  validateParams(params: SearchParams): ValidationResult {
+  async validateParams(params: SearchParams): Promise<ValidationResult> {
+    const language = await getCurrentLanguage()
     const errors: string[] = []
     const warnings: string[] = []
 
     // 检查基本关键词
     if (!params.keyword || !params.keyword.trim()) {
       if (!params.exactMatch && !params.site) {
-        errors.push('请输入搜索关键词')
+        errors.push(translate(language, 'adapter.validation.keywordRequired'))
       }
     }
 
@@ -201,12 +215,12 @@ export class StackOverflowAdapter implements SearchEngineAdapter {
         const cleanTag = tag.replace(/^\[|\]$/g, '')
         const tagPattern = /^[a-zA-Z0-9#.+-]+$/
         if (!tagPattern.test(cleanTag)) {
-          warnings.push(`标签 "${cleanTag}" 格式可能不正确`)
+          warnings.push(translate(language, 'adapter.validation.tagInvalid'))
         }
       })
 
       if (tags.length > 5) {
-        warnings.push('标签数量过多，建议不超过5个')
+        warnings.push(translate(language, 'adapter.validation.tooManySyntax'))
       }
     }
 
@@ -214,14 +228,14 @@ export class StackOverflowAdapter implements SearchEngineAdapter {
     if (params.fromUser && params.fromUser.trim()) {
       const userId = params.fromUser.replace('@', '').trim()
       if (userId !== 'me' && !/^\d+$/.test(userId)) {
-        warnings.push('用户ID应为数字或"me"（搜索自己的问题）')
+        warnings.push(translate(language, 'adapter.validation.usernameInvalid'))
       }
     }
 
     // 检查查询复杂度
     const fullQuery = this.buildSearchQuery(params)
     if (fullQuery.length > 240) {
-      warnings.push('搜索查询过长，可能影响搜索结果')
+      warnings.push(translate(language, 'adapter.validation.queryTooLong'))
     }
 
     // 检查语法数量
@@ -236,7 +250,7 @@ export class StackOverflowAdapter implements SearchEngineAdapter {
     ].reduce((a, b) => a + b, 0)
 
     if (syntaxCount > 5) {
-      warnings.push('搜索条件过多，可能导致结果过少')
+      warnings.push(translate(language, 'adapter.validation.tooManySyntax'))
     }
 
     return {

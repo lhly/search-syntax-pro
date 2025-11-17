@@ -502,6 +502,30 @@ function OptionsContent({
             />
           </div>
 
+          {/* 🔥 启用右键菜单 */}
+          <div className="flex items-center justify-between">
+            <div>
+              <label htmlFor="enableContextMenu" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t('options.fields.enableContextMenu.label')}
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t('options.fields.enableContextMenu.description')}
+              </p>
+            </div>
+            <input
+              id="enableContextMenu"
+              type="checkbox"
+              checked={settings.enableContextMenu}
+              onChange={(e) =>
+                updateSettings((prev) => ({
+                  ...prev,
+                  enableContextMenu: e.target.checked
+                }))
+              }
+              className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            />
+          </div>
+
           {/* 悬浮按钮功能（开发中） */}
           <div className="flex items-center justify-between opacity-50">
             <div>

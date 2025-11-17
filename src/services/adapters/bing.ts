@@ -1,4 +1,17 @@
-import type { SearchEngineAdapter, SearchParams, SyntaxType, ValidationResult } from '@/types'
+import type { SearchEngineAdapter, SearchParams, SyntaxType, ValidationResult, Language } from '@/types'
+import { translate } from '@/i18n/translations'
+
+/**
+ * 获取当前语言设置
+ */
+async function getCurrentLanguage(): Promise<Language> {
+  try {
+    const result = await chrome.storage.local.get('user_settings')
+    return result.user_settings?.language || 'zh-CN'
+  } catch {
+    return 'zh-CN'
+  }
+}
 
 /**
  * 必应搜索引擎适配器
@@ -243,20 +256,22 @@ export class BingAdapter implements SearchEngineAdapter {
   /**
    * 验证搜索参数
    */
-  validateParams(params: SearchParams): ValidationResult {
+  async validateParams(params: SearchParams): Promise<ValidationResult> {
     const errors: string[] = []
     const warnings: string[] = []
+    const language = await getCurrentLanguage()
+    const t = (key: string, vars?: Record<string, string | number>) => translate(language, key, vars)
 
     // 检查关键词或精确匹配
     if (!params.keyword.trim() && !params.exactMatch?.trim()) {
-      errors.push('请输入搜索关键词或精确匹配内容')
+      errors.push(t('adapter.validation.keywordRequired'))
     }
 
     // 验证网站域名格式
     if (params.site) {
       const site = params.site.trim()
       if (site && !this.isValidDomain(site)) {
-        errors.push('网站域名格式不正确')
+        errors.push(t('adapter.validation.domainInvalid'))
       }
     }
 
@@ -265,7 +280,7 @@ export class BingAdapter implements SearchEngineAdapter {
       const fileType = params.fileType.trim().toLowerCase()
       const validTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', 'jpg', 'png', 'gif', 'bmp', 'tiff']
       if (fileType && !validTypes.includes(fileType)) {
-        warnings.push(`文件类型 "${fileType}" 可能不被必应支持`)
+        warnings.push(t('adapter.validation.fileTypeUnsupported', { fileType, engine: this.getName() }))
       }
     }
 
@@ -273,13 +288,13 @@ export class BingAdapter implements SearchEngineAdapter {
     if (params.dateRange) {
       const { from, to } = params.dateRange
       if (from && !this.isValidDate(from)) {
-        errors.push('开始日期格式不正确')
+        errors.push(t('adapter.validation.dateFromInvalid'))
       }
       if (to && !this.isValidDate(to)) {
-        errors.push('结束日期格式不正确')
+        errors.push(t('adapter.validation.dateToInvalid'))
       }
       if (from && to && new Date(from) > new Date(to)) {
-        errors.push('开始日期不能晚于结束日期')
+        errors.push(t('adapter.validation.dateRangeInvalid'))
       }
     }
 
@@ -287,7 +302,7 @@ export class BingAdapter implements SearchEngineAdapter {
     if (params.numberRange) {
       const { min, max } = params.numberRange
       if (min !== undefined && max !== undefined && min > max) {
-        errors.push('最小值不能大于最大值')
+        errors.push(t('adapter.validation.numberRangeInvalid'))
       }
     }
 
@@ -295,19 +310,19 @@ export class BingAdapter implements SearchEngineAdapter {
     if (params.relatedSite) {
       const relatedSite = params.relatedSite.trim()
       if (relatedSite && !this.isValidDomain(relatedSite)) {
-        errors.push('相关网站域名格式不正确')
+        errors.push(t('adapter.validation.relatedUrlInvalid'))
       }
     }
 
     // Bing不支持cache语法
     if (params.cacheSite) {
-      warnings.push('必应不支持cache语法，该参数将被忽略')
+      warnings.push(t('adapter.validation.cacheNotSupported', { engine: this.getName() }))
     }
 
     // 检查查询长度
     const fullQuery = this.buildSearchQuery(params)
     if (fullQuery.length > 160) {
-      warnings.push('搜索查询过长，可能影响搜索结果')
+      warnings.push(t('adapter.validation.queryTooLong'))
     }
 
     // 检查语法数量
@@ -328,7 +343,7 @@ export class BingAdapter implements SearchEngineAdapter {
     ].reduce((a, b) => a + b, 0)
 
     if (syntaxCount > 4) {
-      warnings.push('搜索条件过多，可能导致结果过少')
+      warnings.push(t('adapter.validation.tooManySyntax'))
     }
 
     return {

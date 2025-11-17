@@ -97,6 +97,36 @@ function App() {
     }
   }, [storedHistory])
 
+  // 🔥 右键菜单快速搜索：自动填充选中文本
+  useEffect(() => {
+    const handleQuickSearch = async () => {
+      try {
+        const result = await chrome.storage.local.get(['quick_search_text', 'quick_search_trigger'])
+
+        // 检查是否有新的快速搜索触发（通过时间戳判断）
+        if (result.quick_search_text && result.quick_search_trigger) {
+          console.log('✅ 检测到右键菜单快速搜索，自动填充:', result.quick_search_text)
+
+          // 自动填充搜索框
+          setSearchParams(prev => ({
+            ...prev,
+            keyword: result.quick_search_text
+          }))
+
+          // 清除触发标记，避免重复触发
+          await chrome.storage.local.remove(['quick_search_trigger'])
+
+          // 可选：自动聚焦到搜索框（提升用户体验）
+          // 如果需要，可以在 SearchForm 组件中添加 ref 并暴露 focus 方法
+        }
+      } catch (error) {
+        console.error('❌ 处理快速搜索失败:', error)
+      }
+    }
+
+    handleQuickSearch()
+  }, []) // 只在组件挂载时执行一次
+
   // 自动迁移旧单值字段到新数组字段
   useEffect(() => {
     const migrateOldFieldsToNew = () => {
@@ -130,7 +160,7 @@ function App() {
       if (Object.keys(updates).length > 0) {
         const newParams = { ...searchParams, ...updates }
         setSearchParams(newParams)
-        generateQuery(newParams)
+        void generateQuery(newParams)
         console.log('[Migration] 已自动迁移旧字段到新数组:', updates)
       }
     }
@@ -139,16 +169,18 @@ function App() {
   }, []) // 空依赖,只在挂载时执行一次
 
   // 生成搜索查询 - 使用 useCallback
-  const generateQuery = useCallback((params: SearchParams) => {
+  const generateQuery = useCallback(async (params: SearchParams) => {
     try {
       const adapter = SearchAdapterFactory.getAdapter(params.engine)
 
       // 验证搜索参数
-      const validationResult = adapter.validateParams?.(params) || {
-        isValid: true,
-        errors: [],
-        warnings: []
-      }
+      const validationResult = await Promise.resolve(
+        adapter.validateParams?.(params) || {
+          isValid: true,
+          errors: [],
+          warnings: []
+        }
+      )
       setValidation(validationResult)
 
       // 构建查询和URL
@@ -285,7 +317,7 @@ function App() {
     if (targetEngine) {
       const newParams = { ...searchParams, engine: targetEngine }
       setSearchParams(newParams)
-      generateQuery(newParams)
+      void generateQuery(newParams)
       console.log(`[App] 切换到搜索引擎: ${targetEngine}`)
     } else {
       console.warn(`[App] 无法切换引擎,使用默认引擎`)
@@ -366,7 +398,7 @@ function App() {
       dateRange: historyItem.syntax.dateRange
     }
     setSearchParams(restoredParams)
-    generateQuery(restoredParams)
+    void generateQuery(restoredParams)
   }, [generateQuery])
 
   // 清除历史记录 - 使用 useCallback
@@ -379,13 +411,13 @@ function App() {
   const handleApplySuggestion = useCallback((params: Partial<SearchParams>) => {
     const newParams = { ...searchParams, ...params }
     setSearchParams(newParams)
-    generateQuery(newParams)
+    void generateQuery(newParams)
   }, [searchParams, generateQuery])
 
   // v1.6.0: 应用模板 - 使用 useCallback
   const handleApplyTemplate = useCallback((params: SearchParams) => {
     setSearchParams(params)
-    generateQuery(params)
+    void generateQuery(params)
   }, [generateQuery])
 
   // v1.6.0: 初始化服务（只在组件挂载时初始化一次）

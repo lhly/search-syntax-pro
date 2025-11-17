@@ -1,4 +1,17 @@
-import type { SearchEngineAdapter, SearchParams, SyntaxType, ValidationResult, UIFeatureType, EngineFeatureGroups } from '@/types'
+import type { SearchEngineAdapter, SearchParams, SyntaxType, ValidationResult, UIFeatureType, EngineFeatureGroups, Language } from '@/types'
+import { translate } from '@/i18n/translations'
+
+/**
+ * 获取当前语言设置
+ */
+async function getCurrentLanguage(): Promise<Language> {
+  try {
+    const result = await chrome.storage.local.get('user_settings')
+    return result.user_settings?.language || 'zh-CN'
+  } catch {
+    return 'zh-CN'
+  }
+}
 
 /**
  * Reddit 搜索引擎适配器
@@ -181,14 +194,15 @@ export class RedditAdapter implements SearchEngineAdapter {
   /**
    * 验证搜索参数
    */
-  validateParams(params: SearchParams): ValidationResult {
+  async validateParams(params: SearchParams): Promise<ValidationResult> {
+    const language = await getCurrentLanguage()
     const errors: string[] = []
     const warnings: string[] = []
 
     // 检查基本关键词
     if (!params.keyword || !params.keyword.trim()) {
       if (!params.exactMatch && !params.site && !params.fromUser) {
-        errors.push('请输入搜索关键词')
+        errors.push(translate(language, 'adapter.validation.keywordRequired'))
       }
     }
 
@@ -197,7 +211,7 @@ export class RedditAdapter implements SearchEngineAdapter {
       const subreddit = params.site.replace(/^r\//, '').trim()
       const subredditPattern = /^[a-zA-Z0-9_]{3,21}$/
       if (!subredditPattern.test(subreddit)) {
-        warnings.push('Subreddit名称格式可能不正确（3-21个字符，仅字母、数字和下划线）')
+        warnings.push(translate(language, 'adapter.validation.subredditInvalid'))
       }
     }
 
@@ -206,14 +220,14 @@ export class RedditAdapter implements SearchEngineAdapter {
       const username = params.fromUser.replace(/^u\/|^@/, '').trim()
       const usernamePattern = /^[a-zA-Z0-9_-]{3,20}$/
       if (!usernamePattern.test(username)) {
-        warnings.push('用户名格式可能不正确（3-20个字符，仅字母、数字、下划线和连字符）')
+        warnings.push(translate(language, 'adapter.validation.usernameInvalid'))
       }
     }
 
     // 检查查询复杂度
     const fullQuery = this.buildSearchQuery(params)
     if (fullQuery.length > 250) {
-      warnings.push('搜索查询过长，可能影响搜索结果')
+      warnings.push(translate(language, 'adapter.validation.queryTooLong'))
     }
 
     // 检查语法数量
@@ -229,7 +243,7 @@ export class RedditAdapter implements SearchEngineAdapter {
     ].reduce((a, b) => a + b, 0)
 
     if (syntaxCount > 5) {
-      warnings.push('搜索条件过多，可能导致结果过少')
+      warnings.push(translate(language, 'adapter.validation.tooManySyntax'))
     }
 
     return {

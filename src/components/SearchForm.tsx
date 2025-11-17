@@ -129,11 +129,11 @@ export function SearchForm({
                   <TagInput
                     tags={searchParams.fromUsers || []}
                     onChange={(tags) => updateParam('fromUsers', tags)}
-                    placeholder={t('searchForm.fromUser.placeholder') + ' (支持多个用户)'}
+                    placeholder={t('searchForm.fromUser.placeholder') + t('searchForm.fromUser.multipleHint')}
                     maxTags={10}
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {t('searchForm.fromUser.description')} • 按回车添加多个用户
+                    {t('searchForm.fromUser.description')} • {t('searchForm.fromUser.hint')}
                   </p>
                 </div>
               )}
@@ -146,11 +146,11 @@ export function SearchForm({
                   <TagInput
                     tags={searchParams.toUsers || []}
                     onChange={(tags) => updateParam('toUsers', tags)}
-                    placeholder={t('searchForm.toUser.placeholder') + ' (支持多个用户)'}
+                    placeholder={t('searchForm.toUser.placeholder') + t('searchForm.toUser.multipleHint')}
                     maxTags={10}
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {t('searchForm.toUser.description')} • 按回车添加多个用户
+                    {t('searchForm.toUser.description')} • {t('searchForm.toUser.hint')}
                   </p>
                 </div>
               )}
@@ -245,11 +245,11 @@ export function SearchForm({
                   <TagInput
                     tags={searchParams.sites || []}
                     onChange={(tags) => updateParam('sites', tags)}
-                    placeholder={t('searchForm.site.placeholder') + ' (支持多个域名)'}
+                    placeholder={t('searchForm.site.placeholder') + t('searchForm.site.multipleHint')}
                     maxTags={10}
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {t('searchForm.site.description')} • 按回车添加多个网站
+                    {t('searchForm.site.description')} • {t('searchForm.site.hint')}
                   </p>
                 </div>
               )}
@@ -262,11 +262,11 @@ export function SearchForm({
                   <TagInput
                     tags={searchParams.fileTypes || []}
                     onChange={(tags) => updateParam('fileTypes', tags)}
-                    placeholder="输入文件类型 (pdf, doc, etc.) 支持多个"
+                    placeholder={t('searchForm.fileType.placeholder')}
                     maxTags={5}
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {t('searchForm.fileType.description')} • 按回车添加多个文件类型
+                    {t('searchForm.fileType.description')} • {t('searchForm.fileType.hint')}
                   </p>
                 </div>
               )}
@@ -341,11 +341,11 @@ export function SearchForm({
                   <TagInput
                     tags={searchParams.exactMatches || []}
                     onChange={(tags) => updateParam('exactMatches', tags)}
-                    placeholder={t('searchForm.exactMatch.placeholder') + ' (支持多个短语)'}
+                    placeholder={t('searchForm.exactMatch.placeholder') + t('searchForm.exactMatch.multipleHint')}
                     maxTags={5}
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {t('searchForm.exactMatch.description')} • 按回车添加多个短语
+                    {t('searchForm.exactMatch.description')} • {t('searchForm.exactMatch.hint')}
                   </p>
                 </div>
               )}
@@ -522,19 +522,19 @@ export function SearchForm({
 
           {/* 🔥 Reddit专属 - 板块筛选 */}
           {searchParams.engine === 'reddit' && (
-            <CollapsibleSection title="Reddit板块筛选" icon="📋">
+            <CollapsibleSection title={t('searchForm.reddit.title')} icon="📋">
               <div>
                 <label htmlFor="subreddits" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  板块筛选 (Subreddit) 🔥
+                  {t('searchForm.reddit.label')} 🔥
                 </label>
                 <TagInput
                   tags={searchParams.subreddits || []}
                   onChange={(tags) => updateParam('subreddits', tags)}
-                  placeholder="输入版块名称 (如: programming, javascript) 支持多个"
+                  placeholder={t('searchForm.reddit.placeholder')}
                   maxTags={10}
                 />
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  在指定的Reddit版块内搜索 • 按回车添加多个版块
+                  {t('searchForm.reddit.description')} • {t('searchForm.reddit.hint')}
                 </p>
               </div>
             </CollapsibleSection>
@@ -542,19 +542,19 @@ export function SearchForm({
 
           {/* 🔥 GitHub专属 - 编程语言筛选 */}
           {searchParams.engine === 'github' && (
-            <CollapsibleSection title="GitHub编程语言" icon="💻">
+            <CollapsibleSection title={t('searchForm.github.title')} icon="💻">
               <div>
                 <label htmlFor="languages" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  编程语言筛选 🔥
+                  {t('searchForm.github.label')} 🔥
                 </label>
                 <TagInput
                   tags={searchParams.languages || []}
                   onChange={(tags) => updateParam('languages', tags)}
-                  placeholder="输入编程语言 (如: javascript, python, rust) 支持多个"
+                  placeholder={t('searchForm.github.placeholder')}
                   maxTags={5}
                 />
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  在指定编程语言的仓库中搜索 • 按回车添加多个语言
+                  {t('searchForm.github.description')} • {t('searchForm.github.hint')}
                 </p>
               </div>
             </CollapsibleSection>
@@ -562,19 +562,19 @@ export function SearchForm({
 
           {/* 🔥 Stack Overflow专属 - 标签筛选 */}
           {searchParams.engine === 'stackoverflow' && (
-            <CollapsibleSection title="Stack Overflow标签" icon="🏷️">
+            <CollapsibleSection title={t('searchForm.stackoverflow.title')} icon="🏷️">
               <div>
                 <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  标签筛选 (Tags) 🔥
+                  {t('searchForm.stackoverflow.label')} 🔥
                 </label>
                 <TagInput
                   tags={searchParams.tags || []}
                   onChange={(tags) => updateParam('tags', tags)}
-                  placeholder="输入标签 (如: react, node.js, typescript) 支持多个"
+                  placeholder={t('searchForm.stackoverflow.placeholder')}
                   maxTags={10}
                 />
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  在指定标签的问题中搜索 • 按回车添加多个标签
+                  {t('searchForm.stackoverflow.description')} • {t('searchForm.stackoverflow.hint')}
                 </p>
               </div>
             </CollapsibleSection>
@@ -629,7 +629,7 @@ export function SearchForm({
                 return (
                   <div>
                     <label htmlFor="language" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {languageConfig.label}
+                      {t(languageConfig.label as any)}
                     </label>
                     <select
                       id="language"
@@ -637,10 +637,10 @@ export function SearchForm({
                       onChange={(e) => updateParam('language', e.target.value)}
                       className="input"
                     >
-                      <option value="">{languageConfig.placeholder}</option>
+                      <option value="">{t(languageConfig.placeholder as any)}</option>
                       {languageConfig.options.map((option) => (
                         <option key={option.value} value={option.value}>
-                          {option.label}
+                          {t(option.label as any)}
                         </option>
                       ))}
                     </select>

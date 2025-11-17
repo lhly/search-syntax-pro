@@ -403,7 +403,9 @@ export class TemplateManager {
 
       return template;
     } catch (error) {
-      throw new Error(`导入模板失败: ${error instanceof Error ? error.message : '未知错误'}`);
+      const errorMsg = error instanceof Error ? error.message : '未知错误'
+      // Note: This error will be caught and displayed by the UI layer with proper i18n
+      throw new Error(`导入模板失败: ${errorMsg}`);
     }
   }
 

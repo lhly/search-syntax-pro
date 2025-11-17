@@ -1,4 +1,17 @@
-import type { SearchEngineAdapter, SearchParams, SyntaxType, ValidationResult } from '@/types'
+import type { SearchEngineAdapter, SearchParams, SyntaxType, ValidationResult, Language } from '@/types'
+import { translate } from '@/i18n/translations'
+
+/**
+ * 获取当前语言设置
+ */
+async function getCurrentLanguage(): Promise<Language> {
+  try {
+    const result = await chrome.storage.local.get('user_settings')
+    return result.user_settings?.language || 'zh-CN'
+  } catch {
+    return 'zh-CN'
+  }
+}
 
 /**
  * Twitter/X 搜索引擎适配器
@@ -182,7 +195,8 @@ export class TwitterAdapter implements SearchEngineAdapter {
   /**
    * 验证搜索参数
    */
-  validateParams(params: SearchParams): ValidationResult {
+  async validateParams(params: SearchParams): Promise<ValidationResult> {
+    const language = await getCurrentLanguage()
     const errors: string[] = []
     const warnings: string[] = []
 
@@ -190,9 +204,9 @@ export class TwitterAdapter implements SearchEngineAdapter {
     if (!params.keyword.trim() && !params.exactMatch?.trim()) {
       // Twitter 允许纯用户搜索，但建议添加关键词
       if (!params.fromUser && !params.toUser) {
-        errors.push('请输入搜索关键词或指定用户')
+        errors.push(translate(language, 'adapter.validation.userMissing'))
       } else {
-        warnings.push('建议添加关键词以获得更精确的搜索结果')
+        warnings.push(translate(language, 'adapter.validation.keywordRecommended'))
       }
     }
 
@@ -200,14 +214,14 @@ export class TwitterAdapter implements SearchEngineAdapter {
     if (params.fromUser) {
       const username = this.cleanUsername(params.fromUser.trim())
       if (username && !this.isValidUsername(username)) {
-        errors.push('来源用户名格式不正确（仅支持字母、数字和下划线）')
+        errors.push(translate(language, 'adapter.validation.usernameInvalid'))
       }
     }
 
     if (params.toUser) {
       const username = this.cleanUsername(params.toUser.trim())
       if (username && !this.isValidUsername(username)) {
-        errors.push('目标用户名格式不正确（仅支持字母、数字和下划线）')
+        errors.push(translate(language, 'adapter.validation.usernameInvalid'))
       }
     }
 
@@ -215,30 +229,30 @@ export class TwitterAdapter implements SearchEngineAdapter {
     if (params.dateRange) {
       const { from, to } = params.dateRange
       if (from && !this.isValidDate(from)) {
-        errors.push('开始日期格式不正确')
+        errors.push(translate(language, 'adapter.validation.dateFromInvalid'))
       }
       if (to && !this.isValidDate(to)) {
-        errors.push('结束日期格式不正确')
+        errors.push(translate(language, 'adapter.validation.dateToInvalid'))
       }
       if (from && to && new Date(from) > new Date(to)) {
-        errors.push('开始日期不能晚于结束日期')
+        errors.push(translate(language, 'adapter.validation.dateRangeInvalid'))
       }
     }
 
     // 验证互动数据
     if (params.minRetweets !== undefined && params.minRetweets < 0) {
-      errors.push('最少转发数不能为负数')
+      errors.push(translate(language, 'adapter.validation.numberRangeInvalid'))
     }
 
     if (params.minFaves !== undefined && params.minFaves < 0) {
-      errors.push('最少点赞数不能为负数')
+      errors.push(translate(language, 'adapter.validation.numberRangeInvalid'))
     }
 
     // 验证语言代码
     if (params.language) {
       const validLanguages = ['zh', 'en', 'ja', 'ko', 'es', 'fr', 'de', 'pt', 'it', 'ru', 'ar']
       if (!validLanguages.includes(params.language.toLowerCase())) {
-        warnings.push(`语言代码 "${params.language}" 可能不被 Twitter 支持`)
+        warnings.push(translate(language, 'adapter.validation.languageUnsupported', { language: params.language }))
       }
     }
 
@@ -247,14 +261,14 @@ export class TwitterAdapter implements SearchEngineAdapter {
       const validFilters = ['images', 'videos', 'links', 'media', 'replies', 'retweets', 'news']
       const invalidFilters = params.contentFilters.filter(f => !validFilters.includes(f))
       if (invalidFilters.length > 0) {
-        errors.push(`不支持的内容过滤器: ${invalidFilters.join(', ')}`)
+        errors.push(translate(language, 'adapter.validation.filterInvalid', { filters: invalidFilters.join(', ') }))
       }
     }
 
     // 检查查询复杂度
     const fullQuery = this.buildSearchQuery(params)
     if (fullQuery.length > 200) {
-      warnings.push('搜索查询过长，可能影响搜索结果')
+      warnings.push(translate(language, 'adapter.validation.queryTooLong'))
     }
 
     // 检查语法数量
@@ -271,7 +285,7 @@ export class TwitterAdapter implements SearchEngineAdapter {
     ].reduce((a, b) => a + b, 0)
 
     if (syntaxCount > 6) {
-      warnings.push('搜索条件过多，可能导致结果过少')
+      warnings.push(translate(language, 'adapter.validation.tooManySyntax'))
     }
 
     return {
@@ -401,21 +415,23 @@ export class TwitterAdapter implements SearchEngineAdapter {
    * @returns Twitter的自然语言选项配置
    */
   getLanguageOptions(): import('@/types').LanguageFieldConfig {
+    // Note: Language labels use native language names for clarity
+    // The label and placeholder use i18n keys which will be translated in the UI
     return {
-      label: '语言筛选 (lang:)',
-      placeholder: '选择推文语言',
+      label: 'twitter.language.label',
+      placeholder: 'twitter.language.placeholder',
       options: [
-        { value: 'zh', label: '中文' },
-        { value: 'en', label: 'English' },
-        { value: 'ja', label: '日本語' },
-        { value: 'ko', label: '한국어' },
-        { value: 'es', label: 'Español' },
-        { value: 'fr', label: 'Français' },
-        { value: 'de', label: 'Deutsch' },
-        { value: 'pt', label: 'Português' },
-        { value: 'it', label: 'Italiano' },
-        { value: 'ru', label: 'Русский' },
-        { value: 'ar', label: 'العربية' }
+        { value: 'zh', label: 'twitter.language.zh' },
+        { value: 'en', label: 'twitter.language.en' },
+        { value: 'ja', label: 'twitter.language.ja' },
+        { value: 'ko', label: 'twitter.language.ko' },
+        { value: 'es', label: 'twitter.language.es' },
+        { value: 'fr', label: 'twitter.language.fr' },
+        { value: 'de', label: 'twitter.language.de' },
+        { value: 'pt', label: 'twitter.language.pt' },
+        { value: 'it', label: 'twitter.language.it' },
+        { value: 'ru', label: 'twitter.language.ru' },
+        { value: 'ar', label: 'twitter.language.ar' }
       ]
     }
   }

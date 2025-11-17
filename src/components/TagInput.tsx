@@ -1,4 +1,5 @@
 import { useState, KeyboardEvent } from 'react'
+import { useTranslation } from '@/i18n'
 
 interface TagInputProps {
   tags: string[]
@@ -11,7 +12,8 @@ interface TagInputProps {
  * 标签输入组件
  * 支持添加、删除多个标签,用于排除关键词和OR逻辑等场景
  */
-export function TagInput({ tags, onChange, placeholder = '输入后按回车添加', maxTags = 10 }: TagInputProps) {
+export function TagInput({ tags, onChange, placeholder, maxTags = 10 }: TagInputProps) {
+  const { t } = useTranslation()
   const [inputValue, setInputValue] = useState('')
 
   // 添加标签
@@ -57,7 +59,7 @@ export function TagInput({ tags, onChange, placeholder = '输入后按回车添�
                 type="button"
                 onClick={() => removeTag(index)}
                 className="hover:text-primary-900 dark:hover:text-primary-100 transition-colors"
-                aria-label={`删除标签: ${tag}`}
+                aria-label={`${t('tagInput.removeTagAriaLabel')}: ${tag}`}
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -76,7 +78,7 @@ export function TagInput({ tags, onChange, placeholder = '输入后按回车添�
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={addTag}
-          placeholder={tags.length >= maxTags ? `最多${maxTags}个标签` : placeholder}
+          placeholder={tags.length >= maxTags ? t('tagInput.maxLimitReached', { max: maxTags }) : (placeholder || t('tagInput.defaultPlaceholder'))}
           disabled={tags.length >= maxTags}
           className="input w-full"
         />
@@ -85,7 +87,7 @@ export function TagInput({ tags, onChange, placeholder = '输入后按回车添�
             type="button"
             onClick={addTag}
             className="absolute right-2 top-1/2 -translate-y-1/2 text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-            aria-label="添加标签"
+            aria-label={t('tagInput.addTagAriaLabel')}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -97,7 +99,7 @@ export function TagInput({ tags, onChange, placeholder = '输入后按回车添�
       {/* 标签计数 */}
       {tags.length > 0 && (
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          已添加 {tags.length}/{maxTags} 个标签
+          {t('tagInput.statsText', { count: tags.length, max: maxTags })}
         </p>
       )}
     </div>

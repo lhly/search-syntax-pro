@@ -1,10 +1,22 @@
 // Content Script for SearchSyntax Pro Chrome Extension
 
+import { translate } from '@/i18n/translations'
+
 // ========== 功能开关配置 ==========
 // 注意：这些开关控制实验性功能的启用状态
 const FEATURE_FLAGS = {
   // 悬浮按钮功能开关（开发中，未来版本启用）
   enableFloatingButton: false
+}
+
+// 获取当前语言设置
+async function getCurrentLanguage(): Promise<'zh-CN' | 'en-US'> {
+  try {
+    const result = await chrome.storage.local.get('user_settings')
+    return result.user_settings?.language || 'zh-CN'
+  } catch {
+    return 'zh-CN'
+  }
 }
 
 // 检查是否在搜索引擎页面
@@ -23,12 +35,14 @@ function isSearchEnginePage(): boolean {
 // 在搜索引擎页面注入功能
 // TODO: 此功能为未来版本规划，当前通过FEATURE_FLAGS.enableFloatingButton控制
 // 计划功能：在搜索引擎页面添加悬浮按钮，提供快速访问入口
-function injectSearchFeatures() {
+async function injectSearchFeatures() {
+  const language = await getCurrentLanguage()
+
   // 创建悬浮按钮
   const floatingButton = document.createElement('div')
   floatingButton.id = 'ssp-floating-button'
   floatingButton.innerHTML = `
-    <button title="打开 SearchSyntax Pro">
+    <button title="${translate(language, 'content.openSearchButton')}">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"></circle>
         <path d="m21 21-4.35-4.35"></path>

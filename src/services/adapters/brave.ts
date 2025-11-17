@@ -1,4 +1,17 @@
-import type { SearchEngineAdapter, SearchParams, SyntaxType, ValidationResult, UIFeatureType, EngineFeatureGroups } from '@/types'
+import type { SearchEngineAdapter, SearchParams, SyntaxType, ValidationResult, UIFeatureType, EngineFeatureGroups, Language } from '@/types'
+import { translate } from '@/i18n/translations'
+
+/**
+ * 获取当前语言设置
+ */
+async function getCurrentLanguage(): Promise<Language> {
+  try {
+    const result = await chrome.storage.local.get('user_settings')
+    return result.user_settings?.language || 'zh-CN'
+  } catch {
+    return 'zh-CN'
+  }
+}
 
 /**
  * Brave Search 搜索引擎适配器
@@ -188,14 +201,15 @@ export class BraveAdapter implements SearchEngineAdapter {
   /**
    * 验证搜索参数
    */
-  validateParams(params: SearchParams): ValidationResult {
+  async validateParams(params: SearchParams): Promise<ValidationResult> {
+    const language = await getCurrentLanguage()
     const errors: string[] = []
     const warnings: string[] = []
 
     // 检查是否有基本关键词
     if (!params.keyword || !params.keyword.trim()) {
       if (!params.exactMatch && !params.site) {
-        errors.push('请输入搜索关键词')
+        errors.push(translate(language, 'adapter.validation.keywordRequired'))
       }
     }
 
@@ -203,7 +217,7 @@ export class BraveAdapter implements SearchEngineAdapter {
     if (params.site && params.site.trim()) {
       const site = this.cleanSiteDomain(params.site.trim())
       if (!this.isValidDomain(site)) {
-        warnings.push('网站域名格式可能不正确')
+        warnings.push(translate(language, 'adapter.validation.domainInvalid'))
       }
     }
 
@@ -211,7 +225,7 @@ export class BraveAdapter implements SearchEngineAdapter {
     if (params.fileType && params.fileType.trim()) {
       const validTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'json', 'xml']
       if (!validTypes.includes(params.fileType.toLowerCase())) {
-        warnings.push(`文件类型 "${params.fileType}" 可能不被 Brave Search 支持`)
+        warnings.push(translate(language, 'adapter.validation.fileTypeUnsupported', { fileType: params.fileType, engine: 'Brave Search' }))
       }
     }
 
@@ -219,14 +233,14 @@ export class BraveAdapter implements SearchEngineAdapter {
     if (params.language && params.language.trim()) {
       const validLangs = ['en', 'zh', 'ja', 'es', 'fr', 'de', 'ko', 'ru', 'it', 'pt', 'ar']
       if (!validLangs.includes(params.language.toLowerCase())) {
-        warnings.push(`语言代码 "${params.language}" 可能不被支持`)
+        warnings.push(translate(language, 'adapter.validation.languageUnsupported', { language: params.language }))
       }
     }
 
     // 检查查询复杂度
     const fullQuery = this.buildSearchQuery(params)
     if (fullQuery.length > 200) {
-      warnings.push('搜索查询过长，可能影响搜索结果')
+      warnings.push(translate(language, 'adapter.validation.queryTooLong'))
     }
 
     // 检查语法数量
@@ -241,7 +255,7 @@ export class BraveAdapter implements SearchEngineAdapter {
     ].reduce((a, b) => a + b, 0)
 
     if (syntaxCount > 5) {
-      warnings.push('搜索条件过多，可能导致结果过少')
+      warnings.push(translate(language, 'adapter.validation.tooManySyntax'))
     }
 
     return {

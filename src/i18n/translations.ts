@@ -107,6 +107,8 @@ const translations: Record<Language, Record<string, string>> = {
     'options.fields.enableHistory.description': '保存搜索记录以便后续查看和重用',
     'options.fields.autoOpen.label': '在新标签页打开搜索结果',
     'options.fields.autoOpen.description': '开启时在新标签页打开搜索结果，关闭时在当前标签页打开',
+    'options.fields.enableContextMenu.label': '启用右键菜单快速搜索',
+    'options.fields.enableContextMenu.description': '选中文本后右键显示快速搜索菜单',
     'options.fields.historyLimit.label': '历史记录限制',
     'options.fields.historyLimit.description': '最多保存的历史记录数量（建议不超过1000条）',
     'options.actions.export': '导出数据',
@@ -149,6 +151,9 @@ const translations: Record<Language, Record<string, string>> = {
     'historyManager.usageTips': '使用提示',
     'historyManager.tip1': '点击历史记录可直接执行搜索',
     'historyManager.tip2': '点击"编辑后搜索"按钮可在弹窗中修改参数后搜索',
+
+    // 右键菜单
+    'contextMenu.searchSelection': '使用 SearchSyntax Pro 搜索 "%s"',
 
     // SearchForm 高级选项 - 用户筛选
     'searchForm.userFiltering.title': '用户筛选',
@@ -369,7 +374,135 @@ const translations: Record<Language, Record<string, string>> = {
     'template.product_reviews.tags': '购物,评测,评价',
     'template.price_comparison.name': '价格比较',
     'template.price_comparison.description': '在多个电商平台比较商品价格',
-    'template.price_comparison.tags': '购物,比价,电商'
+    'template.price_comparison.tags': '购物,比价,电商',
+
+    // SearchForm - 额外的提示文本
+    'searchForm.fileType.placeholder': '输入文件类型 (pdf, doc, etc.) 支持多个',
+    'searchForm.fromUser.multipleHint': ' (支持多个用户)',
+    'searchForm.toUser.multipleHint': ' (支持多个用户)',
+    'searchForm.site.multipleHint': ' (支持多个域名)',
+    'searchForm.exactMatch.multipleHint': ' (支持多个短语)',
+    'searchForm.reddit.title': 'Reddit板块筛选',
+    'searchForm.reddit.label': '板块筛选 (Subreddit)',
+    'searchForm.reddit.placeholder': '输入版块名称 (如: programming, javascript) 支持多个',
+    'searchForm.reddit.description': '在指定的Reddit版块内搜索',
+    'searchForm.reddit.hint': '按回车添加多个版块',
+    'searchForm.github.title': 'GitHub编程语言',
+    'searchForm.github.label': '编程语言筛选',
+    'searchForm.github.placeholder': '输入编程语言 (如: javascript, python, rust) 支持多个',
+    'searchForm.github.description': '在指定编程语言的仓库中搜索',
+    'searchForm.github.hint': '按回车添加多个语言',
+    'searchForm.stackoverflow.title': 'Stack Overflow标签',
+    'searchForm.stackoverflow.label': '标签筛选 (Tags)',
+    'searchForm.stackoverflow.placeholder': '输入标签 (如: react, node.js, typescript) 支持多个',
+    'searchForm.stackoverflow.description': '在指定标签的问题中搜索',
+    'searchForm.stackoverflow.hint': '按回车添加多个标签',
+
+    // TagInput组件
+    'tagInput.defaultPlaceholder': '输入后按回车添加',
+    'tagInput.maxLimitReached': '最多{max}个标签',
+    'tagInput.removeTagAriaLabel': '删除标签',
+    'tagInput.addTagAriaLabel': '添加标签',
+    'tagInput.statsText': '已添加 {count}/{max} 个标签',
+
+    // SearchForm - hint文本
+    'searchForm.fromUser.hint': '按回车添加多个用户',
+    'searchForm.toUser.hint': '按回车添加多个用户',
+    'searchForm.site.hint': '按回车添加多个网站',
+    'searchForm.fileType.hint': '按回车添加多个文件类型',
+    'searchForm.exactMatch.hint': '按回车添加多个短语',
+
+    // Content Script
+    'content.openSearchButton': '打开 SearchSyntax Pro',
+
+    // PopoutButton
+    'popout.openFailedAlert': '打开独立窗口失败，请重试',
+
+    // Suggestion Engine - 建议标题和原因
+    'suggestion.limitFileTypePdf.title': '限定文件类型为 PDF',
+    'suggestion.limitFileTypePdf.reason': '检测到学术搜索意图,建议添加 PDF 文件过滤',
+    'suggestion.limitRecentYears.title': '限定近5年文献',
+    'suggestion.limitRecentYears.reason': '学术搜索建议限制近5年文献',
+    'suggestion.limitLast24Hours.title': '限定最近24小时',
+    'suggestion.limitLast24Hours.reason': '检测到时效性需求,建议限制最近24小时',
+    'suggestion.limitSiteSearch.title': '限定站内搜索',
+    'suggestion.limitSiteSearch.reason': '检测到站内搜索意图',
+    'suggestion.limitDocsUrl.title': '限定文档URL',
+    'suggestion.limitDocsUrl.reason': '技术搜索建议限定文档URL',
+    'suggestion.expandDocsSources.title': '扩展文档来源',
+    'suggestion.expandDocsSources.reason': '建议搜索多个文档平台',
+    'suggestion.limitGithub.title': '限定 GitHub',
+    'suggestion.limitGithub.reason': '检测到开源代码搜索意图',
+    'suggestion.useExactMatch.title': '使用精确匹配',
+    'suggestion.useExactMatch.reason': '关键词较长,建议使用精确匹配提高准确度',
+    'suggestion.excludeAds.title': '排除广告内容',
+    'suggestion.excludeAds.reason': '建议排除广告和推广内容',
+    'suggestion.useSyntax.title': '使用 {syntax} 语法',
+    'suggestion.useSyntax.reason': '您在 {count} 次类似搜索中使用了此语法',
+    'suggestion.limitUrlPath.title': '进一步限定 URL 路径',
+    'suggestion.limitUrlPath.reason': '已限定站点,可进一步限定 URL 路径',
+    'suggestion.excludeIrrelevant.title': '排除不相关结果',
+    'suggestion.excludeIrrelevant.reason': '精确匹配可能结果过多,建议排除不相关词',
+    'suggestion.limitTimeRange.title': '限定时间范围',
+    'suggestion.limitTimeRange.reason': '添加时间范围可获得更相关的结果',
+
+    // Template Manager
+    'template.importError': '导入模板失败: {error}',
+
+    // GitHub adapter - 编程语言
+    'github.language.javascript': 'JavaScript',
+    'github.language.typescript': 'TypeScript',
+    'github.language.python': 'Python',
+    'github.language.java': 'Java',
+    'github.language.go': 'Go',
+    'github.language.rust': 'Rust',
+    'github.language.cpp': 'C++',
+    'github.language.c': 'C',
+    'github.language.csharp': 'C#',
+    'github.language.ruby': 'Ruby',
+    'github.language.php': 'PHP',
+    'github.language.swift': 'Swift',
+    'github.language.kotlin': 'Kotlin',
+    'github.language.dart': 'Dart',
+    'github.language.shell': 'Shell',
+    'github.language.html': 'HTML',
+    'github.language.css': 'CSS',
+    'github.language.vue': 'Vue',
+
+    // Twitter adapter - 自然语言
+    'twitter.language.zh': '中文',
+    'twitter.language.en': 'English',
+    'twitter.language.ja': '日本語',
+    'twitter.language.ko': '한국어',
+    'twitter.language.es': 'Español',
+    'twitter.language.fr': 'Français',
+    'twitter.language.de': 'Deutsch',
+    'twitter.language.pt': 'Português',
+    'twitter.language.it': 'Italiano',
+    'twitter.language.ru': 'Русский',
+    'twitter.language.ar': 'العربية',
+
+    // Adapter 验证错误消息
+    'adapter.validation.keywordRequired': '请输入搜索关键词、精确匹配内容或缓存网站',
+    'adapter.validation.domainInvalid': '网站域名格式不正确',
+    'adapter.validation.fileTypeUnsupported': '文件类型 "{fileType}" 可能不被{engine}支持',
+    'adapter.validation.dateFromInvalid': '开始日期格式不正确',
+    'adapter.validation.dateToInvalid': '结束日期格式不正确',
+    'adapter.validation.dateRangeInvalid': '开始日期不能晚于结束日期',
+    'adapter.validation.numberRangeInvalid': '最小值不能大于最大值',
+    'adapter.validation.cacheUrlInvalid': '缓存网站URL格式不正确',
+    'adapter.validation.queryTooLong': '搜索查询过长，可能影响搜索结果',
+    'adapter.validation.tooManySyntax': '搜索条件过多，可能导致结果过少',
+    'adapter.validation.relatedUrlInvalid': '相关网站URL格式不正确',
+    'adapter.validation.subredditInvalid': 'Subreddit名称不能包含r/前缀',
+    'adapter.validation.userMissing': '请至少指定一个用户筛选条件',
+    'adapter.validation.cacheNotSupported': '{engine}不支持cache语法，该参数将被忽略',
+    'adapter.validation.keywordRecommended': '建议添加关键词以获得更精确的搜索结果',
+    'adapter.validation.usernameInvalid': '用户名格式不正确（仅支持字母、数字和下划线）',
+    'adapter.validation.languageUnsupported': '语言代码 "{language}" 可能不被支持',
+    'adapter.validation.filterInvalid': '不支持的内容过滤器: {filters}',
+    'adapter.validation.repoInvalid': '仓库格式应为: 用户名/仓库名 (例如: facebook/react)',
+    'adapter.validation.tagInvalid': '标签格式不正确'
   },
   'en-US': {
     'common.languages.zh-CN': 'Simplified Chinese',
@@ -477,6 +610,8 @@ const translations: Record<Language, Record<string, string>> = {
     'options.fields.enableHistory.description': 'Keep recent searches for quick access.',
     'options.fields.autoOpen.label': 'Open search results in new tab',
     'options.fields.autoOpen.description': 'When enabled, opens results in a new tab; when disabled, opens in current tab',
+    'options.fields.enableContextMenu.label': 'Enable right-click menu quick search',
+    'options.fields.enableContextMenu.description': 'Show quick search menu when right-clicking selected text',
     'options.fields.historyLimit.label': 'History limit',
     'options.fields.historyLimit.description': 'Maximum number of saved history entries (recommended ≤ 1000).',
     'options.actions.export': 'Export data',
@@ -519,6 +654,9 @@ const translations: Record<Language, Record<string, string>> = {
     'historyManager.usageTips': 'Usage Tips',
     'historyManager.tip1': 'Click on a history item to execute the search directly',
     'historyManager.tip2': 'Click "Edit & Search" button to modify parameters in popup before searching',
+
+    // Context menu
+    'contextMenu.searchSelection': 'Search with SearchSyntax Pro "%s"',
 
     // SearchForm advanced options - User filtering
     'searchForm.userFiltering.title': 'User Filtering',
@@ -739,7 +877,135 @@ const translations: Record<Language, Record<string, string>> = {
     'template.product_reviews.tags': 'Shopping,Review,Feedback',
     'template.price_comparison.name': 'Price Comparison',
     'template.price_comparison.description': 'Compare product prices across multiple e-commerce platforms',
-    'template.price_comparison.tags': 'Shopping,Price Comparison,E-commerce'
+    'template.price_comparison.tags': 'Shopping,Price Comparison,E-commerce',
+
+    // SearchForm - Additional hint texts
+    'searchForm.fileType.placeholder': 'Enter file types (pdf, doc, etc.) - supports multiple',
+    'searchForm.fromUser.multipleHint': ' (supports multiple users)',
+    'searchForm.toUser.multipleHint': ' (supports multiple users)',
+    'searchForm.site.multipleHint': ' (supports multiple domains)',
+    'searchForm.exactMatch.multipleHint': ' (supports multiple phrases)',
+    'searchForm.reddit.title': 'Reddit Subreddit Filter',
+    'searchForm.reddit.label': 'Subreddit Filter',
+    'searchForm.reddit.placeholder': 'Enter subreddit names (e.g. programming, javascript) - supports multiple',
+    'searchForm.reddit.description': 'Search within specified Reddit subreddits',
+    'searchForm.reddit.hint': 'Press Enter to add multiple subreddits',
+    'searchForm.github.title': 'GitHub Programming Language',
+    'searchForm.github.label': 'Programming Language Filter',
+    'searchForm.github.placeholder': 'Enter programming languages (e.g. javascript, python, rust) - supports multiple',
+    'searchForm.github.description': 'Search in repositories of specified programming languages',
+    'searchForm.github.hint': 'Press Enter to add multiple languages',
+    'searchForm.stackoverflow.title': 'Stack Overflow Tags',
+    'searchForm.stackoverflow.label': 'Tag Filter',
+    'searchForm.stackoverflow.placeholder': 'Enter tags (e.g. react, node.js, typescript) - supports multiple',
+    'searchForm.stackoverflow.description': 'Search in questions with specified tags',
+    'searchForm.stackoverflow.hint': 'Press Enter to add multiple tags',
+
+    // TagInput component
+    'tagInput.defaultPlaceholder': 'Type and press Enter to add',
+    'tagInput.maxLimitReached': 'Maximum {max} tags',
+    'tagInput.removeTagAriaLabel': 'Remove tag',
+    'tagInput.addTagAriaLabel': 'Add tag',
+    'tagInput.statsText': 'Added {count}/{max} tags',
+
+    // SearchForm - hint texts
+    'searchForm.fromUser.hint': 'Press Enter to add multiple users',
+    'searchForm.toUser.hint': 'Press Enter to add multiple users',
+    'searchForm.site.hint': 'Press Enter to add multiple sites',
+    'searchForm.fileType.hint': 'Press Enter to add multiple file types',
+    'searchForm.exactMatch.hint': 'Press Enter to add multiple phrases',
+
+    // Content Script
+    'content.openSearchButton': 'Open SearchSyntax Pro',
+
+    // PopoutButton
+    'popout.openFailedAlert': 'Failed to open standalone window, please try again',
+
+    // Suggestion Engine - suggestion titles and reasons
+    'suggestion.limitFileTypePdf.title': 'Limit file type to PDF',
+    'suggestion.limitFileTypePdf.reason': 'Detected academic search intent, recommend adding PDF file filter',
+    'suggestion.limitRecentYears.title': 'Limit to recent 5 years',
+    'suggestion.limitRecentYears.reason': 'Academic search recommends limiting to recent 5 years of literature',
+    'suggestion.limitLast24Hours.title': 'Limit to last 24 hours',
+    'suggestion.limitLast24Hours.reason': 'Detected time-sensitive requirement, recommend limiting to last 24 hours',
+    'suggestion.limitSiteSearch.title': 'Limit to site search',
+    'suggestion.limitSiteSearch.reason': 'Detected site search intent',
+    'suggestion.limitDocsUrl.title': 'Limit to documentation URL',
+    'suggestion.limitDocsUrl.reason': 'Technical search recommends limiting to documentation URL',
+    'suggestion.expandDocsSources.title': 'Expand documentation sources',
+    'suggestion.expandDocsSources.reason': 'Recommend searching multiple documentation platforms',
+    'suggestion.limitGithub.title': 'Limit to GitHub',
+    'suggestion.limitGithub.reason': 'Detected open source code search intent',
+    'suggestion.useExactMatch.title': 'Use exact match',
+    'suggestion.useExactMatch.reason': 'Keyword is long, recommend using exact match to improve accuracy',
+    'suggestion.excludeAds.title': 'Exclude advertisements',
+    'suggestion.excludeAds.reason': 'Recommend excluding advertisements and promotional content',
+    'suggestion.useSyntax.title': 'Use {syntax} syntax',
+    'suggestion.useSyntax.reason': 'You used this syntax in {count} similar searches',
+    'suggestion.limitUrlPath.title': 'Further limit URL path',
+    'suggestion.limitUrlPath.reason': 'Site already limited, can further limit URL path',
+    'suggestion.excludeIrrelevant.title': 'Exclude irrelevant results',
+    'suggestion.excludeIrrelevant.reason': 'Exact match may return too many results, recommend excluding irrelevant words',
+    'suggestion.limitTimeRange.title': 'Limit time range',
+    'suggestion.limitTimeRange.reason': 'Adding time range can get more relevant results',
+
+    // Template Manager
+    'template.importError': 'Failed to import template: {error}',
+
+    // GitHub adapter - programming languages
+    'github.language.javascript': 'JavaScript',
+    'github.language.typescript': 'TypeScript',
+    'github.language.python': 'Python',
+    'github.language.java': 'Java',
+    'github.language.go': 'Go',
+    'github.language.rust': 'Rust',
+    'github.language.cpp': 'C++',
+    'github.language.c': 'C',
+    'github.language.csharp': 'C#',
+    'github.language.ruby': 'Ruby',
+    'github.language.php': 'PHP',
+    'github.language.swift': 'Swift',
+    'github.language.kotlin': 'Kotlin',
+    'github.language.dart': 'Dart',
+    'github.language.shell': 'Shell',
+    'github.language.html': 'HTML',
+    'github.language.css': 'CSS',
+    'github.language.vue': 'Vue',
+
+    // Twitter adapter - natural languages
+    'twitter.language.zh': 'Chinese',
+    'twitter.language.en': 'English',
+    'twitter.language.ja': 'Japanese',
+    'twitter.language.ko': 'Korean',
+    'twitter.language.es': 'Spanish',
+    'twitter.language.fr': 'French',
+    'twitter.language.de': 'German',
+    'twitter.language.pt': 'Portuguese',
+    'twitter.language.it': 'Italian',
+    'twitter.language.ru': 'Russian',
+    'twitter.language.ar': 'Arabic',
+
+    // Adapter validation error messages
+    'adapter.validation.keywordRequired': 'Please enter search keywords, exact match content, or cache site',
+    'adapter.validation.domainInvalid': 'Invalid domain format',
+    'adapter.validation.fileTypeUnsupported': 'File type "{fileType}" may not be supported by {engine}',
+    'adapter.validation.dateFromInvalid': 'Invalid start date format',
+    'adapter.validation.dateToInvalid': 'Invalid end date format',
+    'adapter.validation.dateRangeInvalid': 'Start date cannot be later than end date',
+    'adapter.validation.numberRangeInvalid': 'Minimum value cannot be greater than maximum value',
+    'adapter.validation.cacheUrlInvalid': 'Invalid cache site URL format',
+    'adapter.validation.queryTooLong': 'Search query too long, may affect search results',
+    'adapter.validation.tooManySyntax': 'Too many search conditions, may result in fewer results',
+    'adapter.validation.relatedUrlInvalid': 'Invalid related site URL format',
+    'adapter.validation.subredditInvalid': 'Subreddit name should not include r/ prefix',
+    'adapter.validation.userMissing': 'Please specify at least one user filter',
+    'adapter.validation.cacheNotSupported': '{engine} does not support cache syntax, this parameter will be ignored',
+    'adapter.validation.keywordRecommended': 'Keywords are recommended for more precise search results',
+    'adapter.validation.usernameInvalid': 'Invalid username format (only letters, numbers, and underscores allowed)',
+    'adapter.validation.languageUnsupported': 'Language code "{language}" may not be supported',
+    'adapter.validation.filterInvalid': 'Unsupported content filters: {filters}',
+    'adapter.validation.repoInvalid': 'Repository format should be: username/repository (e.g., facebook/react)',
+    'adapter.validation.tagInvalid': 'Invalid tag format'
   }
 }
 

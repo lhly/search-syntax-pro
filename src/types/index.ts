@@ -178,6 +178,7 @@ export interface UserSettings {
   theme: 'light' | 'dark' | 'auto';
   historyLimit: number;
   autoOpenInNewTab: boolean;
+  enableContextMenu: boolean;  // 🔥 新增：启用右键菜单功能
 }
 
 // UI 功能特性类型 (用于控制 UI 显示)
@@ -239,7 +240,7 @@ export interface SearchEngineAdapter {
   getSupportedSyntax(): SyntaxType[];
   getBaseUrl(): string;
   getName(): string;
-  validateParams?(params: SearchParams): ValidationResult;
+  validateParams?(params: SearchParams): ValidationResult | Promise<ValidationResult>;
   getSearchSuggestions?(params: SearchParams): string[];
   // 新增: 语法兼容性检查
   isSyntaxSupported?(syntax: SyntaxType): boolean;
@@ -266,11 +267,28 @@ export interface ValidationResult {
   warnings: string[];
 }
 
+// 🔥 Chrome Storage 数据结构类型定义
+export interface ChromeStorageData {
+  // 核心数据
+  search_history?: SearchHistory[];
+  user_settings?: UserSettings;
+  app_cache?: {
+    timestamp: number;
+    [key: string]: any;
+  };
+
+  // 🔥 右键菜单快速搜索
+  quick_search_text?: string;        // 选中的文本内容
+  quick_search_trigger?: number;     // 触发时间戳（用于判断是否为新触发）
+}
+
 // 存储键名常量
 export const STORAGE_KEYS = {
   HISTORY: 'search_history',
   SETTINGS: 'user_settings',
-  CACHE: 'app_cache'
+  CACHE: 'app_cache',
+  QUICK_SEARCH_TEXT: 'quick_search_text',
+  QUICK_SEARCH_TRIGGER: 'quick_search_trigger'
 } as const;
 
 // 默认设置 - enginePreferences 需要在运行时通过 EnginePreferenceService 生成
@@ -280,7 +298,8 @@ export const DEFAULT_SETTINGS: Omit<UserSettings, 'enginePreferences'> = {
   enableHistory: true,
   theme: 'auto',
   historyLimit: 1000,
-  autoOpenInNewTab: true
+  autoOpenInNewTab: true,
+  enableContextMenu: true  // 🔥 默认启用右键菜单
 };
 
 // 常见文件类型

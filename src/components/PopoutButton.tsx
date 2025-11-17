@@ -28,7 +28,7 @@ export function PopoutButton({ className = '' }: PopoutButtonProps) {
     } catch (error) {
       console.error('弹出窗口失败:', error)
       setIsLoading(false)
-      alert('打开独立窗口失败，请重试')
+      alert(t('popout.openFailedAlert'))
     }
   }
 

@@ -106,6 +106,7 @@ Search like an expert with precision:
 - **One-Click Copy** - Generated query ready to copy and use
 - **Multi-language UI** - Full Chinese and English support
 - **Responsive Design** - Adapt to all screen sizes
+- **Right-Click Quick Search** - Select text → right-click → instant search with visual syntax builder
 
 ### 🪟 Window Management
 
