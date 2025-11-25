@@ -53,6 +53,9 @@ function FloatingPanelContent() {
   const [validation, setValidation] = useState<ValidationResult | null>(null)
   // 浮动面板默认展开高级选项(用户打开面板就是为了构建高级搜索语法)
   const [showAdvanced, setShowAdvanced] = useState(true)
+  const handleSearchParamsChange = useCallback((params: SearchParams) => {
+    setSearchParams(params)
+  }, [])
 
   // 🔥 监听来自 content script 的消息
   useEffect(() => {
@@ -110,7 +113,6 @@ function FloatingPanelContent() {
       // 安全提取和解码查询字符串,避免在搜索框中显示 %20, %3A 等编码
       const decodedQuery = extractAndDecodeQuery(query)
       setGeneratedQuery(decodedQuery)
-      setSearchParams(params)
     } catch (error) {
       console.error('[FloatingPanel] Failed to generate query:', error)
       setValidation({
@@ -120,6 +122,10 @@ function FloatingPanelContent() {
       })
     }
   }, [t])
+
+  useEffect(() => {
+    void generateQuery(searchParams)
+  }, [searchParams, generateQuery])
 
   // 通用的应用逻辑,接受autoSearch参数
   const applyQuery = useCallback((autoSearch: boolean) => {
@@ -201,7 +207,7 @@ function FloatingPanelContent() {
         {/* 搜索表单 - 针对 800px 优化，隐藏引擎选择器（当前页面已确定搜索引擎） */}
         <SearchForm
           searchParams={searchParams}
-          onSearchParamsChange={generateQuery}
+          onSearchParamsChange={handleSearchParamsChange}
           showAdvanced={showAdvanced}
           onToggleAdvanced={setShowAdvanced}
           hideEngineSelector={true}

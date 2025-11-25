@@ -200,15 +200,14 @@ function App() {
         updates.toUsers = [searchParams.toUser]
       }
 
-      if (Object.keys(updates).length > 0) {
-        const newParams = { ...searchParams, ...updates }
-        setSearchParams(newParams)
-        void generateQuery(newParams)
-        console.log('[Migration] 已自动迁移旧字段到新数组:', updates)
-      }
+    if (Object.keys(updates).length > 0) {
+      const newParams = { ...searchParams, ...updates }
+      setSearchParams(newParams)
+      console.log('[Migration] 已自动迁移旧字段到新数组:', updates)
     }
+  }
 
-    migrateOldFieldsToNew()
+  migrateOldFieldsToNew()
   }, []) // 空依赖,只在挂载时执行一次
 
   // 生成搜索查询 - 使用 useCallback
@@ -232,7 +231,6 @@ function App() {
       const decodedQuery = extractAndDecodeQuery(query)
       setGeneratedQuery(decodedQuery)
       setSearchUrl(query)
-      setSearchParams(params)
     } catch (error) {
       console.error('生成搜索查询失败:', error)
       setValidation({
@@ -242,6 +240,10 @@ function App() {
       })
     }
   }, [t])
+
+  useEffect(() => {
+    void generateQuery(searchParams)
+  }, [searchParams, generateQuery])
 
   // 执行搜索 - 使用 useCallback
   const executeSearch = useCallback(() => {
@@ -384,7 +386,6 @@ function App() {
     if (targetEngine) {
       const newParams = { ...searchParams, engine: targetEngine }
       setSearchParams(newParams)
-      void generateQuery(newParams)
       console.log(`[App] 切换到搜索引擎: ${targetEngine}`)
     } else {
       console.warn(`[App] 无法切换引擎,使用默认引擎`)
@@ -431,6 +432,10 @@ function App() {
     console.log('表单已清空')
   }, [settings])
 
+  const handleSearchParamsChange = useCallback((params: SearchParams) => {
+    setSearchParams(params)
+  }, [])
+
   // 从历史记录中恢复搜索 - 使用 useCallback
   const restoreFromHistory = useCallback((historyItem: SearchHistoryType) => {
     const restoredParams: SearchParams = {
@@ -465,8 +470,7 @@ function App() {
       dateRange: historyItem.syntax.dateRange
     }
     setSearchParams(restoredParams)
-    void generateQuery(restoredParams)
-  }, [generateQuery])
+  }, [])
 
   // 清除历史记录 - 使用 useCallback
   const clearHistory = useCallback(() => {
@@ -478,14 +482,12 @@ function App() {
   const handleApplySuggestion = useCallback((params: Partial<SearchParams>) => {
     const newParams = { ...searchParams, ...params }
     setSearchParams(newParams)
-    void generateQuery(newParams)
-  }, [searchParams, generateQuery])
+  }, [searchParams])
 
   // v1.6.0: 应用模板 - 使用 useCallback
   const handleApplyTemplate = useCallback((params: SearchParams) => {
     setSearchParams(params)
-    void generateQuery(params)
-  }, [generateQuery])
+  }, [])
 
   // v1.6.0: 初始化服务（只在组件挂载时初始化一次）
   // 🔥 P0修复：React Strict Mode 兼容性说明
@@ -592,7 +594,7 @@ function App() {
       <TranslationProvider language={settings?.language ?? 'zh-CN'}>
         <PopupContent
           searchParams={searchParams}
-          generateQuery={generateQuery}
+          onSearchParamsChange={handleSearchParamsChange}
           validation={validation}
           generatedQuery={generatedQuery}
           executeSearch={executeSearch}
@@ -621,7 +623,7 @@ export default App
 
 interface PopupContentProps {
   searchParams: SearchParams
-  generateQuery: (params: SearchParams) => void
+  onSearchParamsChange: (params: SearchParams) => void
   validation: ValidationResult | null
   generatedQuery: string
   executeSearch: () => void
@@ -646,7 +648,7 @@ interface PopupContentProps {
 
 function PopupContent({
   searchParams,
-  generateQuery,
+  onSearchParamsChange,
   validation,
   generatedQuery,
   executeSearch,
@@ -699,7 +701,7 @@ function PopupContent({
         {/* 搜索表单 */}
         <SearchForm
           searchParams={searchParams}
-          onSearchParamsChange={generateQuery}
+          onSearchParamsChange={onSearchParamsChange}
           showAdvanced={showAdvanced}
           onToggleAdvanced={(show) => setShowAdvanced(show)}
         />
