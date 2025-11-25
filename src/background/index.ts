@@ -1,9 +1,145 @@
 // Background Service Worker for SearchSyntax Pro Chrome Extension
 
-import { autoMigrateStorage } from '@/utils/migration'
-import { EnginePreferenceService } from '@/services/engine-preference'
-import { translate } from '@/i18n/translations'
-import type { Language } from '@/types'
+import type { Language, UserSettings, EnginePreference, SearchEngine } from '@/types'
+
+/**
+ * 内联的搜索引擎支持函数
+ * 避免跨文件导入导致的编译符号不匹配问题
+ */
+function getSupportedEngines(): SearchEngine[] {
+  return ['baidu', 'google', 'bing', 'twitter', 'duckduckgo', 'brave', 'yandex', 'reddit', 'github', 'stackoverflow']
+}
+
+/**
+ * 内联的引擎偏好设置服务方法
+ * 避免跨文件导入导致的编译符号不匹配问题
+ */
+function getDefaultPreferences(): EnginePreference[] {
+  return getSupportedEngines().map((engine, index) => ({
+    engine,
+    visible: true,
+    order: index
+  }))
+}
+
+function reorderEngines(
+  preferences: EnginePreference[],
+  fromIndex: number,
+  toIndex: number
+): EnginePreference[] {
+  if (fromIndex === toIndex) return preferences
+
+  const result = [...preferences]
+  const [removed] = result.splice(fromIndex, 1)
+  result.splice(toIndex, 0, removed)
+
+  // 更新order值
+  return result.map((pref, index) => ({
+    ...pref,
+    order: index
+  }))
+}
+
+function ensureAtLeastOneVisible(preferences: EnginePreference[]): EnginePreference[] {
+  const visibleCount = preferences.filter(p => p.visible).length
+
+  if (visibleCount === 0) {
+    // 自动显示第一个引擎
+    return preferences.map((pref, index) =>
+      index === 0 ? { ...pref, visible: true } : pref
+    )
+  }
+
+  return preferences
+}
+
+function getDefaultUserSettings(): UserSettings {
+  return {
+    language: 'zh-CN',
+    enableHistory: true,
+    theme: 'auto',
+    historyLimit: 1000,
+    autoOpenInNewTab: true,
+    enableContextMenu: true,
+    enableFloatingButton: true,  // 🔥 默认启用悬浮按钮
+    enginePreferences: getDefaultPreferences()
+  }
+}
+
+/**
+ * 内联的数据迁移函数
+ * 避免跨文件导入导致的编译符号不匹配问题
+ */
+async function autoMigrateStorage(): Promise<boolean> {
+  try {
+    const result = await chrome.storage.local.get('user_settings')
+    const oldSettings = result.user_settings as any
+
+    if (!oldSettings) {
+      console.log('📭 未找到用户设置，跳过迁移')
+      return false
+    }
+
+    // 检查是否需要迁移（是否存在旧的defaultEngine字段）
+    if ('defaultEngine' in oldSettings) {
+      console.log('🔄 开始自动迁移用户设置...')
+
+      // 获取或创建 enginePreferences
+      let preferences: EnginePreference[] =
+        oldSettings.enginePreferences || getDefaultPreferences()
+
+      // 如果存在 defaultEngine，将其移到第一位
+      if (oldSettings.defaultEngine) {
+        const defaultEngine = oldSettings.defaultEngine
+        const defaultIndex = preferences.findIndex((p: EnginePreference) => p.engine === defaultEngine)
+
+        if (defaultIndex > 0) {
+          console.log(`📌 将默认引擎 "${defaultEngine}" 移动到排序第一位`)
+          preferences = reorderEngines(preferences, defaultIndex, 0)
+        }
+      }
+
+      // 确保至少一个可见
+      preferences = ensureAtLeastOneVisible(preferences)
+
+      // 移除 defaultEngine 字段，创建新格式设置
+      const { defaultEngine, ...rest } = oldSettings
+      const newSettings: UserSettings = {
+        ...rest,
+        enginePreferences: preferences
+      }
+
+      await chrome.storage.local.set({ user_settings: newSettings })
+
+      console.log('✅ 用户设置已自动迁移到 V2 格式')
+      return true
+    }
+
+    console.log('✅ 设置已是最新格式，无需迁移')
+    return false
+  } catch (error) {
+    console.error('❌ 自动迁移失败:', error)
+    return false
+  }
+}
+
+/**
+ * 获取翻译文本
+ * 内联简化版本，避免跨文件导入问题
+ */
+function getTranslation(language: Language, key: string, fallback: string): string {
+  // 简化实现：直接返回中英文
+  const translations: Record<string, Record<string, string>> = {
+    'zh-CN': {
+      'contextMenu.searchSelection': '使用 SearchSyntax Pro 搜索 "%s"'
+    },
+    'en-US': {
+      'contextMenu.searchSelection': 'Search with SearchSyntax Pro "%s"'
+    }
+  }
+
+  return translations[language]?.[key] || translations['zh-CN']?.[key] || fallback
+}
 
 /**
  * 监听快捷键命令
@@ -39,7 +175,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   // 设置默认设置
   if (details.reason === 'install') {
     // 🔥 新安装：使用新的设置结构（无 defaultEngine）
-    const defaultSettings = EnginePreferenceService.getDefaultUserSettings()
+    const defaultSettings = getDefaultUserSettings()
 
     await chrome.storage.local.set({
       user_settings: defaultSettings
@@ -73,11 +209,10 @@ async function createContextMenus() {
   chrome.contextMenus.removeAll(() => {
     // 🔥 只在启用时创建右键菜单
     if (enableContextMenu) {
-      // 🌐 使用translate函数获取当前语言的菜单文本
-      const menuTitle = translate(
+      // 🌐 使用内联函数获取当前语言的菜单文本
+      const menuTitle = getTranslation(
         language,
         'contextMenu.searchSelection',
-        undefined,
         '使用 SearchSyntax Pro 搜索 "%s"' // fallback文本
       )
 

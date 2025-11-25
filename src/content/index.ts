@@ -1,111 +1,24 @@
 // Content Script for SearchSyntax Pro Chrome Extension
 
-import { translate } from '@/i18n/translations'
+import { FloatingPanelManager } from './FloatingPanelManager'
+import type { UserSettings } from '@/types'
 
-// ========== 功能开关配置 ==========
-// 注意：这些开关控制实验性功能的启用状态
-const FEATURE_FLAGS = {
-  // 悬浮按钮功能开关（开发中，未来版本启用）
-  enableFloatingButton: false
-}
-
-// 获取当前语言设置
-async function getCurrentLanguage(): Promise<'zh-CN' | 'en-US'> {
-  try {
-    const result = await chrome.storage.local.get('user_settings')
-    return result.user_settings?.language || 'zh-CN'
-  } catch {
-    return 'zh-CN'
-  }
-}
+// 全局管理器实例
+let floatingPanelManager: FloatingPanelManager | null = null
 
 // 检查是否在搜索引擎页面
+// 支持所有国际域名变体
+// Note: Google excluded - it has built-in advanced search tools
 function isSearchEnginePage(): boolean {
-  const searchEngines = [
-    'www.baidu.com',
-    'www.google.com',
-    'www.bing.com'
-  ]
-  
-  return searchEngines.some(engine => 
-    window.location.hostname.includes(engine)
-  )
-}
+  const hostname = window.location.hostname;
 
-// 在搜索引擎页面注入功能
-// TODO: 此功能为未来版本规划，当前通过FEATURE_FLAGS.enableFloatingButton控制
-// 计划功能：在搜索引擎页面添加悬浮按钮，提供快速访问入口
-async function injectSearchFeatures() {
-  const language = await getCurrentLanguage()
+  // 匹配 Baidu 所有域名 (baidu.com, baidu.com.hk, baidu.jp, etc.)
+  if (hostname.includes('baidu.com')) return true;
 
-  // 创建悬浮按钮
-  const floatingButton = document.createElement('div')
-  floatingButton.id = 'ssp-floating-button'
-  floatingButton.innerHTML = `
-    <button title="${translate(language, 'content.openSearchButton')}">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"></circle>
-        <path d="m21 21-4.35-4.35"></path>
-      </svg>
-    </button>
-  `
-  
-  // 添加样式
-  const style = document.createElement('style')
-  style.textContent = `
-    #ssp-floating-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 10000;
-      background: #3b82f6;
-      border-radius: 50%;
-      width: 56px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    #ssp-floating-button:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-    }
-    
-    #ssp-floating-button button {
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    #ssp-floating-button.ducked {
-      transform: translateY(100px);
-    }
-  `
-  
-  document.head.appendChild(style)
-  document.body.appendChild(floatingButton)
-  
-  // 点击事件
-  floatingButton.addEventListener('click', () => {
-    chrome.runtime.sendMessage({ action: 'open_popup' })
-  })
-  
-  // 键盘快捷键 (Ctrl/Cmd + Shift + S)
-  document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') {
-      e.preventDefault()
-      chrome.runtime.sendMessage({ action: 'open_popup' })
-    }
-  })
+  // 匹配 Bing 所有域名 (bing.com, cn.bing.com, etc.)
+  if (hostname.includes('bing.com')) return true;
+
+  return false;
 }
 
 // 分析搜索查询
@@ -236,18 +149,39 @@ function highlightSearchSyntax() {
 }
 
 // 初始化content script
-function init() {
+async function init() {
   console.log('SearchSyntax Pro Content Script 已加载')
 
   if (isSearchEnginePage()) {
     console.log('检测到搜索引擎页面，注入功能')
 
     // 延迟注入，确保页面加载完成
-    setTimeout(() => {
-      // 根据功能开关决定是否注入悬浮按钮
-      if (FEATURE_FLAGS.enableFloatingButton) {
-        injectSearchFeatures()
+    setTimeout(async () => {
+      // 🔥 从用户设置读取悬浮按钮开关
+      try {
+        const result = await chrome.storage.local.get('user_settings')
+        const settings: UserSettings | undefined = result.user_settings
+        const enableFloatingButton = settings?.enableFloatingButton ?? true // 默认启用
+
+        // 根据用户设置决定是否注入悬浮按钮
+        if (enableFloatingButton) {
+          console.log('[SSP] 悬浮按钮功能已启用')
+          floatingPanelManager = new FloatingPanelManager()
+          floatingPanelManager.initialize().catch((error) => {
+            console.error('[SSP] Failed to initialize floating panel:', error)
+          })
+        } else {
+          console.log('[SSP] 悬浮按钮功能已禁用')
+        }
+      } catch (error) {
+        console.error('[SSP] Failed to load user settings:', error)
+        // 发生错误时，默认启用悬浮按钮
+        floatingPanelManager = new FloatingPanelManager()
+        floatingPanelManager.initialize().catch((error) => {
+          console.error('[SSP] Failed to initialize floating panel:', error)
+        })
       }
+
       analyzeSearchQuery()
     }, 1000)
   }
@@ -269,5 +203,10 @@ new MutationObserver(() => {
     setTimeout(init, 1000) // 延迟重新初始化
   }
 }).observe(document, { subtree: true, childList: true })
+
+// 清理资源
+window.addEventListener('beforeunload', () => {
+  floatingPanelManager?.destroy()
+})
 
 export {}

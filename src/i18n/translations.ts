@@ -29,12 +29,17 @@ const translations: Record<Language, Record<string, string>> = {
     'common.fileTypes.gif': '图片文件',
     'common.save': '保存',
     'common.cancel': '取消',
+    'common.apply': '应用到搜索框',
+    'common.close': '关闭 (ESC)',
     'common.saving': '保存中...',
     'common.edit': '编辑',
     'common.reset': '重置',
     'copyButton.tooltipCopy': '复制',
     'copyButton.tooltipCopied': '已复制!',
     'copyButton.copyError': '复制失败',
+    'content.openPanelHint': '打开高级搜索面板',
+    'content.openSearchButton': '打开高级搜索',
+    'content.triggerButtonTooltip': '拖动调整位置 | 点击打开高级搜索面板',
     'popup.headerTitle': 'SearchSyntax Pro',
     'popup.footer.currentEngine': '当前引擎: {engine}',
     'popup.settingsButtonTitle': '设置',
@@ -109,6 +114,8 @@ const translations: Record<Language, Record<string, string>> = {
     'options.fields.autoOpen.description': '开启时在新标签页打开搜索结果，关闭时在当前标签页打开',
     'options.fields.enableContextMenu.label': '启用右键菜单快速搜索',
     'options.fields.enableContextMenu.description': '选中文本后右键显示快速搜索菜单',
+    'options.fields.enableFloatingButton.label': '启用悬浮按钮',
+    'options.fields.enableFloatingButton.description': '在搜索引擎页面显示可拖动的悬浮按钮，点击打开高级语法面板',
     'options.fields.historyLimit.label': '历史记录限制',
     'options.fields.historyLimit.description': '最多保存的历史记录数量（建议不超过1000条）',
     'options.actions.export': '导出数据',
@@ -412,9 +419,6 @@ const translations: Record<Language, Record<string, string>> = {
     'searchForm.fileType.hint': '按回车添加多个文件类型',
     'searchForm.exactMatch.hint': '按回车添加多个短语',
 
-    // Content Script
-    'content.openSearchButton': '打开 SearchSyntax Pro',
-
     // PopoutButton
     'popout.openFailedAlert': '打开独立窗口失败，请重试',
 
@@ -532,12 +536,17 @@ const translations: Record<Language, Record<string, string>> = {
     'common.fileTypes.gif': 'Image File',
     'common.save': 'Save',
     'common.cancel': 'Cancel',
+    'common.apply': 'Apply to Search Box',
+    'common.close': 'Close (ESC)',
     'common.saving': 'Saving...',
     'common.edit': 'Edit',
     'common.reset': 'Reset',
     'copyButton.tooltipCopy': 'Copy',
     'copyButton.tooltipCopied': 'Copied!',
     'copyButton.copyError': 'Copy failed',
+    'content.openPanelHint': 'Open advanced search panel',
+    'content.openSearchButton': 'Open advanced search',
+    'content.triggerButtonTooltip': 'Drag to move | Click to open advanced search panel',
     'popup.headerTitle': 'SearchSyntax Pro',
     'popup.footer.currentEngine': 'Current engine: {engine}',
     'popup.settingsButtonTitle': 'Settings',
@@ -612,6 +621,8 @@ const translations: Record<Language, Record<string, string>> = {
     'options.fields.autoOpen.description': 'When enabled, opens results in a new tab; when disabled, opens in current tab',
     'options.fields.enableContextMenu.label': 'Enable right-click menu quick search',
     'options.fields.enableContextMenu.description': 'Show quick search menu when right-clicking selected text',
+    'options.fields.enableFloatingButton.label': 'Enable floating button',
+    'options.fields.enableFloatingButton.description': 'Show draggable floating button on search engine pages to open advanced syntax panel',
     'options.fields.historyLimit.label': 'History limit',
     'options.fields.historyLimit.description': 'Maximum number of saved history entries (recommended ≤ 1000).',
     'options.actions.export': 'Export data',
@@ -914,9 +925,6 @@ const translations: Record<Language, Record<string, string>> = {
     'searchForm.site.hint': 'Press Enter to add multiple sites',
     'searchForm.fileType.hint': 'Press Enter to add multiple file types',
     'searchForm.exactMatch.hint': 'Press Enter to add multiple phrases',
-
-    // Content Script
-    'content.openSearchButton': 'Open SearchSyntax Pro',
 
     // PopoutButton
     'popout.openFailedAlert': 'Failed to open standalone window, please try again',

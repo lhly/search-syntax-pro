@@ -1,6 +1,6 @@
 {
   "name": "ssp-smart-search-plugin",
-  "version": "1.7.2",
+  "version": "1.8.0",
   "description": "搜索语法可视化工具 - SearchSyntax Pro",
   "type": "module",
   "scripts": {

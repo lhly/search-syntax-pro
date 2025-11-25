@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_app_name__",
-  "version": "1.7.2",
+  "version": "1.8.0",
   "description": "__MSG_app_description__",
   "default_locale": "zh_CN",
 
@@ -12,14 +12,13 @@
   ],
 
   "host_permissions": [
-    "https://www.baidu.com/*",
-    "https://www.google.com/*",
-    "https://www.bing.com/*"
+    "https://*.baidu.com/*",
+    "https://*.bing.com/*",
+    "https://cn.bing.com/*"
   ],
 
   "background": {
-    "service_worker": "background.js",
-    "type": "module"
+    "service_worker": "background.js"
   },
 
   "action": {
@@ -48,9 +47,9 @@
   "content_scripts": [
     {
       "matches": [
-        "https://www.baidu.com/*",
-        "https://www.google.com/*",
-        "https://www.bing.com/*"
+        "https://*.baidu.com/*",
+        "https://*.bing.com/*",
+        "https://cn.bing.com/*"
       ],
       "js": ["content.js"],
       "run_at": "document_end"
@@ -66,8 +65,21 @@
 
   "web_accessible_resources": [
     {
-      "resources": ["icons/*", "src/detached/index.html"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "icons/*",
+        "src/floating-panel/index.html",
+        "floating-panel.js",
+        "floating-panel.css",
+        "useTheme.js",
+        "useTheme.css",
+        "QueryPreview.js",
+        "search-engine-selectors.js"
+      ],
+      "matches": [
+        "https://*.baidu.com/*",
+        "https://*.bing.com/*",
+        "https://cn.bing.com/*"
+      ]
     }
   ],
 

@@ -179,6 +179,7 @@ export interface UserSettings {
   historyLimit: number;
   autoOpenInNewTab: boolean;
   enableContextMenu: boolean;  // 🔥 新增：启用右键菜单功能
+  enableFloatingButton: boolean;  // 🔥 新增：启用悬浮按钮功能
 }
 
 // UI 功能特性类型 (用于控制 UI 显示)
@@ -267,6 +268,13 @@ export interface ValidationResult {
   warnings: string[];
 }
 
+// 🔥 悬浮按钮位置类型定义
+export interface TriggerButtonPosition {
+  x: number;      // 水平位置百分比 (0-100)
+  y: number;      // 垂直位置百分比 (0-100)
+  timestamp: number;  // 保存时间戳
+}
+
 // 🔥 Chrome Storage 数据结构类型定义
 export interface ChromeStorageData {
   // 核心数据
@@ -280,6 +288,9 @@ export interface ChromeStorageData {
   // 🔥 右键菜单快速搜索
   quick_search_text?: string;        // 选中的文本内容
   quick_search_trigger?: number;     // 触发时间戳（用于判断是否为新触发）
+
+  // 🔥 悬浮按钮位置
+  trigger_button_position?: TriggerButtonPosition;  // 可拖动悬浮按钮的位置
 }
 
 // 存储键名常量
@@ -288,7 +299,8 @@ export const STORAGE_KEYS = {
   SETTINGS: 'user_settings',
   CACHE: 'app_cache',
   QUICK_SEARCH_TEXT: 'quick_search_text',
-  QUICK_SEARCH_TRIGGER: 'quick_search_trigger'
+  QUICK_SEARCH_TRIGGER: 'quick_search_trigger',
+  TRIGGER_BUTTON_POSITION: 'trigger_button_position'
 } as const;
 
 // 默认设置 - enginePreferences 需要在运行时通过 EnginePreferenceService 生成
@@ -299,7 +311,8 @@ export const DEFAULT_SETTINGS: Omit<UserSettings, 'enginePreferences'> = {
   theme: 'auto',
   historyLimit: 1000,
   autoOpenInNewTab: true,
-  enableContextMenu: true  // 🔥 默认启用右键菜单
+  enableContextMenu: true,  // 🔥 默认启用右键菜单
+  enableFloatingButton: true  // 🔥 默认启用悬浮按钮
 };
 
 // 常见文件类型
@@ -324,3 +337,64 @@ export type Theme = 'light' | 'dark' | 'auto';
 
 // 语言类型
 export type Language = 'zh-CN' | 'en-US';
+
+// ===========================================
+// Floating Panel Message Protocol
+// ===========================================
+
+/**
+ * Message Protocol for Floating Panel Communication
+ */
+
+export type FloatingPanelMessage =
+  | OpenPanelMessage
+  | ClosePanelMessage
+  | ApplySyntaxMessage
+  | PanelReadyMessage
+  | FillSearchInputMessage;
+
+/** Content script requests to open panel */
+export interface OpenPanelMessage {
+  type: 'FLOATING_PANEL_OPEN';
+  payload?: {
+    initialKeyword?: string;
+  };
+}
+
+/** Content script or iframe requests to close panel */
+export interface ClosePanelMessage {
+  type: 'FLOATING_PANEL_CLOSE';
+}
+
+/** Iframe sends completed search syntax to content script */
+export interface ApplySyntaxMessage {
+  type: 'FLOATING_PANEL_APPLY_SYNTAX';
+  payload: {
+    query: string;
+    autoSearch: boolean;
+    searchUrl?: string;
+  };
+}
+
+/** Iframe notifies content script it's ready */
+export interface PanelReadyMessage {
+  type: 'FLOATING_PANEL_READY';
+}
+
+/** Content script requests iframe to fill search input */
+export interface FillSearchInputMessage {
+  type: 'FLOATING_PANEL_FILL_INPUT';
+  payload: {
+    keyword: string;
+    engine?: SearchEngine; // 父页面传递的引擎信息（修复 iframe 无法检测引擎的问题）
+  };
+}
+
+/**
+ * Message envelope for postMessage communication
+ */
+export interface FloatingPanelMessageEnvelope {
+  source: 'ssp-content' | 'ssp-iframe';
+  message: FloatingPanelMessage;
+  timestamp: number;
+}

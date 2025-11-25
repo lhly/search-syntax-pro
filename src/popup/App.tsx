@@ -18,8 +18,9 @@ import { WindowManager } from '@/services/window-manager'
 import { TranslationProvider, useTranslation } from '@/i18n'
 import { useExtensionVersion } from '@/utils/version'
 import { autoMigrateStorage } from '@/utils/migration'
+import { extractAndDecodeQuery } from '@/utils/url-utils'
 import { DEFAULT_SHORTCUTS, getShortcutDisplayText } from '@/config/keyboard-shortcuts'
-import type { SearchParams, SearchHistory as SearchHistoryType, UserSettings, ValidationResult, SearchEngine } from '@/types'
+import type { SearchParams, SearchHistory as SearchHistoryType, UserSettings, ValidationResult, SearchEngine, FloatingPanelMessageEnvelope } from '@/types'
 
 function App() {
   const { t } = useTranslation();
@@ -96,6 +97,48 @@ function App() {
       setHistory(storedHistory)
     }
   }, [storedHistory])
+
+  // 🔥 iframe上下文检测和消息通信
+  useEffect(() => {
+    // 检测是否在iframe中运行
+    const isIframe = window.self !== window.top
+
+    if (isIframe) {
+      console.log('[SSP Popup] Running in iframe context (floating panel)')
+
+      // 通知content script iframe已准备好
+      const readyMessage: FloatingPanelMessageEnvelope = {
+        source: 'ssp-iframe',
+        message: { type: 'FLOATING_PANEL_READY' },
+        timestamp: Date.now()
+      }
+      window.parent.postMessage(readyMessage, '*')
+
+      // 监听来自content script的消息
+      const handleMessage = (event: MessageEvent) => {
+        const data = event.data as FloatingPanelMessageEnvelope
+
+        if (data && data.source === 'ssp-content') {
+          const message = data.message
+
+          // 处理填充关键词请求
+          if (message.type === 'FLOATING_PANEL_FILL_INPUT') {
+            const payload = (message as any).payload
+            setSearchParams(prev => ({
+              ...prev,
+              keyword: payload.keyword
+            }))
+          }
+        }
+      }
+
+      window.addEventListener('message', handleMessage)
+
+      return () => {
+        window.removeEventListener('message', handleMessage)
+      }
+    }
+  }, [])
 
   // 🔥 右键菜单快速搜索：自动填充选中文本
   useEffect(() => {
@@ -185,7 +228,9 @@ function App() {
 
       // 构建查询和URL
       const query = adapter.buildQuery(params)
-      setGeneratedQuery(query.replace(/^[^?]+\?/, '').replace(/^wd=/, '').replace(/^q=/, '').split('&')[0])
+      // 安全提取和解码查询字符串,提升用户界面友好性
+      const decodedQuery = extractAndDecodeQuery(query)
+      setGeneratedQuery(decodedQuery)
       setSearchUrl(query)
       setSearchParams(params)
     } catch (error) {
@@ -202,6 +247,28 @@ function App() {
   const executeSearch = useCallback(() => {
     if (!searchUrl || !validation?.isValid) return
 
+    // 检测是否在iframe中运行
+    const isIframe = window.self !== window.top
+
+    if (isIframe) {
+      // 在floating panel iframe中，发送消息到content script
+      const applyMessage: FloatingPanelMessageEnvelope = {
+        source: 'ssp-iframe',
+        message: {
+          type: 'FLOATING_PANEL_APPLY_SYNTAX',
+          payload: {
+            query: generatedQuery,
+            autoSearch: true,
+            searchUrl
+          }
+        },
+        timestamp: Date.now()
+      }
+      window.parent.postMessage(applyMessage, '*')
+      return
+    }
+
+    // 正常popup行为（非iframe）
     // 保存到历史记录
     if (settings?.enableHistory) {
       const newHistoryItem: SearchHistoryType = {

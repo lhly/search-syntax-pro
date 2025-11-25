@@ -526,22 +526,27 @@ function OptionsContent({
             />
           </div>
 
-          {/* 悬浮按钮功能（开发中） */}
-          <div className="flex items-center justify-between opacity-50">
+          {/* 🔥 启用悬浮按钮 */}
+          <div className="flex items-center justify-between">
             <div>
               <label htmlFor="enableFloatingButton" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                启用悬浮按钮 (开发中)
+                {t('options.fields.enableFloatingButton.label')}
               </label>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                此功能正在开发中，将在未来版本启用
+                {t('options.fields.enableFloatingButton.description')}
               </p>
             </div>
             <input
               id="enableFloatingButton"
               type="checkbox"
-              checked={false}
-              disabled
-              className="h-4 w-4 text-gray-400 border-gray-300 rounded cursor-not-allowed"
+              checked={settings.enableFloatingButton}
+              onChange={(e) =>
+                updateSettings((prev) => ({
+                  ...prev,
+                  enableFloatingButton: e.target.checked
+                }))
+              }
+              className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
             />
           </div>
 

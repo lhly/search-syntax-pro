@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { SearchParams, UserSettings } from '@/types'
 import { useTranslation } from '@/i18n'
 import { CollapsibleSection } from './CollapsibleSection'
@@ -6,6 +6,7 @@ import { TagInput } from './TagInput'
 import { SearchAdapterFactory } from '@/services/adapters'
 import { EnginePreferenceService } from '@/services/engine-preference'
 import { useStorage } from '@/hooks/useStorage'
+import { SyntaxParser } from '@/utils/syntax-parser'
 
 interface SearchFormProps {
   searchParams: SearchParams
@@ -13,16 +14,20 @@ interface SearchFormProps {
   // Round 2: 支持外部控制的高级选项状态
   showAdvanced?: boolean
   onToggleAdvanced?: (show: boolean) => void
+  // 悬浮面板模式：隐藏引擎选择器（当前页面已确定搜索引擎）
+  hideEngineSelector?: boolean
 }
 
 export function SearchForm({
   searchParams,
   onSearchParamsChange,
   showAdvanced: externalShowAdvanced,
-  onToggleAdvanced
+  onToggleAdvanced,
+  hideEngineSelector = false
 }: SearchFormProps) {
   const [internalShowAdvanced, setInternalShowAdvanced] = useState(false)
   const { t } = useTranslation()
+  const hasAutoInjectedRef = useRef(false) // 防止重复自动注入
 
   // 使用外部状态或内部状态
   const showAdvanced = externalShowAdvanced !== undefined ? externalShowAdvanced : internalShowAdvanced
@@ -48,6 +53,36 @@ export function SearchForm({
     const newParams = { ...searchParams, [key]: value }
     onSearchParamsChange(newParams)
   }
+
+  // 🔥 自动解析关键词中的高级语法
+  useEffect(() => {
+    // 只在第一次展开高级选项时自动解析
+    if (showAdvanced && !hasAutoInjectedRef.current && searchParams.keyword) {
+      const parsedSyntax = SyntaxParser.parse(searchParams.keyword, searchParams.engine)
+
+      // 检查是否解析出了有效的语法
+      const hasValidSyntax = SyntaxParser.isValidParsedSyntax(parsedSyntax) && (
+        !!parsedSyntax.inTitle ||
+        !!parsedSyntax.inUrl ||
+        !!parsedSyntax.inText ||
+        (parsedSyntax.sites && parsedSyntax.sites.length > 0) ||
+        (parsedSyntax.fileTypes && parsedSyntax.fileTypes.length > 0) ||
+        (parsedSyntax.exactMatches && parsedSyntax.exactMatches.length > 0) ||
+        (parsedSyntax.excludeWords && parsedSyntax.excludeWords.length > 0)
+      )
+
+      if (hasValidSyntax) {
+        // 合并解析结果到现有参数
+        const mergedParams = SyntaxParser.mergeParams(searchParams, parsedSyntax)
+        onSearchParamsChange(mergedParams)
+        hasAutoInjectedRef.current = true
+      }
+    }
+    // 当折叠高级选项时重置标记,允许下次展开时再次解析(如果关键词已变化)
+    if (!showAdvanced) {
+      hasAutoInjectedRef.current = false
+    }
+  }, [showAdvanced, searchParams.keyword]) // 监听高级选项状态和关键词变化
 
   // 切换高级选项
   const toggleAdvanced = () => {
@@ -76,24 +111,26 @@ export function SearchForm({
         />
       </div>
 
-      {/* 搜索引擎选择 */}
-      <div>
-        <label htmlFor="engine" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          {t('searchForm.engineLabel')}
-        </label>
-        <select
-          id="engine"
-          value={searchParams.engine}
-          onChange={(e) => updateParam('engine', e.target.value as any)}
-          className="input"
-        >
-          {visibleEngines.map((engine) => (
-            <option key={engine} value={engine}>
-              {t(`common.searchEngines.${engine}`)}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* 搜索引擎选择 - 悬浮面板模式下隐藏（当前页面已确定搜索引擎） */}
+      {!hideEngineSelector && (
+        <div>
+          <label htmlFor="engine" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {t('searchForm.engineLabel')}
+          </label>
+          <select
+            id="engine"
+            value={searchParams.engine}
+            onChange={(e) => updateParam('engine', e.target.value as any)}
+            className="input"
+          >
+            {visibleEngines.map((engine) => (
+              <option key={engine} value={engine}>
+                {t(`common.searchEngines.${engine}`)}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* 高级选项切换按钮 */}
       <button
