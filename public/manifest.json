@@ -72,7 +72,6 @@
         "floating-panel.css",
         "useTheme.js",
         "useTheme.css",
-        "QueryPreview.js",
         "search-engine-selectors.js"
       ],
       "matches": [

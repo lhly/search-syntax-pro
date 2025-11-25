@@ -85,6 +85,12 @@ export class TriggerIcon {
    */
   private async restorePosition(): Promise<void> {
     try {
+      if (!this.isExtensionContextValid()) {
+        console.warn('[SSP] Skip restoring position: extension context unavailable');
+        this.setDefaultPosition();
+        return;
+      }
+
       const result = await chrome.storage.local.get('trigger_button_position');
       const saved = result.trigger_button_position as TriggerButtonPosition | undefined;
 
@@ -101,6 +107,11 @@ export class TriggerIcon {
         this.setDefaultPosition();
       }
     } catch (error) {
+      if (this.isContextInvalidationError(error)) {
+        console.warn('[SSP] Skip restoring position: extension context invalidated');
+        return;
+      }
+
       console.error('[SSP] Failed to restore position:', error);
       this.setDefaultPosition();
     }
@@ -253,9 +264,19 @@ export class TriggerIcon {
     };
 
     try {
+      if (!this.isExtensionContextValid()) {
+        console.warn('[SSP] Skip saving position: extension context unavailable');
+        return;
+      }
+
       await chrome.storage.local.set({ trigger_button_position: position });
       console.log('[SSP] Position saved:', position);
     } catch (error) {
+      if (this.isContextInvalidationError(error)) {
+        console.warn('[SSP] Skip saving position: extension context invalidated');
+        return;
+      }
+
       console.error('[SSP] Failed to save position:', error);
     }
   }
@@ -320,5 +341,30 @@ export class TriggerIcon {
       this.element.remove();
       this.element = null;
     }
+  }
+
+  /**
+   * 判断扩展上下文是否可用
+   */
+  private isExtensionContextValid(): boolean {
+    return typeof chrome !== 'undefined' && !!chrome.runtime?.id;
+  }
+
+  /**
+   * 判断是否为扩展上下文失效错误
+   */
+  private isContextInvalidationError(error: unknown): boolean {
+    if (!error) return false;
+
+    const message =
+      typeof error === 'string'
+        ? error
+        : error instanceof Error
+          ? error.message
+          : typeof (error as { message?: unknown }).message === 'string'
+            ? String((error as { message?: unknown }).message)
+            : null;
+
+    return typeof message === 'string' && message.includes('Extension context invalidated');
   }
 }
