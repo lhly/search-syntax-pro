@@ -5,6 +5,20 @@ import { SearchAdapterFactory } from './adapters'
 /**
  * 引擎偏好设置管理服务
  * 负责处理用户的搜索引擎可见性和排序偏好
+ *
+ * ⚠️ 代码维护警告 - Background Service Worker 存在内联副本
+ *
+ * 此类中的以下方法在 src/background/index.ts 中有内联副本：
+ * - getDefaultPreferences()
+ * - reorderEngines()
+ * - ensureAtLeastOneVisible()
+ * - validateAndFixPreferences()
+ *
+ * 维护规则（重要！）：
+ * 1. 修改这些方法时，必须同步更新 src/background/index.ts 中的内联版本
+ * 2. 两处逻辑必须保持完全一致
+ *
+ * 内联原因：Background Service Worker 需要独立运行，避免复杂的模块依赖
  */
 export class EnginePreferenceService {
   /**

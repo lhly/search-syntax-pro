@@ -9,6 +9,13 @@ import { YandexAdapter } from './yandex'
 import { RedditAdapter } from './reddit'
 import { GitHubAdapter } from './github'
 import { StackOverflowAdapter } from './stackoverflow'
+import { YahooAdapter } from './yahoo'
+import { StartpageAdapter } from './startpage'
+import { EcosiaAdapter } from './ecosia'
+import { QwantAdapter } from './qwant'
+import { NaverAdapter } from './naver'
+import { SogouAdapter } from './sogou'
+import { So360Adapter } from './so360'
 
 /**
  * 搜索引擎适配器工厂
@@ -58,6 +65,20 @@ export class SearchAdapterFactory {
         return new GitHubAdapter()
       case 'stackoverflow':
         return new StackOverflowAdapter()
+      case 'yahoo':
+        return new YahooAdapter()
+      case 'startpage':
+        return new StartpageAdapter()
+      case 'ecosia':
+        return new EcosiaAdapter()
+      case 'qwant':
+        return new QwantAdapter()
+      case 'naver':
+        return new NaverAdapter()
+      case 'sogou':
+        return new SogouAdapter()
+      case 'so360':
+        return new So360Adapter()
       default:
         throw new Error(`不支持的搜索引擎: ${engine}`)
     }
@@ -67,7 +88,7 @@ export class SearchAdapterFactory {
    * 获取所有支持的搜索引擎
    */
   static getSupportedEngines(): SearchEngine[] {
-    return ['baidu', 'google', 'bing', 'twitter', 'duckduckgo', 'brave', 'yandex', 'reddit', 'github', 'stackoverflow']
+    return ['baidu', 'google', 'bing', 'twitter', 'duckduckgo', 'brave', 'yandex', 'reddit', 'github', 'stackoverflow', 'yahoo', 'startpage', 'ecosia', 'qwant', 'naver', 'sogou', 'so360']
   }
 
   /**

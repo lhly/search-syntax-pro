@@ -1,5 +1,5 @@
 // 搜索引擎类型
-export type SearchEngine = 'baidu' | 'google' | 'bing' | 'twitter' | 'duckduckgo' | 'brave' | 'yandex' | 'reddit' | 'github' | 'stackoverflow';
+export type SearchEngine = 'baidu' | 'google' | 'bing' | 'twitter' | 'duckduckgo' | 'brave' | 'yandex' | 'reddit' | 'github' | 'stackoverflow' | 'yahoo' | 'startpage' | 'ecosia' | 'qwant' | 'naver' | 'sogou' | 'so360';
 
 // 语法类型
 export type SyntaxType =

@@ -3,16 +3,47 @@
 import type { Language, UserSettings, EnginePreference, SearchEngine } from '@/types'
 
 /**
+ * ⚠️ 代码维护警告 - 与其他模块存在逻辑重复
+ *
+ * 此文件包含以下内联函数，与其他模块功能重复：
+ * - getSupportedEngines() - 同 SearchAdapterFactory.getSupportedEngines()
+ * - getDefaultPreferences() - 同 EnginePreferenceService.getDefaultPreferences()
+ * - reorderEngines() - 同 EnginePreferenceService.reorderEngines()
+ * - ensureAtLeastOneVisible() - 同 EnginePreferenceService.ensureAtLeastOneVisible()
+ * - validateAndFixPreferences() - 同 EnginePreferenceService.validateAndFixPreferences()
+ * - ensureAllEnginesExist() - 同 src/utils/migration.ts
+ * - autoMigrateStorage() - 同 src/utils/migration.ts
+ *
+ * 原因：
+ * - Background Service Worker 需要独立运行，避免复杂的模块依赖
+ * - 避免跨文件导入可能导致的 Chrome 扩展加载问题
+ *
+ * 维护规则（重要！）：
+ * 1. 修改任何内联函数时，必须同步更新对应的源模块
+ * 2. 修改源模块时，必须同步更新此文件的内联版本
+ * 3. 两处逻辑必须保持完全一致
+ *
+ * 对应源文件：
+ * - src/services/adapters/factory.ts (SearchAdapterFactory)
+ * - src/services/engine-preference.ts (EnginePreferenceService)
+ * - src/utils/migration.ts (数据迁移逻辑)
+ */
+
+/**
  * 内联的搜索引擎支持函数
  * 避免跨文件导入导致的编译符号不匹配问题
+ *
+ * 同步源: src/services/adapters/factory.ts - SearchAdapterFactory.getSupportedEngines()
  */
 function getSupportedEngines(): SearchEngine[] {
-  return ['baidu', 'google', 'bing', 'twitter', 'duckduckgo', 'brave', 'yandex', 'reddit', 'github', 'stackoverflow']
+  return ['baidu', 'google', 'bing', 'twitter', 'duckduckgo', 'brave', 'yandex', 'reddit', 'github', 'stackoverflow', 'yahoo', 'startpage', 'ecosia', 'qwant', 'naver', 'sogou', 'so360']
 }
 
 /**
  * 内联的引擎偏好设置服务方法
  * 避免跨文件导入导致的编译符号不匹配问题
+ *
+ * 同步源: src/services/engine-preference.ts - EnginePreferenceService.getDefaultPreferences()
  */
 function getDefaultPreferences(): EnginePreference[] {
   return getSupportedEngines().map((engine, index) => ({
@@ -22,6 +53,9 @@ function getDefaultPreferences(): EnginePreference[] {
   }))
 }
 
+/**
+ * 同步源: src/services/engine-preference.ts - EnginePreferenceService.reorderEngines()
+ */
 function reorderEngines(
   preferences: EnginePreference[],
   fromIndex: number,
@@ -40,6 +74,9 @@ function reorderEngines(
   }))
 }
 
+/**
+ * 同步源: src/services/engine-preference.ts - EnginePreferenceService.ensureAtLeastOneVisible()
+ */
 function ensureAtLeastOneVisible(preferences: EnginePreference[]): EnginePreference[] {
   const visibleCount = preferences.filter(p => p.visible).length
 
@@ -51,6 +88,77 @@ function ensureAtLeastOneVisible(preferences: EnginePreference[]): EnginePrefere
   }
 
   return preferences
+}
+
+/**
+ * 验证并修复偏好设置
+ * - 移除无效的引擎
+ * - 补充缺失的引擎（新增的引擎）
+ * - 修复重复的order值
+ *
+ * 同步源: src/services/engine-preference.ts - EnginePreferenceService.validateAndFixPreferences()
+ */
+function validateAndFixPreferences(preferences: EnginePreference[]): EnginePreference[] {
+  const validEngines = getSupportedEngines()
+  const engineSet = new Set(validEngines)
+
+  // 1. 移除无效引擎
+  const validPreferences = preferences.filter(pref => engineSet.has(pref.engine))
+
+  // 2. 检查缺失的引擎
+  const existingEngines = new Set(validPreferences.map(p => p.engine))
+  const missingEngines = validEngines.filter(engine => !existingEngines.has(engine))
+
+  // 3. 补充缺失的引擎（添加到末尾，默认可见）
+  if (missingEngines.length > 0) {
+    const maxOrder = validPreferences.length > 0
+      ? Math.max(...validPreferences.map(p => p.order))
+      : -1
+
+    missingEngines.forEach((engine, index) => {
+      validPreferences.push({
+        engine,
+        visible: true,
+        order: maxOrder + index + 1
+      })
+    })
+  }
+
+  // 4. 修复order值（确保连续且无重复）
+  const sortedPreferences = validPreferences.sort((a, b) => a.order - b.order)
+  return sortedPreferences.map((pref, index) => ({
+    ...pref,
+    order: index
+  }))
+}
+
+/**
+ * 确保所有引擎存在
+ * 补充新增的引擎到用户配置中
+ *
+ * 同步源: src/utils/migration.ts - ensureAllEnginesExist()
+ */
+function ensureAllEnginesExist(settings: UserSettings): UserSettings {
+  const currentPreferences = settings.enginePreferences || []
+
+  // 使用 validateAndFixPreferences 方法自动补充缺失引擎
+  const fixedPreferences = validateAndFixPreferences(currentPreferences)
+
+  // 检查是否有新增引擎
+  const addedCount = fixedPreferences.length - currentPreferences.length
+  if (addedCount > 0) {
+    console.log(`🆕 检测到 ${addedCount} 个新增搜索引擎，已自动添加`)
+    const addedEngines = fixedPreferences
+      .slice(currentPreferences.length)
+      .map(p => p.engine)
+      .join(', ')
+    console.log(`📝 新增引擎: ${addedEngines}`)
+  }
+
+  return {
+    ...settings,
+    enginePreferences: fixedPreferences
+  }
 }
 
 function getDefaultUserSettings(): UserSettings {
@@ -69,6 +177,10 @@ function getDefaultUserSettings(): UserSettings {
 /**
  * 内联的数据迁移函数
  * 避免跨文件导入导致的编译符号不匹配问题
+ *
+ * 同步源: src/utils/migration.ts - autoMigrateStorage()
+ *
+ * ⚠️ 维护警告：修改此函数时必须同步更新 src/utils/migration.ts
  */
 async function autoMigrateStorage(): Promise<boolean> {
   try {
@@ -80,7 +192,10 @@ async function autoMigrateStorage(): Promise<boolean> {
       return false
     }
 
-    // 检查是否需要迁移（是否存在旧的defaultEngine字段）
+    let needsMigration = false
+    let newSettings: UserSettings
+
+    // 检查是否需要迁移 defaultEngine 字段
     if ('defaultEngine' in oldSettings) {
       console.log('🔄 开始自动迁移用户设置...')
 
@@ -104,14 +219,31 @@ async function autoMigrateStorage(): Promise<boolean> {
 
       // 移除 defaultEngine 字段，创建新格式设置
       const { defaultEngine, ...rest } = oldSettings
-      const newSettings: UserSettings = {
+      newSettings = {
         ...rest,
         enginePreferences: preferences
       }
 
-      await chrome.storage.local.set({ user_settings: newSettings })
-
+      needsMigration = true
       console.log('✅ 用户设置已自动迁移到 V2 格式')
+    } else {
+      // 已经是新格式，直接使用
+      newSettings = oldSettings as UserSettings
+    }
+
+    // 🔥 无论是否执行了 defaultEngine 迁移，都检查并补充新增引擎
+    const beforeCount = newSettings.enginePreferences?.length || 0
+    newSettings = ensureAllEnginesExist(newSettings)
+    const afterCount = newSettings.enginePreferences.length
+
+    if (afterCount > beforeCount) {
+      needsMigration = true
+    }
+
+    // 如果有任何更改，保存到存储
+    if (needsMigration) {
+      await chrome.storage.local.set({ user_settings: newSettings })
+      console.log(`📈 引擎总数: ${afterCount}`)
       return true
     }
 
