@@ -86,7 +86,6 @@ export class TriggerIcon {
   private async restorePosition(): Promise<void> {
     try {
       if (!this.isExtensionContextValid()) {
-        console.warn('[SSP] Skip restoring position: extension context unavailable');
         this.setDefaultPosition();
         return;
       }
@@ -108,7 +107,6 @@ export class TriggerIcon {
       }
     } catch (error) {
       if (this.isContextInvalidationError(error)) {
-        console.warn('[SSP] Skip restoring position: extension context invalidated');
         return;
       }
 
@@ -265,15 +263,12 @@ export class TriggerIcon {
 
     try {
       if (!this.isExtensionContextValid()) {
-        console.warn('[SSP] Skip saving position: extension context unavailable');
         return;
       }
 
       await chrome.storage.local.set({ trigger_button_position: position });
-      console.log('[SSP] Position saved:', position);
     } catch (error) {
       if (this.isContextInvalidationError(error)) {
-        console.warn('[SSP] Skip saving position: extension context invalidated');
         return;
       }
 

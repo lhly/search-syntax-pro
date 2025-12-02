@@ -22,10 +22,6 @@ export class MessageBridge {
     // Listen for messages from iframe
     window.addEventListener('message', this.boundHandleMessage);
 
-    // Wait for iframe to load
-    iframe.addEventListener('load', () => {
-      console.log('[SSP] Iframe loaded, waiting for ready signal');
-    });
   }
 
   /**
@@ -43,7 +39,6 @@ export class MessageBridge {
     // Handle ready signal
     if (message.type === 'FLOATING_PANEL_READY') {
       this.isIframeReady = true;
-      console.log('[SSP] Iframe is ready');
     }
 
     // Dispatch to registered handlers

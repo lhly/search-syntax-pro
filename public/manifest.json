@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_app_name__",
-  "version": "1.8.5",
+  "version": "1.8.6",
   "description": "__MSG_app_description__",
   "default_locale": "zh_CN",
 
@@ -14,7 +14,9 @@
   "host_permissions": [
     "https://*.baidu.com/*",
     "https://*.bing.com/*",
-    "https://cn.bing.com/*"
+    "https://cn.bing.com/*",
+    "https://*.yandex.com/*",
+    "https://*.duckduckgo.com/*"
   ],
 
   "background": {
@@ -49,7 +51,9 @@
       "matches": [
         "https://*.baidu.com/*",
         "https://*.bing.com/*",
-        "https://cn.bing.com/*"
+        "https://cn.bing.com/*",
+        "https://*.yandex.com/*",
+        "https://*.duckduckgo.com/*"
       ],
       "js": ["content.js"],
       "run_at": "document_end"
@@ -77,7 +81,9 @@
       "matches": [
         "https://*.baidu.com/*",
         "https://*.bing.com/*",
-        "https://cn.bing.com/*"
+        "https://cn.bing.com/*",
+        "https://*.yandex.com/*",
+        "https://*.duckduckgo.com/*"
       ]
     }
   ],

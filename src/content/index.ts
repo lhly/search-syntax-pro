@@ -18,6 +18,12 @@ function isSearchEnginePage(): boolean {
   // 匹配 Bing 所有域名 (bing.com, cn.bing.com, etc.)
   if (hostname.includes('bing.com')) return true;
 
+  // 匹配 Yandex 国际域名 (yandex.com)
+  if (hostname.includes('yandex.com')) return true;
+
+  // 匹配 DuckDuckGo (duckduckgo.com)
+  if (hostname.includes('duckduckgo.com')) return true;
+
   return false;
 }
 
@@ -33,8 +39,6 @@ function analyzeSearchQuery() {
     const hasExactMatch = /".*?"/.test(searchQuery)
     
     if (hasSiteSyntax || hasFileTypeSyntax || hasExactMatch) {
-      console.log('检测到高级搜索语法:', searchQuery)
-      
       // 发送分析结果到background
       chrome.runtime.sendMessage({
         action: 'search_query_analyzed',
@@ -141,20 +145,12 @@ function highlightSearchSyntax() {
     // 高亮精确匹配
     highlightedQuery = highlightedQuery.replace(/(".*?")/g, '<mark style="background-color: #fca5a5; color: #7f1d1d;">$1</mark>')
     
-    // 如果有语法高亮，替换输入框的值（仅显示效果）
-    if (highlightedQuery !== query) {
-      console.log('搜索语法高亮完成:', highlightedQuery)
-    }
   }
 }
 
 // 初始化content script
 async function init() {
-  console.log('SearchSyntax Pro Content Script 已加载')
-
   if (isSearchEnginePage()) {
-    console.log('检测到搜索引擎页面，注入功能')
-
     // 延迟注入，确保页面加载完成
     setTimeout(async () => {
       // 🔥 从用户设置读取悬浮按钮开关
@@ -165,13 +161,10 @@ async function init() {
 
         // 根据用户设置决定是否注入悬浮按钮
         if (enableFloatingButton) {
-          console.log('[SSP] 悬浮按钮功能已启用')
           floatingPanelManager = new FloatingPanelManager()
           floatingPanelManager.initialize().catch((error) => {
             console.error('[SSP] Failed to initialize floating panel:', error)
           })
-        } else {
-          console.log('[SSP] 悬浮按钮功能已禁用')
         }
       } catch (error) {
         console.error('[SSP] Failed to load user settings:', error)
@@ -200,6 +193,11 @@ new MutationObserver(() => {
   const url = location.href
   if (url !== lastUrl) {
     lastUrl = url
+    // 🔥 FIX: 销毁旧实例，避免重复注入悬浮按钮
+    if (floatingPanelManager) {
+      floatingPanelManager.destroy()
+      floatingPanelManager = null
+    }
     setTimeout(init, 1000) // 延迟重新初始化
   }
 }).observe(document, { subtree: true, childList: true })

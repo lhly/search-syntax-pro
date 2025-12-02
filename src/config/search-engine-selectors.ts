@@ -25,7 +25,10 @@ export interface SearchEngineConfig {
 
 export const SEARCH_ENGINE_CONFIGS: Record<string, SearchEngineConfig> = {
   baidu: {
-    searchInputSelector: 'input#kw',
+    // ✅ 修复: 百度已切换到新的 textarea 输入系统
+    // 优先使用 textarea#chat-textarea (用户实际看到的元素)
+    // 回退到 input#kw (旧系统，某些页面可能仍在使用)
+    searchInputSelector: 'textarea#chat-textarea, input#kw',
     searchContainerSelector: '#form',
     searchFormSelector: 'form#form',
     iconInsertPosition: 'afterend',
@@ -40,6 +43,24 @@ export const SEARCH_ENGINE_CONFIGS: Record<string, SearchEngineConfig> = {
     iconInsertPosition: 'afterend',
     iconOffsetY: '8px',
     isResultsPage: () => window.location.pathname.includes('/search')
+  },
+
+  yandex: {
+    searchInputSelector: 'input[name="text"]',
+    searchContainerSelector: 'form.search2__form',
+    searchFormSelector: 'form.search2__form',
+    iconInsertPosition: 'afterend',
+    iconOffsetY: '8px',
+    isResultsPage: () => window.location.pathname.includes('/search')
+  },
+
+  duckduckgo: {
+    searchInputSelector: 'input#search_form_input',
+    searchContainerSelector: 'form#search_form',
+    searchFormSelector: 'form#search_form',
+    iconInsertPosition: 'afterend',
+    iconOffsetY: '8px',
+    isResultsPage: () => window.location.search.includes('q=')
   }
 };
 
@@ -55,6 +76,12 @@ export function detectSearchEngine(hostname: string): string | null {
   // Bing: bing.com, cn.bing.com, etc.
   if (hostname.includes('bing.com')) return 'bing';
 
+  // Yandex: yandex.com (international version only)
+  if (hostname.includes('yandex.com')) return 'yandex';
+
+  // DuckDuckGo: duckduckgo.com
+  if (hostname.includes('duckduckgo.com')) return 'duckduckgo';
+
   return null;
 }
 
@@ -68,9 +95,9 @@ export function getCurrentEngineConfig(): SearchEngineConfig | null {
 
 /**
  * Detect and return current search engine key
- * Returns engine key (baidu, bing) or 'baidu' as default
+ * Returns engine key (baidu, bing, yandex, duckduckgo) or 'baidu' as default
  */
-export function detectCurrentEngine(): 'baidu' | 'bing' {
+export function detectCurrentEngine(): 'baidu' | 'bing' | 'yandex' | 'duckduckgo' {
   const engineKey = detectSearchEngine(window.location.hostname);
-  return (engineKey as 'baidu' | 'bing') || 'baidu';
+  return (engineKey as 'baidu' | 'bing' | 'yandex' | 'duckduckgo') || 'baidu';
 }
