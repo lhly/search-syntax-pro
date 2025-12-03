@@ -528,12 +528,15 @@ function OptionsContent({
 
           {/* 🔥 启用悬浮按钮 */}
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1">
               <label htmlFor="enableFloatingButton" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('options.fields.enableFloatingButton.label')}
               </label>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {t('options.fields.enableFloatingButton.description')}
+              </p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                {t('options.fields.enableFloatingButton.supportedEngines')}
               </p>
             </div>
             <input

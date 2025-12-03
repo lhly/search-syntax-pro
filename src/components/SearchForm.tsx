@@ -474,7 +474,7 @@ export function SearchForm({
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {t('searchForm.dateRange.label')}
                   </label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
                       <input
                         type="date"
@@ -485,7 +485,7 @@ export function SearchForm({
                             to: searchParams.dateRange?.to || ''
                           })
                         }
-                        className="input"
+                        className="input-date"
                         placeholder={t('searchForm.dateRange.from')}
                       />
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t('searchForm.dateRange.from')}</p>
@@ -500,7 +500,7 @@ export function SearchForm({
                             to: e.target.value
                           })
                         }
-                        className="input"
+                        className="input-date"
                         placeholder={t('searchForm.dateRange.to')}
                       />
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t('searchForm.dateRange.to')}</p>
