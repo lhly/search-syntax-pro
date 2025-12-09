@@ -16,7 +16,7 @@
  * 内联原因：Background Service Worker 需要独立运行，避免复杂的模块依赖
  */
 
-import type { UserSettings, EnginePreference } from '@/types'
+import type { UserSettings, EnginePreference, Language } from '@/types'
 import { EnginePreferenceService } from '@/services/engine-preference'
 
 /**
@@ -25,7 +25,7 @@ import { EnginePreferenceService } from '@/services/engine-preference'
 interface LegacyUserSettings {
   defaultEngine?: string
   enginePreferences?: EnginePreference[]
-  language: 'zh-CN' | 'en-US'
+  language: Language
   enableHistory: boolean
   theme: 'light' | 'dark' | 'auto'
   historyLimit: number

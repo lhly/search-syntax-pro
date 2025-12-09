@@ -6,6 +6,7 @@ import { HistoryManager } from '@/components/HistoryManager'
 import { ShortcutSettings } from '@/components/ShortcutSettings'
 import { EngineManager } from '@/components/EngineManager'
 import type { UserSettings, Language, SearchHistory } from '@/types'
+import { NATIVE_LANGUAGE_NAMES } from '@/types'
 import { EnginePreferenceService } from '@/services/engine-preference'
 import { autoMigrateStorage } from '@/utils/migration'
 import { TranslationProvider, useTranslation, translate } from '@/i18n'
@@ -415,9 +416,9 @@ function OptionsContent({
               }
               className="input"
             >
-              {(['zh-CN', 'en-US'] as Language[]).map((lang) => (
+              {(['zh-CN', 'en-US', 'ru-RU', 'ko-KR'] as Language[]).map((lang) => (
                 <option key={lang} value={lang}>
-                  {t(`common.languages.${lang}`)}
+                  {NATIVE_LANGUAGE_NAMES[lang]}
                 </option>
               ))}
             </select>

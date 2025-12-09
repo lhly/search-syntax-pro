@@ -104,7 +104,7 @@ Search like an expert with precision:
 
 - **Search History** - Auto-save and quickly reuse past searches
 - **One-Click Copy** - Generated query ready to copy and use
-- **Multi-language UI** - Full Chinese and English support
+- **Multi-language UI** - Support for 4 languages (🇨🇳 Chinese, 🇺🇸 English, 🇷🇺 Russian, 🇰🇷 Korean)
 - **Responsive Design** - Adapt to all screen sizes
 - **Right-Click Quick Search** - Select text → right-click → instant search with visual syntax builder
 
@@ -383,7 +383,7 @@ This project is open source under the MIT License. See [LICENSE](LICENSE) file f
   - Auto-save and restore window state
   - Flexible switching between popup and detached window modes
 - 🌐 **Full Internationalization Support**
-  - Added English language pack (`en`)
+  - Complete UI translation for 4 languages (Chinese, English, Russian, Korean)
   - Improved multi-language switching experience
   - All UI text supports internationalization
   - Auto-select interface language based on browser language
@@ -421,7 +421,7 @@ This project is open source under the MIT License. See [LICENSE](LICENSE) file f
 - 🔍 Support for 10 search engines (Baidu, Google, Bing, DuckDuckGo, Brave, Yandex, Twitter/X, Reddit, GitHub, Stack Overflow)
 - 💡 Smart search syntax generation and validation
 - 📝 Search history management
-- 🌐 Chinese and English UI support
+- 🌐 Multi-language UI support (Chinese, English, Russian, Korean)
 - 🎨 Modern UI design
 
 ## Contact

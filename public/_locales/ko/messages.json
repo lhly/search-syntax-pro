@@ -1,0 +1,114 @@
+{
+  "app_name": {
+    "message": "SearchSyntax Pro",
+    "description": "SearchSyntax Pro - Advanced Search Syntax Tool"
+  },
+  "app_description": {
+    "message": "고급 검색 구문 시각화 도구로 검색 사용의 진입 장벽을 낮춥니다",
+    "description": "App description"
+  },
+  "search_keyword": {
+    "message": "검색어",
+    "description": "Search keyword input label"
+  },
+  "search_button": {
+    "message": "검색",
+    "description": "Search button text"
+  },
+  "site_search": {
+    "message": "사이트 검색",
+    "description": "Site search function label"
+  },
+  "site_placeholder": {
+    "message": "도메인 입력, 예: example.com",
+    "description": "Website domain input placeholder"
+  },
+  "file_type_search": {
+    "message": "파일 형식 검색",
+    "description": "File type search function label"
+  },
+  "file_type_placeholder": {
+    "message": "형식 선택 또는 입력, 예: PDF",
+    "description": "File type input placeholder"
+  },
+  "query_preview": {
+    "message": "쿼리 미리보기",
+    "description": "Query preview label"
+  },
+  "search_history": {
+    "message": "검색 기록",
+    "description": "Search history label"
+  },
+  "clear_history": {
+    "message": "기록 지우기",
+    "description": "Clear history button"
+  },
+  "settings": {
+    "message": "설정",
+    "description": "Settings button label"
+  },
+  "default_engine": {
+    "message": "기본 검색 엔진",
+    "description": "Default search engine setting label"
+  },
+  "language": {
+    "message": "언어",
+    "description": "Language setting label"
+  },
+  "enable_history": {
+    "message": "검색 기록 활성화",
+    "description": "Enable search history toggle label"
+  },
+  "theme": {
+    "message": "테마",
+    "description": "Theme setting label"
+  },
+  "light_theme": {
+    "message": "밝게",
+    "description": "Light theme option"
+  },
+  "dark_theme": {
+    "message": "어둡게",
+    "description": "Dark theme option"
+  },
+  "auto_theme": {
+    "message": "시스템 따름",
+    "description": "Auto theme option"
+  },
+  "about": {
+    "message": "정보",
+    "description": "About page label"
+  },
+  "version": {
+    "message": "버전",
+    "description": "Version info label"
+  },
+  "author": {
+    "message": "개발자",
+    "description": "Author info label"
+  },
+  "export_data": {
+    "message": "데이터 내보내기",
+    "description": "Export data button"
+  },
+  "import_data": {
+    "message": "데이터 가져오기",
+    "description": "Import data button"
+  },
+  "clear_all_data": {
+    "message": "모든 데이터 지우기",
+    "description": "Clear all data button"
+  },
+  "popup_title": {
+    "message": "SearchSyntax Pro",
+    "description": "Popup window title"
+  },
+  "detached_title": {
+    "message": "SearchSyntax Pro - 별도 창",
+    "description": "Detached window title"
+  },
+  "options_title": {
+    "message": "SearchSyntax Pro - 설정",
+    "description": "Options page title"
+  }
+}

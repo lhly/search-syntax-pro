@@ -173,7 +173,7 @@ export interface EnginePreference {
 export interface UserSettings {
   // 🔥 移除 defaultEngine - 现在使用 enginePreferences 的第一位作为默认引擎
   enginePreferences: EnginePreference[];  // 必需字段，排序第一位即为默认引擎
-  language: 'zh-CN' | 'en-US';
+  language: Language;
   enableHistory: boolean;
   theme: 'light' | 'dark' | 'auto';
   historyLimit: number;
@@ -336,7 +336,15 @@ export const COMMON_FILE_TYPES = [
 export type Theme = 'light' | 'dark' | 'auto';
 
 // 语言类型
-export type Language = 'zh-CN' | 'en-US';
+export type Language = 'zh-CN' | 'en-US' | 'ru-RU' | 'ko-KR';
+
+// 🔥 原生语言名称 (不受界面语言影响,始终保持语言本身的原生名称)
+export const NATIVE_LANGUAGE_NAMES: Record<Language, string> = {
+  'zh-CN': '简体中文',
+  'en-US': 'English',
+  'ru-RU': 'Русский',
+  'ko-KR': '한국어'
+} as const;
 
 // ===========================================
 // Floating Panel Message Protocol

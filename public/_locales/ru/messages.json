@@ -1,0 +1,114 @@
+{
+  "app_name": {
+    "message": "SearchSyntax Pro",
+    "description": "SearchSyntax Pro - Advanced Search Syntax Tool"
+  },
+  "app_description": {
+    "message": "Инструмент визуализации расширенного синтаксиса поиска для упрощения использования",
+    "description": "App description"
+  },
+  "search_keyword": {
+    "message": "Ключевое слово",
+    "description": "Search keyword input label"
+  },
+  "search_button": {
+    "message": "Поиск",
+    "description": "Search button text"
+  },
+  "site_search": {
+    "message": "Поиск по сайту",
+    "description": "Site search function label"
+  },
+  "site_placeholder": {
+    "message": "Введите домен, напр. example.com",
+    "description": "Website domain input placeholder"
+  },
+  "file_type_search": {
+    "message": "Поиск по типу файла",
+    "description": "File type search function label"
+  },
+  "file_type_placeholder": {
+    "message": "Выберите или введите тип, напр. PDF",
+    "description": "File type input placeholder"
+  },
+  "query_preview": {
+    "message": "Предпросмотр запроса",
+    "description": "Query preview label"
+  },
+  "search_history": {
+    "message": "История поиска",
+    "description": "Search history label"
+  },
+  "clear_history": {
+    "message": "Очистить историю",
+    "description": "Clear history button"
+  },
+  "settings": {
+    "message": "Настройки",
+    "description": "Settings button label"
+  },
+  "default_engine": {
+    "message": "Поисковик по умолчанию",
+    "description": "Default search engine setting label"
+  },
+  "language": {
+    "message": "Язык",
+    "description": "Language setting label"
+  },
+  "enable_history": {
+    "message": "Включить историю поиска",
+    "description": "Enable search history toggle label"
+  },
+  "theme": {
+    "message": "Тема",
+    "description": "Theme setting label"
+  },
+  "light_theme": {
+    "message": "Светлая",
+    "description": "Light theme option"
+  },
+  "dark_theme": {
+    "message": "Тёмная",
+    "description": "Dark theme option"
+  },
+  "auto_theme": {
+    "message": "Системная",
+    "description": "Auto theme option"
+  },
+  "about": {
+    "message": "О программе",
+    "description": "About page label"
+  },
+  "version": {
+    "message": "Версия",
+    "description": "Version info label"
+  },
+  "author": {
+    "message": "Автор",
+    "description": "Author info label"
+  },
+  "export_data": {
+    "message": "Экспорт данных",
+    "description": "Export data button"
+  },
+  "import_data": {
+    "message": "Импорт данных",
+    "description": "Import data button"
+  },
+  "clear_all_data": {
+    "message": "Очистить все данные",
+    "description": "Clear all data button"
+  },
+  "popup_title": {
+    "message": "SearchSyntax Pro",
+    "description": "Popup window title"
+  },
+  "detached_title": {
+    "message": "SearchSyntax Pro - Отдельное окно",
+    "description": "Detached window title"
+  },
+  "options_title": {
+    "message": "SearchSyntax Pro - Настройки",
+    "description": "Options page title"
+  }
+}

@@ -3,6 +3,7 @@ import { ModalOverlay } from './components/ModalOverlay';
 import { MessageBridge } from './components/MessageBridge';
 import { getCurrentEngineConfig, detectSearchEngine } from '@/config/search-engine-selectors';
 import type { SearchEngineConfig } from '@/config/search-engine-selectors';
+import type { Language } from '@/types';
 import { translate } from '@/i18n/translations';
 
 /**
@@ -35,7 +36,7 @@ export class FloatingPanelManager {
   private readonly MAX_RETRIES = 3;
 
   private mutationObserver: MutationObserver | null = null;
-  private language: 'zh-CN' | 'en-US' = 'zh-CN';
+  private language: Language = 'zh-CN';
 
   /**
    * Initialize floating panel system

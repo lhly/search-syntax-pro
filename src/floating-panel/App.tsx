@@ -7,7 +7,7 @@ import { TranslationProvider, useTranslation } from '@/i18n'
 import { SearchAdapterFactory } from '@/services/adapters'
 import { detectCurrentEngine } from '@/config/search-engine-selectors'
 import { extractAndDecodeQuery } from '@/utils/url-utils'
-import type { SearchParams, ValidationResult, FloatingPanelMessageEnvelope } from '@/types'
+import type { SearchParams, ValidationResult, FloatingPanelMessageEnvelope, Language } from '@/types'
 import './floating-panel.css'
 
 // Inner component that uses the translation hook
@@ -279,7 +279,7 @@ function FloatingPanelContent() {
 
 // Outer component that provides the language context
 function FloatingPanelApp() {
-  const [language, setLanguage] = useState<'zh-CN' | 'en-US'>('zh-CN')
+  const [language, setLanguage] = useState<Language>('zh-CN')
 
   // 🔥 初始化:从 storage 获取用户语言偏好
   useEffect(() => {
